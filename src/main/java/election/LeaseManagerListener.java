@@ -1,5 +1,5 @@
 package election;
 
 public interface LeaseManagerListener {
-	void onStateChanged(State newState);
+	void onStateChanged(String id, State newState);
 }
