@@ -159,10 +159,11 @@ public class LeaseManager implements Runnable {
 		if (state == newState)
 			return;
 
+		State oldState = state;
 		state = newState;
 		logger.trace("Switched to state '{}'.", state.toString());
 
-		listener.onStateChanged(id, state);
+		listener.onStateChanged(id, oldState, newState);
 	}
 
 	private void sleep() {
