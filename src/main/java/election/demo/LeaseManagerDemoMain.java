@@ -18,7 +18,7 @@ public class LeaseManagerDemoMain {
 	public static void main(String... args) throws InterruptedException {
 		LeaseManagerListener listener = new LeaseManagerListener() {
 			@Override
-			public void onStateChanged(String id, State newState) {
+			public void onStateChanged(String id, State oldState, State newState) {
 				if (newState == LEADER)
 					logger.info("{} changed state to '{}'", id, newState);
 			}
