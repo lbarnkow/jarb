@@ -12,7 +12,7 @@ public class Main {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				bot.shutdown();
+				bot.stop();
 			}
 		});
 

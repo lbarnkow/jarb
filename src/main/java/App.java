@@ -87,7 +87,7 @@ public class App {
 
 			// wait 5 seconds for messages from websocket
 			logger.info("going to sleep...");
-			Thread.sleep(600000);
+			Thread.sleep(10000);
 			logger.info("done sleeping!");
 
 			clientEndPoint.userSession.close();
