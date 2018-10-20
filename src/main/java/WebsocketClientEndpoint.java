@@ -22,7 +22,8 @@ public class WebsocketClientEndpoint {
 	public WebsocketClientEndpoint(URI endpointURI) {
 		try {
 			WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-			container.connectToServer(this, endpointURI);
+			Session session = container.connectToServer(this, endpointURI);
+			logger.info("Constructur, session id '{}'.", session.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -36,7 +37,7 @@ public class WebsocketClientEndpoint {
 	 */
 	@OnOpen
 	public void onOpen(Session userSession) {
-		logger.info("opening websocket");
+		logger.info("opened websocket, session id '{}'.", userSession.getId());
 		this.userSession = userSession;
 	}
 
