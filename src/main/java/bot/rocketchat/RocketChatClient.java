@@ -6,19 +6,25 @@ import java.time.Instant;
 import java.util.concurrent.Semaphore;
 
 import javax.websocket.DeploymentException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import bot.ConnectionInfo;
-import bot.rocketchat.messages.Base;
-import bot.rocketchat.messages.RecConnected;
-import bot.rocketchat.messages.RecLogin;
-import bot.rocketchat.messages.RecWithId;
-import bot.rocketchat.messages.SendConnect;
-import bot.rocketchat.messages.SendPong;
+import bot.rocketchat.tasks.LoginTask;
 import bot.rocketchat.websocket.WebsocketClient;
 import bot.rocketchat.websocket.WebsocketClientListener;
+import bot.rocketchat.websocket.messages.Base;
+import bot.rocketchat.websocket.messages.RecConnected;
+import bot.rocketchat.websocket.messages.RecLogin;
+import bot.rocketchat.websocket.messages.RecWithId;
+import bot.rocketchat.websocket.messages.SendConnect;
+import bot.rocketchat.websocket.messages.SendPong;
 
 public class RocketChatClient implements WebsocketClientListener {
 
@@ -40,6 +46,8 @@ public class RocketChatClient implements WebsocketClientListener {
 	private final Semaphore syncWaitForLoggedIn = new Semaphore(0);
 	private Thread loginThread;
 
+	private RecLogin.Result loginToken;
+
 	public RocketChatClient(ConnectionInfo conInfo, RocketChatClientListener listener) {
 		this.conInfo = conInfo;
 		this.listener = listener;
@@ -51,11 +59,19 @@ public class RocketChatClient implements WebsocketClientListener {
 		wsClient.sendMessage(new SendConnect());
 		syncWaitForConnected.acquire();
 
-		loginThread = new Thread(new LoginSender(conInfo, wsClient, LOGIN_THREAD_SLEEP_TIME_MILLIS));
+		loginThread = new Thread(new LoginTask(conInfo, wsClient, LOGIN_THREAD_SLEEP_TIME_MILLIS));
 		loginThread.start();
 		syncWaitForLoggedIn.acquire();
 
 		// TODO
+		Client client = ClientBuilder.newClient();
+		WebTarget target = client.target("http://rocket.system.local/api/v1");
+		target = target.path("me");
+		Response response = target.request(MediaType.APPLICATION_JSON).header("X-Auth-Token", loginToken.getToken())
+				.header("X-User-Id", loginToken.getId()).get();
+		logger.info("" + response.getStatus());
+		logger.info(response.readEntity(String.class));
+
 		// start room / subscription thread, wait for first result
 		//// refresh public-rooms
 		//// get subscriptions (public, private, direct)
@@ -123,15 +139,20 @@ public class RocketChatClient implements WebsocketClientListener {
 		RecWithId recWithId = RecWithId.parse(message);
 		String id = recWithId.getId();
 
-		if (id.startsWith(LoginSender.ID_PREFIX)) {
+		if (id.startsWith(LoginTask.ID_PREFIX)) {
 			RecLogin login = RecLogin.parse(message);
-			long expires = Long.parseLong(login.getResult().getTokenExpires().get$date());
+			loginToken = login.getResult();
+			long expires = Long.parseLong(loginToken.getTokenExpires().get$date());
+
 			logger.info("Logged in as '{}', token expires at '{}'!", conInfo.getUsername(),
 					Instant.ofEpochMilli(expires));
+
 			syncWaitForLoggedIn.release();
 
 		} else {
 			// Handle other "results"
+			logger.info("Unhandled: {}!", message);
+
 		}
 	}
 }

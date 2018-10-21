@@ -1,4 +1,4 @@
-package bot.rocketchat.messages;
+package bot.rocketchat.websocket.messages;
 
 public class RecLogin extends RecWithId {
 	private Result result;

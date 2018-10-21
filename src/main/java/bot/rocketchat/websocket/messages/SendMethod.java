@@ -1,4 +1,4 @@
-package bot.rocketchat.messages;
+package bot.rocketchat.websocket.messages;
 
 public class SendMethod extends SendWithId {
 	private static final String MSG = "method";
