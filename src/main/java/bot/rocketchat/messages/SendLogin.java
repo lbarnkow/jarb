@@ -2,14 +2,12 @@ package bot.rocketchat.messages;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import messages.requests.ReqMethodBase;
-
-public class SendLogin extends ReqMethodBase {
+public class SendLogin extends SendMethod {
 	@SuppressWarnings("unused")
 	private final Params[] params;
 
-	public SendLogin(String username, String password) {
-		super("login");
+	public SendLogin(String id, String username, String password) {
+		super(id, "login");
 		this.params = new Params[] { new Params(username, password) };
 	}
 

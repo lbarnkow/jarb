@@ -6,10 +6,14 @@ public class ReqMethodBase extends ReqBase {
 	private final String method;
 	private final String id;
 
-	public ReqMethodBase(String method) {
+	public ReqMethodBase(String id, String method) {
 		super("method");
+		this.id = id;
 		this.method = method;
-		this.id = UUID.randomUUID().toString();
+	}
+
+	public ReqMethodBase(String method) {
+		this(UUID.randomUUID().toString(), method);
 	}
 
 	public String getMethod() {
