@@ -25,6 +25,10 @@ dependencies {
 	// simple json implementation
 	compile 'com.google.code.gson:gson:2.8.5'
 	
+	// REST client
+	compile 'org.glassfish.jersey.core:jersey-client:2.27'
+	compile 'org.glassfish.jersey.inject:jersey-hk2:2.27'
+	
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
 }

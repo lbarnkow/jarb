@@ -1,4 +1,4 @@
-package bot.rocketchat.messages;
+package bot.rocketchat.websocket.messages;
 
 public class RecConnected extends Base {
 	private String session;

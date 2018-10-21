@@ -1,4 +1,4 @@
-package bot.rocketchat;
+package bot.rocketchat.tasks;
 
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -7,11 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import bot.ConnectionInfo;
-import bot.rocketchat.messages.SendLogin;
 import bot.rocketchat.websocket.WebsocketClient;
+import bot.rocketchat.websocket.messages.SendLogin;
 
-public class LoginSender implements Runnable {
-	private static final Logger logger = LoggerFactory.getLogger(LoginSender.class);
+public class LoginTask implements Runnable {
+	private static final Logger logger = LoggerFactory.getLogger(LoginTask.class);
 
 	public static final String ID_PREFIX = UUID.randomUUID().toString() + "-";
 
@@ -20,7 +20,7 @@ public class LoginSender implements Runnable {
 	private final long sleepTimeMillis;
 	private final AtomicLong counter = new AtomicLong();
 
-	public LoginSender(ConnectionInfo conInfo, WebsocketClient wsClient, long sleepTimeMillis) {
+	public LoginTask(ConnectionInfo conInfo, WebsocketClient wsClient, long sleepTimeMillis) {
 		this.conInfo = conInfo;
 		this.wsClient = wsClient;
 		this.sleepTimeMillis = sleepTimeMillis;

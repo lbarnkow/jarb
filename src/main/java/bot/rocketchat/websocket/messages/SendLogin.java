@@ -1,4 +1,4 @@
-package bot.rocketchat.messages;
+package bot.rocketchat.websocket.messages;
 
 import org.apache.commons.codec.digest.DigestUtils;
 

@@ -1,4 +1,4 @@
-package bot.rocketchat.messages;
+package bot.rocketchat.websocket.messages;
 
 import com.google.gson.Gson;
 
