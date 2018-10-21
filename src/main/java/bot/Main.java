@@ -18,5 +18,13 @@ public class Main {
 
 		Thread t = new Thread(bot);
 		t.start();
+
+		try {
+			Thread.sleep(20000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		System.exit(0);
 	}
 }

@@ -58,6 +58,10 @@ public class WebsocketClient {
 	@OnMessage
 	public void onMessage(String message) {
 		logger.debug("Received Websocket message: '{}'.", message);
+
+		if (message.contains("server_id"))
+			return;
+
 		listener.onWebsocketMessage(message);
 	}
 

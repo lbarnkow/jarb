@@ -31,7 +31,7 @@ public class Bot implements Runnable, LeaseManagerListener, RocketChatClientList
 	public Bot(ConnectionInfo conInfo) {
 		rcClient = new RocketChatClient(conInfo, this);
 	}
-	
+
 	@Override
 	public Message onRocketChatClientMessage(Message message) {
 		logger.info(message.toString());
@@ -42,26 +42,32 @@ public class Bot implements Runnable, LeaseManagerListener, RocketChatClientList
 	public void run() {
 		alive = true;
 		thread = Thread.currentThread();
-		
+
 		startLeaseManager();
 
 		try {
 			while (alive) {
 				if (Thread.interrupted())
 					throw new InterruptedException();
-				
+
 				syncWaitForLease.acquire();
 				rcClient.start();
 
 				syncLostLease.acquire();
 				rcClient.stop();
 			}
-		} catch (InterruptedException | URISyntaxException | DeploymentException | IOException e) {
-			logger.error("Caught exception, shutting down!", e);
-			e.printStackTrace();
+		} catch (InterruptedException e) {
+			logger.error("Caught '{}', shutting down!", e.getClass().getSimpleName());
+		} catch (URISyntaxException | DeploymentException | IOException e) {
+			logger.error("Caught unexpected exception, shutting down!", e);
 		}
 
-		rcClient.stop();
+		try {
+			rcClient.stop();
+		} catch (IOException e) {
+			logger.error("Error stopping {}!", rcClient.getClass().getSimpleName(), e);
+		}
+
 		leaseManager.stop();
 	}
 
@@ -82,7 +88,7 @@ public class Bot implements Runnable, LeaseManagerListener, RocketChatClientList
 		else if (oldState == LEADER)
 			syncLostLease.release();
 	}
-	
+
 	@Override
 	public void onRocketChatClientClose(boolean initiatedByClient) {
 		// TODO Auto-generated method stub

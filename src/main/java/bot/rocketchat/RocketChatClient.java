@@ -2,6 +2,7 @@ package bot.rocketchat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.concurrent.Semaphore;
 
 import javax.websocket.DeploymentException;
@@ -11,8 +12,10 @@ import org.slf4j.LoggerFactory;
 
 import bot.ConnectionInfo;
 import bot.rocketchat.messages.Base;
+import bot.rocketchat.messages.RecConnected;
+import bot.rocketchat.messages.RecLogin;
+import bot.rocketchat.messages.RecWithId;
 import bot.rocketchat.messages.SendConnect;
-import bot.rocketchat.messages.SendLogin;
 import bot.rocketchat.messages.SendPong;
 import bot.rocketchat.websocket.WebsocketClient;
 import bot.rocketchat.websocket.WebsocketClientListener;
@@ -26,12 +29,15 @@ public class RocketChatClient implements WebsocketClientListener {
 	private static final String MSG_PING = "ping";
 	private static final String MSG_CONNECTED = "connected";
 	private static final String MSG_RESULT = "result";
+	private static final String MSG_ADDED = "added";
+	private static final String MSG_UPDATED = "updated";
 
 	private final ConnectionInfo conInfo;
 	private final RocketChatClientListener listener;
 	private WebsocketClient wsClient;
 
 	private final Semaphore syncWaitForConnected = new Semaphore(0);
+	private final Semaphore syncWaitForLoggedIn = new Semaphore(0);
 	private Thread loginThread;
 
 	public RocketChatClient(ConnectionInfo conInfo, RocketChatClientListener listener) {
@@ -40,7 +46,6 @@ public class RocketChatClient implements WebsocketClientListener {
 	}
 
 	public void start() throws URISyntaxException, DeploymentException, IOException, InterruptedException {
-		// TODO
 		wsClient = new WebsocketClient(conInfo.getServerUrl(), this);
 
 		wsClient.sendMessage(new SendConnect());
@@ -48,9 +53,9 @@ public class RocketChatClient implements WebsocketClientListener {
 
 		loginThread = new Thread(new LoginSender(conInfo, wsClient, LOGIN_THREAD_SLEEP_TIME_MILLIS));
 		loginThread.start();
+		syncWaitForLoggedIn.acquire();
 
-		// start login-thread, wait for logged in.
-
+		// TODO
 		// start room / subscription thread, wait for first result
 		//// refresh public-rooms
 		//// get subscriptions (public, private, direct)
@@ -63,16 +68,20 @@ public class RocketChatClient implements WebsocketClientListener {
 		// start real-time subscriptions
 	}
 
-	public void stop() {
+	public void stop() throws IOException {
 		// TODO
 		// stop subscriptions
-		// stop login-thread (+ logout?)
-		// close websocket
+
+		loginThread.interrupt();
+		wsClient.close();
 	}
 
 	@Override
 	public void onWebsocketClose(boolean initiatedByClient) {
-		// TODO Auto-generated method stub
+		logger.debug("WebsocketClient closed the session.");
+
+		loginThread.interrupt();
+		listener.onRocketChatClientClose(initiatedByClient);
 	}
 
 	@Override
@@ -80,41 +89,49 @@ public class RocketChatClient implements WebsocketClientListener {
 		Base entity = Base.parse(message);
 
 		if (MSG_PING.equals(entity.getMsg())) {
-			wsClient.sendMessage(new SendPong());
+			handleMessagePing();
 
 		} else if (MSG_CONNECTED.equals(entity.getMsg())) {
-			// TODO
-			return;
+			handleMessageConnected(message);
 
 		} else if (MSG_RESULT.equals(entity.getMsg())) {
-			// TODO
-			return;
+			handleMessageResult(message);
+
+		} else if (MSG_UPDATED.equals(entity.getMsg())) {
+			// Do nothing
+
+		} else if (MSG_ADDED.equals(entity.getMsg())) {
+			// Do nothing
 
 		} else {
 			logger.warn("Unhandled message received in class '{}': '{}'!", getClass().getSimpleName(), message);
 		}
 	}
 
-	private static class LoginSender implements Runnable {
-		private final ConnectionInfo conInfo;
-		private final WebsocketClient wsClient;
-		private final long sleepTimeMillis;
+	private void handleMessagePing() {
+		wsClient.sendMessage(new SendPong());
+	}
 
-		public LoginSender(ConnectionInfo conInfo, WebsocketClient wsClient, long sleepTimeMillis) {
-			this.conInfo = conInfo;
-			this.wsClient = wsClient;
-			this.sleepTimeMillis = sleepTimeMillis;
-		}
+	private void handleMessageConnected(String message) {
+		RecConnected connected = RecConnected.parse(message);
+		logger.info("Connected and started session '{}'.", connected.getSession());
 
-		@Override
-		public void run() {
-			while (!Thread.interrupted()) {
-				wsClient.sendMessage(new SendLogin(conInfo.getUsername(), conInfo.getPassword()));
-				try {
-					Thread.sleep(sleepTimeMillis);
-				} catch (InterruptedException e) {
-				}
-			}
+		syncWaitForConnected.release();
+	}
+
+	private void handleMessageResult(String message) {
+		RecWithId recWithId = RecWithId.parse(message);
+		String id = recWithId.getId();
+
+		if (id.startsWith(LoginSender.ID_PREFIX)) {
+			RecLogin login = RecLogin.parse(message);
+			long expires = Long.parseLong(login.getResult().getTokenExpires().get$date());
+			logger.info("Logged in as '{}', token expires at '{}'!", conInfo.getUsername(),
+					Instant.ofEpochMilli(expires));
+			syncWaitForLoggedIn.release();
+
+		} else {
+			// Handle other "results"
 		}
 	}
 }
