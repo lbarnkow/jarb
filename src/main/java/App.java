@@ -24,9 +24,8 @@ public class App {
 
 	public static void main(String[] args) throws IOException {
 		try {
-			// open websocket
 			final WebsocketClientEndpoint clientEndPoint = new WebsocketClientEndpoint(
-					new URI("ws://rocket.system.local/websocket/"));
+					new URI("ws://localhost:8080/websocket/"));
 
 			final Semaphore sync = new Semaphore(0);
 			final Gson gson = new Gson();
@@ -63,7 +62,7 @@ public class App {
 			logger.info("Initiated session " + connected.getSession());
 			store.put("session", connected.getSession());
 
-			ReqLogin loginRequest = new ReqLogin("admin", "qqSKfA1hH9n37uR979iuck7POImY3HZp");
+			ReqLogin loginRequest = new ReqLogin("demobot", "demobot");
 			clientEndPoint.sendMessage(gson.toJson(loginRequest));
 			while (!responses.containsKey(loginRequest.getId())) {
 				sync.acquire();

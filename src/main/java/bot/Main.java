@@ -2,11 +2,15 @@ package bot;
 
 public class Main {
 	public static void main(String... args) {
-		String url = "ws://rocket.system.local/websocket/";
-		String username = "admin";
-		String password = "qqSKfA1hH9n37uR979iuck7POImY3HZp";
+//		String hostname = "rockettest.system.local";
+//		int port = 80;
+		String hostname = "localhost";
+		int port = 8080;
 
-		ConnectionInfo conInfo = new ConnectionInfo(url, username, password);
+		String username = "demobot";
+		String password = "demobot";
+
+		ConnectionInfo conInfo = new ConnectionInfo(false, hostname, port, username, password);
 		final Bot bot = new Bot(conInfo);
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {

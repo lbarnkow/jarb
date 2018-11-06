@@ -1,5 +1,6 @@
 package bot;
 
+import static bot.rocketchat.RocketChatClient.State.CONNECTED;
 import static election.State.LEADER;
 
 import java.io.IOException;
@@ -63,7 +64,8 @@ public class Bot implements Runnable, LeaseManagerListener, RocketChatClientList
 		}
 
 		try {
-			rcClient.stop();
+			if (rcClient.getState() == CONNECTED)
+				rcClient.stop();
 		} catch (IOException e) {
 			logger.error("Error stopping {}!", rcClient.getClass().getSimpleName(), e);
 		}
@@ -91,6 +93,6 @@ public class Bot implements Runnable, LeaseManagerListener, RocketChatClientList
 
 	@Override
 	public void onRocketChatClientClose(boolean initiatedByClient) {
-		// TODO Auto-generated method stub
+		stop();
 	}
 }

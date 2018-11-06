@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  mongo:
+    image: centos/mongodb-36-centos7:latest
+    networks:
+      - si
+    volumes:
+      - db-data:/var/lib/mongodb/data
+    environment:
+      MONGODB_ADMIN_PASSWORD: admin
+      MONGODB_USER: rocketchat
+      MONGODB_PASSWORD: rocketchat
+      MONGODB_DATABASE: rocketchat
+
+  rocketchat:
+    image: rocketchat/rocket.chat:0.70.4
+    ports:
+      - "8080:3000"
+    networks:
+      - si
+    depends_on:
+      - mongo
+    environment:
+      MONGO_URL: "mongodb://rocketchat:rocketchat@mongo:27017/rocketchat"
+      ROOT_URL: "http://localhost:8080/"
+    restart: on-failure
+
+networks:
+  si:
+    external: true
+
+volumes:
+  db-data:
