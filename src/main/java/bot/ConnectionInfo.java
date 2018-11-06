@@ -1,23 +1,33 @@
 package bot;
 
 public class ConnectionInfo {
-	private String serverUrl;
+	private boolean encrypted;
+	private String hostname;
+	private int port;
 	private String username;
-	// TODO: Don't store as password? Must be SHA-256 for login anyways.
+	// TODO: Don't store password as String? Must be SHA-256 for login anyways.
 	private String password;
 
-	ConnectionInfo() {
-		this(null, null, null);
-	}
+//	ConnectionInfo() {
+//		this(false, null, 0, null, null);
+//	}
 
-	public ConnectionInfo(String serverUrl, String username, String password) {
-		this.serverUrl = serverUrl;
+	public ConnectionInfo(boolean encrypted, String hostname, int port, String username, String password) {
+		this.encrypted = encrypted;
+		this.hostname = hostname;
+		this.port = port;
 		this.username = username;
 		this.password = password;
 	}
 
-	public String getServerUrl() {
-		return serverUrl;
+	public String getWebsocketUrl() {
+		String scheme = encrypted ? "wss" : "ws";
+		return scheme + "://" + hostname + ":" + port + "/websocket/";
+	}
+
+	public String getRestUrl() {
+		String scheme = encrypted ? "https" : "http";
+		return scheme + "://" + hostname + ":" + port + "/api/v1";
 	}
 
 	public String getUsername() {

@@ -17,6 +17,8 @@ import javax.websocket.WebSocketContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bot.ConnectionInfo;
+
 @ClientEndpoint
 public class WebsocketClient {
 	private static final Logger logger = LoggerFactory.getLogger(WebsocketClient.class);
@@ -26,10 +28,10 @@ public class WebsocketClient {
 
 	private boolean closedByClient = false;
 
-	public WebsocketClient(String uri, WebsocketClientListener listener)
+	public WebsocketClient(ConnectionInfo conInfo, WebsocketClientListener listener)
 			throws URISyntaxException, DeploymentException, IOException {
 		this.listener = listener;
-		URI endpointUri = new URI(uri);
+		URI endpointUri = new URI(conInfo.getWebsocketUrl());
 
 		logger.debug("Opening Websocket connection.");
 
