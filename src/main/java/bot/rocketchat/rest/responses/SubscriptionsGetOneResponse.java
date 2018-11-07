@@ -1,15 +1,13 @@
 package bot.rocketchat.rest.responses;
 
-import java.util.List;
-
 import bot.rocketchat.Subscription;
 
-public class SubscriptionsGetResponse {
-	private List<Subscription> update;
+public class SubscriptionsGetOneResponse {
+	private Subscription subscription;
 	private boolean success;
 
-	public List<Subscription> getUpdated() {
-		return update;
+	public Subscription getSubscription() {
+		return subscription;
 	}
 
 	public boolean isSuccessful() {

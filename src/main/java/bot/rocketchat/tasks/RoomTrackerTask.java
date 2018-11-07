@@ -7,6 +7,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bot.rocketchat.Room;
+import bot.rocketchat.Subscription;
 import bot.rocketchat.rest.RestClient;
 
 public class RoomTrackerTask implements Runnable {
@@ -30,11 +32,11 @@ public class RoomTrackerTask implements Runnable {
 		logger.debug("Unsubscribed public channel tracker refresh thread started.");
 
 		while (!Thread.interrupted()) {
-			List<String> channels = rsClient.getChannels();
-			List<String> subs = rsClient.getSubscriptions();
+			List<Room> channels = rsClient.getChannels();
+			List<Subscription> subs = rsClient.getSubscriptions();
 
-			List<String> diff = new ArrayList<>(channels);
-			diff.removeAll(subs);
+			List<Room> diff = new ArrayList<>(channels);
+			diff.removeIf(room -> isRoomInSubscriptionList(room, subs));
 
 			listener.onNewRooms(diff);
 
@@ -49,6 +51,14 @@ public class RoomTrackerTask implements Runnable {
 	}
 
 	public static interface RoomTrackerListener {
-		void onNewRooms(List<String> newRooms);
+		void onNewRooms(List<Room> newRooms);
+	}
+
+	private boolean isRoomInSubscriptionList(Room room, List<Subscription> subs) {
+		for (Subscription sub : subs)
+			if (sub.getRoomId().equals(room.getRoomId()))
+				return true;
+
+		return false;
 	}
 }

@@ -2,7 +2,6 @@ package bot.rocketchat.rest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -14,10 +13,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 
 import bot.ConnectionInfo;
+import bot.rocketchat.Room;
+import bot.rocketchat.Subscription;
 import bot.rocketchat.rest.responses.ChannelListResponse;
-import bot.rocketchat.rest.responses.ChannelListResponse.Channel;
+import bot.rocketchat.rest.responses.GenericHistoryResponse;
+import bot.rocketchat.rest.responses.GenericHistoryResponse.HistoryMessage;
 import bot.rocketchat.rest.responses.SubscriptionsGetResponse;
-import bot.rocketchat.rest.responses.SubscriptionsGetResponse.Subscription;
 import bot.rocketchat.util.GsonJerseyProvider;
 import bot.rocketchat.util.ObjectHolder;
 import bot.rocketchat.websocket.messages.RecLogin;
@@ -59,24 +60,59 @@ public class RestClient {
 		return target.path(path).request(MediaType.APPLICATION_JSON).headers(authHeaders());
 	}
 
-	public List<String> getSubscriptions() {
+	public List<Subscription> getSubscriptions() {
 		Response response = buildRequest("subscriptions.get", new QueryParam("count", 0)).get();
-		List<Subscription> updated = new ArrayList<>();
+		List<Subscription> subs = new ArrayList<>();
 
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
-			updated = response.readEntity(SubscriptionsGetResponse.class).getUpdated();
+			subs = response.readEntity(SubscriptionsGetResponse.class).getUpdated();
 
-		return updated.stream().map(sub -> sub.getRoomId()).collect(Collectors.toList());
+		return subs;
 	}
 
-	public List<String> getChannels() {
+	public Subscription getOneSubscription(String roomId) {
+		Response response = buildRequest("subscriptions.getOne", new QueryParam("roomId", roomId)).get();
+		Subscription sub = null;
+
+		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
+			sub = response.readEntity(Subscription.class);
+
+		return sub;
+	}
+
+	public List<Room> getChannels() {
 		Response response = buildRequest("channels.list", new QueryParam("count", 0)).get();
-		List<Channel> channels = new ArrayList<>();
+		List<Room> channels = new ArrayList<>();
 
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
 			channels = response.readEntity(ChannelListResponse.class).getChannels();
 
-		return channels.stream().map(channel -> channel.getId()).collect(Collectors.toList());
+		return channels;
+	}
+
+	public List<HistoryMessage> getChatHistory(Subscription sub) {
+		String endpoint = selectRestEndpointBase(sub);
+		Response response = buildRequest(endpoint + ".history", new QueryParam("roomId", sub.getRoomId()),
+				new QueryParam("count", sub.getUnread())).get();
+		List<HistoryMessage> messages = new ArrayList<>();
+
+		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
+			messages = response.readEntity(GenericHistoryResponse.class).getMessages();
+
+		return messages;
+	}
+
+	private String selectRestEndpointBase(Subscription sub) {
+		switch (sub.getRoomType()) {
+		case CHANNEL:
+			return "channels";
+		case GROUP:
+			return "groups";
+		case IM:
+			return "im";
+		default:
+			throw new IllegalArgumentException("Unrecognized room type '" + sub.getRoomType() + "'!");
+		}
 	}
 
 	public static class QueryParam {

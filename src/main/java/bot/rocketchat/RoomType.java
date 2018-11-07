@@ -1,4 +1,4 @@
-package bot.rocketchat.util;
+package bot.rocketchat;
 
 public enum RoomType {
 	CHANNEL("c"), GROUP("p"), IM("d");
@@ -7,6 +7,10 @@ public enum RoomType {
 
 	private RoomType(String type) {
 		this.type = type;
+	}
+
+	public String getRocketChatString() {
+		return type;
 	}
 
 	public static RoomType parse(String type) {

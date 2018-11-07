@@ -2,14 +2,16 @@ package bot.rocketchat.rest.responses;
 
 import java.util.List;
 
+import bot.rocketchat.Room;
+
 public class ImListResponse {
-	private List<Im> ims;
+	private List<Room> ims;
 	private int offset;
 	private int count;
 	private int total;
 	private boolean success;
 
-	public List<Im> getIms() {
+	public List<Room> getIms() {
 		return ims;
 	}
 
@@ -27,19 +29,5 @@ public class ImListResponse {
 
 	public boolean isSuccessful() {
 		return success;
-	}
-
-	public static class Im {
-		private String _id;
-//		private String _updatedAt;
-//		private String t;
-//		private int msgs;
-//		private String ts;
-//		private String lm;
-//		private String topic;
-
-		public String getId() {
-			return _id;
-		}
 	}
 }
