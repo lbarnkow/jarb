@@ -3,7 +3,7 @@ package bot.rocketchat.websocket;
 import bot.rocketchat.websocket.messages.Base;
 
 public enum MessageTypes {
-	PING, CONNECTED, RESULT, ADDED, UPDATED;
+	ADDED, CHANGED, CONNECTED, PING, READY, RESULT, UPDATED;
 
 	private final String type;
 

@@ -3,11 +3,13 @@ package bot.rocketchat.websocket.messages;
 import org.apache.commons.codec.digest.DigestUtils;
 
 public class SendLogin extends SendMethod {
+	private static final String METHOD = "login";
+
 	@SuppressWarnings("unused")
 	private final Params[] params;
 
 	public SendLogin(String id, String username, String password) {
-		super(id, "login");
+		super(id, METHOD);
 		this.params = new Params[] { new Params(username, password) };
 	}
 

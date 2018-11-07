@@ -3,6 +3,7 @@ package bot.rocketchat.websocket.messages;
 import java.util.UUID;
 
 public class SendWithId extends Base {
+	@SuppressWarnings("unused")
 	private String id;
 
 	protected SendWithId(String id, String msg) {

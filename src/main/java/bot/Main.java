@@ -23,6 +23,7 @@ public class Main {
 		Thread t = new Thread(bot);
 		t.start();
 
+		// TODO: raus?!
 		try {
 			Thread.sleep(20000);
 		} catch (InterruptedException e) {
