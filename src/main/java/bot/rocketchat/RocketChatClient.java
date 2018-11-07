@@ -14,6 +14,8 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
@@ -24,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import bot.ConnectionInfo;
 import bot.rocketchat.rest.RestClient;
+import bot.rocketchat.rest.responses.GenericHistoryResponse.HistoryMessage;
 import bot.rocketchat.tasks.LoginTask;
 import bot.rocketchat.tasks.RoomTrackerTask;
 import bot.rocketchat.tasks.RoomTrackerTask.RoomTrackerListener;
@@ -64,11 +67,13 @@ public class RocketChatClient implements WebsocketClientListener, RoomTrackerLis
 
 	private Thread roomTrackerThread;
 
+	private Map<String, Room> knownRooms = new ConcurrentSkipListMap<>();
+
 	private State state = State.DISCONNECTED;
 
 	public RocketChatClient(ConnectionInfo conInfo, RocketChatClientListener listener) {
-		String regex = "^(?:(?:${BOTNAME}\\s.*)|(?:@${BOTNAME}\\s.*))";
-		regex.replaceAll("${BOTNAME}", "demobot");
+		String regex = "^(?:(?:BOTNAME\\s.*)|(?:@BOTNAME\\s.*))";
+		regex.replaceAll("BOTNAME", "demobot");
 
 		this.pattern = Pattern.compile(regex);
 
@@ -92,15 +97,12 @@ public class RocketChatClient implements WebsocketClientListener, RoomTrackerLis
 		roomTrackerThread = new Thread(new RoomTrackerTask(rsClient, ROOM_TRACKER_THREAD_SLEEP_TIME_MILLIS, this));
 		roomTrackerThread.start();
 
-		List<String> channels = rsClient.getSubscriptions();
-		for (String roomId : channels)
-			wsClient.sendMessage(new SendStreamRoomMessages(roomId));
+		List<Subscription> subs = rsClient.getSubscriptions();
+		for (Subscription sub : subs)
+			wsClient.sendMessage(new SendStreamRoomMessages(sub.getRoomId()));
 
-		// TODO
-		// catch-up
-		//// check for unread messages in all subscriptions
-		//// handle unread messages and mark as read
-
+		for (Subscription sub : subs)
+			processRoom(new Room(sub));
 	}
 
 	public void stop() throws IOException {
@@ -199,25 +201,38 @@ public class RocketChatClient implements WebsocketClientListener, RoomTrackerLis
 	}
 
 	@Override
-	public void onNewRooms(List<String> newRooms) {
-		for (String roomId : newRooms)
-			wsClient.sendMessage(new SendJoinRoom(roomId));
+	public void onNewRooms(List<Room> newRooms) {
+		for (Room room : newRooms)
+			wsClient.sendMessage(new SendJoinRoom(room.getRoomId()));
 
-		for (String roomId : newRooms)
-			wsClient.sendMessage(new SendStreamRoomMessages(roomId));
+		for (Room room : newRooms)
+			wsClient.sendMessage(new SendStreamRoomMessages(room.getRoomId()));
 
-		for (String roomId : newRooms)
-			processRoom(roomId);
+		for (Room room : newRooms)
+			processRoom(room);
 	}
 
-	private boolean isMessageAimedAtMe(String message) {
-		return pattern.matcher(message).matches();
+	private boolean isMessageAimedAtMe(String roomMessage) {
+		return pattern.matcher(roomMessage).matches();
 	}
 
 	private void processRoom(String roomId) {
-		// TODO Get all unread
+		Room room = null;
+		if (knownRooms.containsKey(roomId))
+			room = knownRooms.get(roomId);
+		else {
+			Subscription sub = rsClient.getOneSubscription(roomId);
+			room = new Room(sub);
+		}
 
-		// TODO Mark all as read
+		processRoom(room);
+	}
+
+	private void processRoom(Room room) {
+		Subscription sub = rsClient.getOneSubscription(room.getRoomId());
+		List<HistoryMessage> history = rsClient.getChatHistory(sub);
+		// TODO Mark all as read in room
+		// TODO pass messages to listener
 	}
 
 	public State getState() {
