@@ -2,6 +2,8 @@ package bot.rocketchat.rest.responses;
 
 import java.util.List;
 
+import bot.rocketchat.util.RoomType;
+
 public class SubscriptionsGetResponse {
 	private List<Subscription> update;
 	private List<Subscription> remove;
@@ -21,25 +23,24 @@ public class SubscriptionsGetResponse {
 
 	public static class Subscription {
 		private String _id;
-		// private String t;
-		// private String ts;
-		// private String name;
-		// private String fname;
-		// private String rid;
-		// "u": {
-		// "_id": "EoyAmF4mxx5HxJHJB",
-		// "username": "rocket.cat",
-		// "name": "Rocket Cat"
-		// },
-		// "open": true,
-		// "alert": true,
-		// "unread": 1,
-		// "userMentions": 1,
-		// "groupMentions": 0,
-		// "_updatedAt": "2017-11-25T15:08:17.249Z",
+		private String rid;
+		private String t;
+		private int unread;
 
-		public String getId() {
+		public String getSubId() {
 			return _id;
+		}
+
+		public String getRoomId() {
+			return rid;
+		}
+
+		public RoomType getRoomType() {
+			return RoomType.parse(t);
+		}
+
+		public int getUnread() {
+			return unread;
 		}
 	}
 }
