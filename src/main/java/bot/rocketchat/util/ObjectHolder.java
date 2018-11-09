@@ -1,6 +1,8 @@
 package bot.rocketchat.util;
 
-public class ObjectHolder<T> {
+import bot.CommonBase;
+
+public class ObjectHolder<T> extends CommonBase {
 	private T value;
 
 	public T get() {

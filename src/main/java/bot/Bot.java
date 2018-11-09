@@ -19,7 +19,7 @@ import election.LeaseManager;
 import election.LeaseManagerListener;
 import election.State;
 
-public class Bot implements Runnable, LeaseManagerListener, RocketChatClientListener {
+public class Bot extends CommonBase implements Runnable, LeaseManagerListener, RocketChatClientListener {
 	private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
 	private final LeaseManager leaseManager = new LeaseManager(this);;

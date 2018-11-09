@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
@@ -12,18 +13,20 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 
+import bot.CommonBase;
 import bot.ConnectionInfo;
-import bot.rocketchat.Room;
-import bot.rocketchat.Subscription;
+import bot.rocketchat.rest.requests.SubscriptionsReadRequest;
 import bot.rocketchat.rest.responses.ChannelListResponse;
+import bot.rocketchat.rest.responses.ChatCountersResponse;
 import bot.rocketchat.rest.responses.GenericHistoryResponse;
 import bot.rocketchat.rest.responses.GenericHistoryResponse.HistoryMessage;
+import bot.rocketchat.rest.responses.SubscriptionsGetOneResponse;
 import bot.rocketchat.rest.responses.SubscriptionsGetResponse;
 import bot.rocketchat.util.GsonJerseyProvider;
 import bot.rocketchat.util.ObjectHolder;
 import bot.rocketchat.websocket.messages.RecLogin;
 
-public class RestClient {
+public class RestClient extends CommonBase {
 
 //	private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
@@ -55,7 +58,7 @@ public class RestClient {
 		WebTarget target = baseTarget;
 
 		for (QueryParam param : params)
-			target.queryParam(param.getKey(), param.getValues());
+			target = target.queryParam(param.getKey(), param.getValues());
 
 		return target.path(path).request(MediaType.APPLICATION_JSON).headers(authHeaders());
 	}
@@ -75,7 +78,10 @@ public class RestClient {
 		Subscription sub = null;
 
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
-			sub = response.readEntity(Subscription.class);
+			sub = response.readEntity(SubscriptionsGetOneResponse.class).getSubscription();
+		else
+			throw new RuntimeException("subscriptions.getOne failed for room '" + roomId + "'! Reason: "
+					+ response.readEntity(String.class));
 
 		return sub;
 	}
@@ -90,10 +96,22 @@ public class RestClient {
 		return channels;
 	}
 
-	public List<HistoryMessage> getChatHistory(Subscription sub) {
-		String endpoint = selectRestEndpointBase(sub);
-		Response response = buildRequest(endpoint + ".history", new QueryParam("roomId", sub.getRoomId()),
-				new QueryParam("count", sub.getUnread())).get();
+	public ChatCountersResponse getChatCounters(Room room, String userId) {
+		String endpoint = selectRestEndpointBase(room);
+		Response response = buildRequest(endpoint + ".counters", new QueryParam("roomId", room.getId())).get();
+		// , new QueryParam("userId", userId)).get();
+
+		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
+			return response.readEntity(ChatCountersResponse.class);
+		else
+			throw new RuntimeException("Failed to get chat counters for room '" + room.getId() + "'. Reason: "
+					+ response.readEntity(String.class));
+	}
+
+	public List<HistoryMessage> getChatHistory(Room room, int count) {
+		String endpoint = selectRestEndpointBase(room);
+		Response response = buildRequest(endpoint + ".history", new QueryParam("roomId", room.getId()),
+				new QueryParam("count", count)).get();
 		List<HistoryMessage> messages = new ArrayList<>();
 
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
@@ -102,8 +120,15 @@ public class RestClient {
 		return messages;
 	}
 
-	private String selectRestEndpointBase(Subscription sub) {
-		switch (sub.getRoomType()) {
+	public boolean markSubscriptionRead(String roomId) {
+		SubscriptionsReadRequest payload = new SubscriptionsReadRequest(roomId);
+		Response response = buildRequest("subscriptions.read").post(Entity.entity(payload, MediaType.APPLICATION_JSON));
+
+		return response.getStatusInfo().getFamily() == Family.SUCCESSFUL;
+	}
+
+	private String selectRestEndpointBase(Room room) {
+		switch (room.getType()) {
 		case CHANNEL:
 			return "channels";
 		case GROUP:
@@ -111,7 +136,7 @@ public class RestClient {
 		case IM:
 			return "im";
 		default:
-			throw new IllegalArgumentException("Unrecognized room type '" + sub.getRoomType() + "'!");
+			throw new IllegalArgumentException("Unrecognized room type '" + room.getType() + "'!");
 		}
 	}
 

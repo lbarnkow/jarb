@@ -12,9 +12,10 @@ import static bot.rocketchat.websocket.messages.RecChangedStreamRoomMessages.COL
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
@@ -24,8 +25,12 @@ import javax.websocket.DeploymentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bot.CommonBase;
 import bot.ConnectionInfo;
 import bot.rocketchat.rest.RestClient;
+import bot.rocketchat.rest.Room;
+import bot.rocketchat.rest.Subscription;
+import bot.rocketchat.rest.responses.ChatCountersResponse;
 import bot.rocketchat.rest.responses.GenericHistoryResponse.HistoryMessage;
 import bot.rocketchat.tasks.LoginTask;
 import bot.rocketchat.tasks.RoomTrackerTask;
@@ -46,7 +51,7 @@ import bot.rocketchat.websocket.messages.SendJoinRoom;
 import bot.rocketchat.websocket.messages.SendPong;
 import bot.rocketchat.websocket.messages.SendStreamRoomMessages;
 
-public class RocketChatClient implements WebsocketClientListener, RoomTrackerListener {
+public class RocketChatClient extends CommonBase implements WebsocketClientListener, RoomTrackerListener {
 
 	private static final long LOGIN_THREAD_SLEEP_TIME_MILLIS = 60000L;
 	private static final long ROOM_TRACKER_THREAD_SLEEP_TIME_MILLIS = 2500L;
@@ -73,7 +78,7 @@ public class RocketChatClient implements WebsocketClientListener, RoomTrackerLis
 
 	public RocketChatClient(ConnectionInfo conInfo, RocketChatClientListener listener) {
 		String regex = "^(?:(?:BOTNAME\\s.*)|(?:@BOTNAME\\s.*))";
-		regex.replaceAll("BOTNAME", "demobot");
+		regex = regex.replaceAll("BOTNAME", "demobot");
 
 		this.pattern = Pattern.compile(regex);
 
@@ -175,7 +180,7 @@ public class RocketChatClient implements WebsocketClientListener, RoomTrackerLis
 		if (changedSub.getCollection().equals(COLLECTION)) {
 			RecChangedStreamRoomMessages stream = RecChangedStreamRoomMessages.parse(message);
 
-			List<String> roomIds = new ArrayList<>();
+			Set<String> roomIds = new HashSet<>();
 
 			for (Tuple<String, String> tuple : stream.getMessages()) {
 				String roomId = tuple.getA();
@@ -183,6 +188,8 @@ public class RocketChatClient implements WebsocketClientListener, RoomTrackerLis
 				if (isMessageAimedAtMe(roomMessage))
 					roomIds.add(roomId);
 			}
+
+			logger.debug("{}", roomIds);
 
 			for (String roomId : roomIds)
 				processRoom(roomId);
@@ -203,36 +210,50 @@ public class RocketChatClient implements WebsocketClientListener, RoomTrackerLis
 	@Override
 	public void onNewRooms(List<Room> newRooms) {
 		for (Room room : newRooms)
-			wsClient.sendMessage(new SendJoinRoom(room.getRoomId()));
+			wsClient.sendMessage(new SendJoinRoom(room.getId()));
 
 		for (Room room : newRooms)
-			wsClient.sendMessage(new SendStreamRoomMessages(room.getRoomId()));
+			wsClient.sendMessage(new SendStreamRoomMessages(room.getId()));
 
 		for (Room room : newRooms)
 			processRoom(room);
 	}
 
+	// TODO: Remove?! This would prevent a JIRA-Bot from expanding every
+	// JIRA-Reference...
 	private boolean isMessageAimedAtMe(String roomMessage) {
 		return pattern.matcher(roomMessage).matches();
 	}
 
 	private void processRoom(String roomId) {
 		Room room = null;
-		if (knownRooms.containsKey(roomId))
+
+		if (knownRooms.containsKey(roomId)) {
 			room = knownRooms.get(roomId);
-		else {
+		} else {
 			Subscription sub = rsClient.getOneSubscription(roomId);
 			room = new Room(sub);
+			knownRooms.put(roomId, room);
 		}
 
 		processRoom(room);
 	}
 
 	private void processRoom(Room room) {
-		Subscription sub = rsClient.getOneSubscription(room.getRoomId());
-		List<HistoryMessage> history = rsClient.getChatHistory(sub);
-		// TODO Mark all as read in room
-		// TODO pass messages to listener
+		ChatCountersResponse counters = rsClient.getChatCounters(room, conInfo.getUsername());
+
+		logger.debug("{}", counters);
+
+		if (counters.getUnreads() > 0) {
+			List<HistoryMessage> history = rsClient.getChatHistory(room, counters.getUnreads());
+			rsClient.markSubscriptionRead(room.getId());
+
+			for (HistoryMessage hm : history) {
+				logger.debug("{}", hm);
+				if (isMessageAimedAtMe(hm.getMsg()))
+					listener.onRocketChatClientMessage(hm.asMessage());
+			}
+		}
 	}
 
 	public State getState() {

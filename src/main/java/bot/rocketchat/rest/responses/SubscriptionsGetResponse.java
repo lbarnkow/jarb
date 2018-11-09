@@ -2,9 +2,10 @@ package bot.rocketchat.rest.responses;
 
 import java.util.List;
 
-import bot.rocketchat.Subscription;
+import bot.CommonBase;
+import bot.rocketchat.rest.Subscription;
 
-public class SubscriptionsGetResponse {
+public class SubscriptionsGetResponse extends CommonBase {
 	private List<Subscription> update;
 	private boolean success;
 

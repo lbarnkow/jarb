@@ -1,6 +1,8 @@
 package bot.rocketchat.util;
 
-public class Tuple<A, B> {
+import bot.CommonBase;
+
+public class Tuple<A, B> extends CommonBase {
 	private final A a;
 	private final B b;
 
