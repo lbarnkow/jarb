@@ -2,9 +2,10 @@ package bot.rocketchat.rest.responses;
 
 import java.util.List;
 
-import bot.rocketchat.Room;
+import bot.CommonBase;
+import bot.rocketchat.rest.Room;
 
-public class ChannelListResponse {
+public class ChannelListResponse extends CommonBase {
 	private List<Room> channels;
 	private int offset;
 	private int count;

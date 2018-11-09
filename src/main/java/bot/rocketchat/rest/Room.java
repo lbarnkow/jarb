@@ -1,6 +1,8 @@
-package bot.rocketchat;
+package bot.rocketchat.rest;
 
-public class Room {
+import bot.CommonBase;
+
+public class Room extends CommonBase {
 	private String _id;
 	private String t;
 
@@ -12,11 +14,11 @@ public class Room {
 		this.t = sub.getRoomType().getRocketChatString();
 	}
 
-	public String getRoomId() {
+	public String getId() {
 		return _id;
 	}
 
-	public RoomType getRoomType() {
+	public RoomType getType() {
 		return RoomType.parse(t);
 	}
 }

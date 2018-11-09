@@ -1,8 +1,9 @@
 package bot.rocketchat.rest.responses;
 
-import bot.rocketchat.Subscription;
+import bot.CommonBase;
+import bot.rocketchat.rest.Subscription;
 
-public class SubscriptionsGetOneResponse {
+public class SubscriptionsGetOneResponse extends CommonBase {
 	private Subscription subscription;
 	private boolean success;
 

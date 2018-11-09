@@ -2,14 +2,17 @@ package bot.rocketchat.rest.responses;
 
 import java.util.List;
 
-public class GenericHistoryResponse {
+import bot.CommonBase;
+import bot.rocketchat.Message;
+
+public class GenericHistoryResponse extends CommonBase {
 	private List<HistoryMessage> messages;
 
 	public List<HistoryMessage> getMessages() {
 		return messages;
 	}
 
-	public static class HistoryMessage {
+	public static class HistoryMessage extends CommonBase {
 		private String _id;
 		private String rid;
 		private String msg;
@@ -24,6 +27,10 @@ public class GenericHistoryResponse {
 
 		public String getMsg() {
 			return msg;
+		}
+
+		public Message asMessage() {
+			return new Message(_id, msg, rid);
 		}
 	}
 }

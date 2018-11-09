@@ -1,16 +1,12 @@
 package bot;
 
-public class ConnectionInfo {
+public class ConnectionInfo extends CommonBase {
 	private boolean encrypted;
 	private String hostname;
 	private int port;
 	private String username;
 	// TODO: Don't store password as String? Must be SHA-256 for login anyways.
 	private String password;
-
-//	ConnectionInfo() {
-//		this(false, null, 0, null, null);
-//	}
 
 	public ConnectionInfo(boolean encrypted, String hostname, int port, String username, String password) {
 		this.encrypted = encrypted;

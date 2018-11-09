@@ -1,6 +1,8 @@
-package bot.rocketchat;
+package bot.rocketchat.rest;
 
-public class Subscription {
+import bot.CommonBase;
+
+public class Subscription extends CommonBase {
 	private String _id;
 	private String rid;
 	private String t;
@@ -16,6 +18,10 @@ public class Subscription {
 
 	public RoomType getRoomType() {
 		return RoomType.parse(t);
+	}
+
+	public boolean hasUnread() {
+		return unread != 0;
 	}
 
 	public int getUnread() {

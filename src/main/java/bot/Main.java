@@ -1,6 +1,6 @@
 package bot;
 
-public class Main {
+public class Main extends CommonBase {
 	public static void main(String... args) {
 //		String hostname = "rockettest.system.local";
 //		int port = 80;
@@ -25,7 +25,7 @@ public class Main {
 
 		// TODO: raus?!
 		try {
-			Thread.sleep(20000);
+			Thread.sleep(60000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

@@ -7,11 +7,12 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bot.rocketchat.Room;
-import bot.rocketchat.Subscription;
+import bot.CommonBase;
 import bot.rocketchat.rest.RestClient;
+import bot.rocketchat.rest.Room;
+import bot.rocketchat.rest.Subscription;
 
-public class RoomTrackerTask implements Runnable {
+public class RoomTrackerTask extends CommonBase implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(RoomTrackerTask.class);
 
 	public static final String ID_PREFIX = UUID.randomUUID().toString() + "-";
@@ -56,7 +57,7 @@ public class RoomTrackerTask implements Runnable {
 
 	private boolean isRoomInSubscriptionList(Room room, List<Subscription> subs) {
 		for (Subscription sub : subs)
-			if (sub.getRoomId().equals(room.getRoomId()))
+			if (sub.getRoomId().equals(room.getId()))
 				return true;
 
 		return false;

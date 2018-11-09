@@ -16,6 +16,9 @@ dependencies {
 	// Simple File read/write
 	compile 'commons-io:commons-io:2.6'
 	
+	// ToStringBuilder
+	compile 'org.apache.commons:commons-lang3:3.8.1'
+	
 	// Logging
 	compile 'org.slf4j:slf4j-simple:1.7.25'
 	
