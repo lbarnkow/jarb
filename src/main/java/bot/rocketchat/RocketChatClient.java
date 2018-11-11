@@ -182,14 +182,8 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 			Set<String> roomIds = new HashSet<>();
 
-			for (Tuple<String, String> tuple : stream.getMessages()) {
-				String roomId = tuple.getA();
-				String roomMessage = tuple.getB();
-				if (isMessageAimedAtMe(roomMessage))
-					roomIds.add(roomId);
-			}
-
-			logger.debug("{}", roomIds);
+			for (Tuple<String, String> tuple : stream.getMessages())
+				roomIds.add(tuple.getA());
 
 			for (String roomId : roomIds)
 				processRoom(roomId);
@@ -219,12 +213,6 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 			processRoom(room);
 	}
 
-	// TODO: Remove?! This would prevent a JIRA-Bot from expanding every
-	// JIRA-Reference...
-	private boolean isMessageAimedAtMe(String roomMessage) {
-		return pattern.matcher(roomMessage).matches();
-	}
-
 	private void processRoom(String roomId) {
 		Room room = null;
 
@@ -242,17 +230,12 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	private void processRoom(Room room) {
 		ChatCountersResponse counters = rsClient.getChatCounters(room, conInfo.getUsername());
 
-		logger.debug("{}", counters);
-
 		if (counters.getUnreads() > 0) {
 			List<HistoryMessage> history = rsClient.getChatHistory(room, counters.getUnreads());
 			rsClient.markSubscriptionRead(room.getId());
 
-			for (HistoryMessage hm : history) {
-				logger.debug("{}", hm);
-				if (isMessageAimedAtMe(hm.getMsg()))
-					listener.onRocketChatClientMessage(hm.asMessage());
-			}
+			for (HistoryMessage hm : history)
+				listener.onRocketChatClientMessage(hm.asMessage());
 		}
 	}
 
