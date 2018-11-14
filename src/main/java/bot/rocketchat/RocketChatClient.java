@@ -14,11 +14,8 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Semaphore;
-import java.util.regex.Pattern;
 
 import javax.websocket.DeploymentException;
 
@@ -58,8 +55,6 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 	private static final Logger logger = LoggerFactory.getLogger(RocketChatClient.class);
 
-	private final Pattern pattern;
-
 	private final ConnectionInfo conInfo;
 	private final RocketChatClientListener listener;
 	private WebsocketClient wsClient;
@@ -72,51 +67,59 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 	private Thread roomTrackerThread;
 
-	private Map<String, Room> knownRooms = new ConcurrentSkipListMap<>();
-
 	private State state = State.DISCONNECTED;
 
 	public RocketChatClient(ConnectionInfo conInfo, RocketChatClientListener listener) {
-		String regex = "^(?:(?:BOTNAME\\s.*)|(?:@BOTNAME\\s.*))";
-		regex = regex.replaceAll("BOTNAME", "demobot");
-
-		this.pattern = Pattern.compile(regex);
-
 		this.conInfo = conInfo;
 		this.listener = listener;
 	}
 
 	public void start() throws URISyntaxException, DeploymentException, IOException, InterruptedException {
+		logger.debug("Starting RocketChatClient...");
+
 		state = State.CONNECTED;
 		wsClient = new WebsocketClient(conInfo, this);
 		rsClient = new RestClient(conInfo, loginTokenHolder);
 
+		logger.trace("Opened to WebSocket, initialized REST client.");
+
 		wsClient.sendMessage(new SendConnect());
 		syncWaitForConnected.acquire();
+		logger.trace("Connected to real-time API (WebSocket).");
 
 		syncWaitForLoggedIn.drainPermits();
 		loginThread = new Thread(new LoginTask(conInfo, wsClient, LOGIN_THREAD_SLEEP_TIME_MILLIS));
 		loginThread.start();
 		syncWaitForLoggedIn.acquire();
+		logger.trace("Logged in via real-time API (WebSocket).");
 
 		roomTrackerThread = new Thread(new RoomTrackerTask(rsClient, ROOM_TRACKER_THREAD_SLEEP_TIME_MILLIS, this));
 		roomTrackerThread.start();
+		logger.trace("Started room tracker to periodically join open channels.");
 
 		List<Subscription> subs = rsClient.getSubscriptions();
+		logger.trace("Subscribing to {} rooms...", subs.size());
 		for (Subscription sub : subs)
 			wsClient.sendMessage(new SendStreamRoomMessages(sub.getRoomId()));
 
+		logger.trace("Checking for unread messages in {} rooms...", subs.size());
 		for (Subscription sub : subs)
 			processRoom(new Room(sub));
+
+		logger.debug("RocketChatClient started!");
 	}
 
 	public void stop() throws IOException {
+		logger.debug("Stopping RocketChatClient...");
+
 		loginThread.interrupt();
 		wsClient.close();
 		wsClient = null;
 		rsClient = null;
 		loginTokenHolder.reset();
 		state = State.DISCONNECTED;
+
+		logger.debug("RocketChatClient stopped!");
 	}
 
 	@Override
@@ -203,39 +206,37 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 	@Override
 	public void onNewRooms(List<Room> newRooms) {
+		logger.trace("Joining {} new rooms...", newRooms.size());
 		for (Room room : newRooms)
 			wsClient.sendMessage(new SendJoinRoom(room.getId()));
 
+		logger.trace("Subscribing to {} rooms...", newRooms.size());
 		for (Room room : newRooms)
 			wsClient.sendMessage(new SendStreamRoomMessages(room.getId()));
 
+		logger.trace("Checking for unread messages in {} rooms...", newRooms.size());
 		for (Room room : newRooms)
 			processRoom(room);
 	}
 
 	private void processRoom(String roomId) {
-		Room room = null;
-
-		if (knownRooms.containsKey(roomId)) {
-			room = knownRooms.get(roomId);
-		} else {
-			Subscription sub = rsClient.getOneSubscription(roomId);
-			room = new Room(sub);
-			knownRooms.put(roomId, room);
-		}
-
+		Subscription sub = rsClient.getOneSubscription(roomId);
+		Room room = new Room(sub);
 		processRoom(room);
 	}
 
 	private void processRoom(Room room) {
-		ChatCountersResponse counters = rsClient.getChatCounters(room, conInfo.getUsername());
+		logger.trace("Processing room '{}'...", room.getId());
+		ChatCountersResponse counters = rsClient.getChatCounters(room);
 
-		if (counters.getUnreads() > 0) {
-			List<HistoryMessage> history = rsClient.getChatHistory(room, counters.getUnreads());
+		List<HistoryMessage> history = rsClient.getChatHistory(room, counters);
+		logger.trace("Found '{}' unread messages for room '{}'.", history.size(), room.getId());
+
+		if (!history.isEmpty()) {
 			rsClient.markSubscriptionRead(room.getId());
 
 			for (HistoryMessage hm : history)
-				listener.onRocketChatClientMessage(hm.asMessage());
+				listener.onRocketChatClientMessage(hm.toMessage());
 		}
 	}
 

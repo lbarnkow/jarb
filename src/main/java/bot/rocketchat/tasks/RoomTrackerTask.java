@@ -39,7 +39,12 @@ public class RoomTrackerTask extends CommonBase implements Runnable {
 			List<Room> diff = new ArrayList<>(channels);
 			diff.removeIf(room -> isRoomInSubscriptionList(room, subs));
 
-			listener.onNewRooms(diff);
+			try {
+				if (!diff.isEmpty())
+					listener.onNewRooms(diff);
+			} catch (Exception e) {
+				logger.error("RoomTrackerListener threw an exception!", e);
+			}
 
 			try {
 				Thread.sleep(sleepTimeMillis);

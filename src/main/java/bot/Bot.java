@@ -29,13 +29,19 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 	private volatile boolean alive = false;
 	private Thread thread = null;
 
+	// TODO:
+//	String regex = "^(?:(?:BOTNAME\\s.*)|(?:@BOTNAME\\s.*))";
+//	regex = regex.replaceAll("BOTNAME", "demobot");
+//
+//	this.pattern = Pattern.compile(regex);
+
 	public Bot(ConnectionInfo conInfo) {
 		rcClient = new RocketChatClient(conInfo, this);
 	}
 
 	@Override
 	public Message onRocketChatClientMessage(Message message) {
-		logger.info(message.toString());
+		System.out.println(message);
 		return null;
 	}
 

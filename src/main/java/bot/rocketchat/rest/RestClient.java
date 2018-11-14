@@ -96,10 +96,9 @@ public class RestClient extends CommonBase {
 		return channels;
 	}
 
-	public ChatCountersResponse getChatCounters(Room room, String userId) {
+	public ChatCountersResponse getChatCounters(Room room) {
 		String endpoint = selectRestEndpointBase(room);
 		Response response = buildRequest(endpoint + ".counters", new QueryParam("roomId", room.getId())).get();
-		// , new QueryParam("userId", userId)).get();
 
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
 			return response.readEntity(ChatCountersResponse.class);
@@ -108,10 +107,10 @@ public class RestClient extends CommonBase {
 					+ response.readEntity(String.class));
 	}
 
-	public List<HistoryMessage> getChatHistory(Room room, int count) {
+	public List<HistoryMessage> getChatHistory(Room room, ChatCountersResponse counters) {
 		String endpoint = selectRestEndpointBase(room);
 		Response response = buildRequest(endpoint + ".history", new QueryParam("roomId", room.getId()),
-				new QueryParam("count", count)).get();
+				new QueryParam("oldest", counters.getUnreadsFrom()), new QueryParam("count", 0)).get();
 		List<HistoryMessage> messages = new ArrayList<>();
 
 		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
