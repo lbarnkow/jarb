@@ -32,6 +32,9 @@ dependencies {
 	compile 'org.glassfish.jersey.core:jersey-client:2.27'
 	compile 'org.glassfish.jersey.inject:jersey-hk2:2.27'
 	
+	// JSR-330 dependency injection; implemented by guice
+	compile 'com.google.inject:guice:4.2.2:no_aop'
+	
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
 }

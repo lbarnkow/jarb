@@ -1,5 +1,8 @@
 package bot;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
 public class Main extends CommonBase {
 	public static void main(String... args) {
 //		String hostname = "rockettest.system.local";
@@ -10,8 +13,12 @@ public class Main extends CommonBase {
 		String username = "demobot";
 		String password = "demobot";
 
-		ConnectionInfo conInfo = new ConnectionInfo(false, hostname, port, username, password);
-		final Bot bot = new Bot(conInfo);
+		Injector guice = Guice.createInjector(new BotModule());
+
+		ConnectionInfo conInfoSingleton = guice.getInstance(ConnectionInfo.class);
+		conInfoSingleton.initialize(false, hostname, port, username, password);
+
+		final Bot bot = guice.getInstance(Bot.class);
 
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
@@ -20,16 +27,6 @@ public class Main extends CommonBase {
 			}
 		});
 
-		Thread t = new Thread(bot);
-		t.start();
-
-		// TODO: raus?!
-		try {
-			Thread.sleep(300000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		System.exit(0);
+		bot.run();
 	}
 }
