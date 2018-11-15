@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.concurrent.Semaphore;
 
+import javax.inject.Inject;
 import javax.websocket.DeploymentException;
 
 import org.slf4j.Logger;
@@ -22,8 +23,8 @@ import election.State;
 public class Bot extends CommonBase implements Runnable, LeaseManagerListener, RocketChatClientListener {
 	private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
-	private final LeaseManager leaseManager = new LeaseManager(this);;
 	private final RocketChatClient rcClient;
+	private final LeaseManager leaseManager = new LeaseManager(this);;
 	private final Semaphore syncWaitForLease = new Semaphore(0);
 	private final Semaphore syncLostLease = new Semaphore(0);
 	private volatile boolean alive = false;
@@ -35,8 +36,10 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 //
 //	this.pattern = Pattern.compile(regex);
 
-	public Bot(ConnectionInfo conInfo) {
-		rcClient = new RocketChatClient(conInfo, this);
+	@Inject
+	private Bot(ConnectionInfo conInfo, RocketChatClient rcClient) {
+		this.rcClient = rcClient;
+		rcClient.setListener(this);
 	}
 
 	@Override

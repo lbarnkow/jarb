@@ -1,6 +1,10 @@
 package bot;
 
+import javax.inject.Singleton;
+
+@Singleton
 public class ConnectionInfo extends CommonBase {
+	private boolean initialized = false;
 	private boolean encrypted;
 	private String hostname;
 	private int port;
@@ -8,12 +12,17 @@ public class ConnectionInfo extends CommonBase {
 	// TODO: Don't store password as String? Must be SHA-256 for login anyways.
 	private String password;
 
-	public ConnectionInfo(boolean encrypted, String hostname, int port, String username, String password) {
+	public synchronized void initialize(boolean encrypted, String hostname, int port, String username,
+			String password) {
+		if (this.initialized)
+			throw new IllegalStateException("ConnectionInfo already initialized!");
+
 		this.encrypted = encrypted;
 		this.hostname = hostname;
 		this.port = port;
 		this.username = username;
 		this.password = password;
+		this.initialized = true;
 	}
 
 	public String getWebsocketUrl() {

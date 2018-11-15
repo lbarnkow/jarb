@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 
+import javax.inject.Inject;
 import javax.websocket.DeploymentException;
 
 import org.slf4j.Logger;
@@ -55,8 +56,10 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 	private static final Logger logger = LoggerFactory.getLogger(RocketChatClient.class);
 
-	private final ConnectionInfo conInfo;
-	private final RocketChatClientListener listener;
+	@Inject
+	private ConnectionInfo conInfo;
+	private RocketChatClientListener listener;
+
 	private WebsocketClient wsClient;
 	private RestClient rsClient;
 
@@ -69,8 +72,7 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 	private State state = State.DISCONNECTED;
 
-	public RocketChatClient(ConnectionInfo conInfo, RocketChatClientListener listener) {
-		this.conInfo = conInfo;
+	public void setListener(RocketChatClientListener listener) {
 		this.listener = listener;
 	}
 
