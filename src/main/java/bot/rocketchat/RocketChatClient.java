@@ -72,6 +72,9 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 	private State state = State.DISCONNECTED;
 
+	RocketChatClient() {
+	}
+
 	public void setListener(RocketChatClientListener listener) {
 		this.listener = listener;
 	}

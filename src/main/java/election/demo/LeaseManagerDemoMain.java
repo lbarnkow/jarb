@@ -25,8 +25,10 @@ public class LeaseManagerDemoMain {
 		};
 
 		List<LeaseManager> lm = new ArrayList<>();
-		for (int i = 0; i < 30; i++)
-			lm.add(new LeaseManager(listener));
+		for (int i = 0; i < 30; i++) {
+			// TODO: Use DI here, as the constructor is private.
+			// lm.add(new LeaseManager(listener));
+		}
 
 		for (LeaseManager item : lm)
 			spawn(item);
