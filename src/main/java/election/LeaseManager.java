@@ -12,6 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.UUID;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,9 +33,15 @@ public class LeaseManager implements Runnable {
 	private volatile boolean alive = false;
 	private volatile State state = INACTIVE;
 
-	private final LeaseManagerListener listener;
+	private LeaseManagerListener listener;
 
-	public LeaseManager(LeaseManagerListener listener) {
+	@Inject
+	private Provider<Lease> leaseProvider;
+
+	LeaseManager() {
+	}
+
+	public void setListener(LeaseManagerListener listener) {
 		this.listener = listener;
 	}
 
@@ -142,7 +151,8 @@ public class LeaseManager implements Runnable {
 		if (leaseFile != null && !leaseFile.isExpired())
 			return false;
 
-		Lease newLease = new Lease(id);
+		Lease newLease = leaseProvider.get();
+		newLease.setLeaderId(id);
 		writeLeaseFile(newLease);
 
 		logger.info("Challenging lease w/ id '{}'", id);

@@ -23,8 +23,11 @@ import election.State;
 public class Bot extends CommonBase implements Runnable, LeaseManagerListener, RocketChatClientListener {
 	private static final Logger logger = LoggerFactory.getLogger(Bot.class);
 
+	@Inject
+	private ThreadProvider threadProvider;
+
+	private final LeaseManager leaseManager;
 	private final RocketChatClient rcClient;
-	private final LeaseManager leaseManager = new LeaseManager(this);;
 	private final Semaphore syncWaitForLease = new Semaphore(0);
 	private final Semaphore syncLostLease = new Semaphore(0);
 	private volatile boolean alive = false;
@@ -37,8 +40,11 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 //	this.pattern = Pattern.compile(regex);
 
 	@Inject
-	private Bot(ConnectionInfo conInfo, RocketChatClient rcClient) {
+	private Bot(ConnectionInfo conInfo, RocketChatClient rcClient, LeaseManager leaseManager) {
+		this.leaseManager = leaseManager;
 		this.rcClient = rcClient;
+
+		leaseManager.setListener(this);
 		rcClient.setListener(this);
 	}
 
@@ -83,7 +89,8 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 	}
 
 	private void startLeaseManager() {
-		new Thread(leaseManager).start();
+		Thread t = threadProvider.create(leaseManager, "lease-thread");
+		t.start();
 	}
 
 	public void stop() {

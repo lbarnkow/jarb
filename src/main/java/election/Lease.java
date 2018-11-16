@@ -5,13 +5,7 @@ public class Lease {
 	private long leaseAcquired;
 	private long leaseExpiration;
 
-	private Lease() {
-		// Default constructor for Gson
-	}
-
-	public Lease(String leaderId) {
-		this();
-		this.leaderId = leaderId;
+	Lease() {
 		this.leaseAcquired = System.currentTimeMillis();
 		refreshExpiration();
 	}
