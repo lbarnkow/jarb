@@ -5,6 +5,9 @@ import bot.CommonBase;
 public class ObjectHolder<T> extends CommonBase {
 	private T value;
 
+	ObjectHolder() {
+	}
+
 	public T get() {
 		return value;
 	}

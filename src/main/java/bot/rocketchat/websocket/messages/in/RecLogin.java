@@ -1,14 +1,13 @@
-package bot.rocketchat.websocket.messages;
+package bot.rocketchat.websocket.messages.in;
 
 public class RecLogin extends RecWithId {
 	private Result result;
 
-	public Result getResult() {
-		return result;
+	RecLogin() {
 	}
 
-	public static RecLogin parse(String json) {
-		return parse(json, RecLogin.class);
+	public Result getResult() {
+		return result;
 	}
 
 	public static class Result {
@@ -16,6 +15,9 @@ public class RecLogin extends RecWithId {
 		private String token;
 		private TokenExpires tokenExpires;
 		private String type;
+
+		Result() {
+		}
 
 		public String getId() {
 			return id;
@@ -36,6 +38,9 @@ public class RecLogin extends RecWithId {
 
 	public static class TokenExpires {
 		private String $date;
+
+		TokenExpires() {
+		}
 
 		public String get$date() {
 			return $date;

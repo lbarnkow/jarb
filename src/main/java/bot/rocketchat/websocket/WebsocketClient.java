@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.inject.Inject;
 import javax.websocket.ClientEndpoint;
 import javax.websocket.CloseReason;
-import javax.websocket.ContainerProvider;
 import javax.websocket.DeploymentException;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
@@ -23,19 +23,32 @@ import bot.ConnectionInfo;
 public class WebsocketClient {
 	private static final Logger logger = LoggerFactory.getLogger(WebsocketClient.class);
 
-	private final WebsocketClientListener listener;
-	private final Session session;
+	@Inject
+	private WebsocketContainerProvider websocketContainerProvider;
+	@Inject
+	private ConnectionInfo conInfo;
+
+	private boolean initialized;
+
+	private WebsocketClientListener listener;
+	private Session session;
 
 	private boolean closedByClient = false;
 
-	public WebsocketClient(ConnectionInfo conInfo, WebsocketClientListener listener)
+	WebsocketClient() {
+	}
+
+	public void initialize(WebsocketClientListener listener)
 			throws URISyntaxException, DeploymentException, IOException {
+		if (this.initialized)
+			throw new IllegalStateException("Message already initialized!");
+
 		this.listener = listener;
 		URI endpointUri = new URI(conInfo.getWebsocketUrl());
 
 		logger.debug("Opening Websocket connection.");
 
-		WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+		WebSocketContainer container = websocketContainerProvider.get();
 		session = container.connectToServer(this, endpointUri);
 	}
 

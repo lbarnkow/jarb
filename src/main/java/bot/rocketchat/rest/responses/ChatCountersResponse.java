@@ -12,6 +12,9 @@ public class ChatCountersResponse extends CommonBase {
 	private int userMentions;
 	private boolean success;
 
+	ChatCountersResponse() {
+	}
+
 	public boolean isJoined() {
 		return joined;
 	}

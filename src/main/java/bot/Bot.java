@@ -34,10 +34,10 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 	private Thread thread = null;
 
 	// TODO:
-//	String regex = "^(?:(?:BOTNAME\\s.*)|(?:@BOTNAME\\s.*))";
-//	regex = regex.replaceAll("BOTNAME", "demobot");
-//
-//	this.pattern = Pattern.compile(regex);
+	// String regex = "^(?:(?:BOTNAME\\s.*)|(?:@BOTNAME\\s.*))";
+	// regex = regex.replaceAll("BOTNAME", "demobot");
+	//
+	// this.pattern = Pattern.compile(regex);
 
 	@Inject
 	private Bot(ConnectionInfo conInfo, RocketChatClient rcClient, LeaseManager leaseManager) {
@@ -50,6 +50,7 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 
 	@Override
 	public Message onRocketChatClientMessage(Message message) {
+		// TODO: inspect and respond
 		System.out.println(message);
 		return null;
 	}
@@ -73,7 +74,7 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 				rcClient.stop();
 			}
 		} catch (InterruptedException e) {
-			logger.error("Caught '{}', shutting down!", e.getClass().getSimpleName());
+			logger.error("Caught InterruptedException, shutting down!", e);
 		} catch (URISyntaxException | DeploymentException | IOException e) {
 			logger.error("Caught unexpected exception, shutting down!", e);
 		}

@@ -1,4 +1,4 @@
-package bot.rocketchat.websocket.messages;
+package bot.rocketchat.websocket.messages.out;
 
 public class SendStreamRoomMessages extends SendSub {
 	private static final String NAME = "stream-room-messages";
@@ -6,8 +6,12 @@ public class SendStreamRoomMessages extends SendSub {
 	@SuppressWarnings("unused")
 	private Object[] params;
 
-	public SendStreamRoomMessages(String roomId) {
-		super(NAME);
+	SendStreamRoomMessages() {
+	}
+
+	public SendStreamRoomMessages initialize(String roomId) {
+		super.initialize(NAME);
 		params = new Object[] { roomId, false };
+		return this;
 	}
 }

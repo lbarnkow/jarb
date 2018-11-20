@@ -3,7 +3,7 @@ package bot.rocketchat.rest.responses;
 import java.util.List;
 
 import bot.CommonBase;
-import bot.rocketchat.rest.Room;
+import bot.rocketchat.rest.entities.Room;
 
 public class ImListResponse extends CommonBase {
 	private List<Room> ims;
@@ -11,6 +11,9 @@ public class ImListResponse extends CommonBase {
 	private int count;
 	private int total;
 	private boolean success;
+
+	ImListResponse() {
+	}
 
 	public List<Room> getIms() {
 		return ims;

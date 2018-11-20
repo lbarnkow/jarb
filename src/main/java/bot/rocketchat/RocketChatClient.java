@@ -1,13 +1,13 @@
 package bot.rocketchat;
 
-import static bot.rocketchat.websocket.MessageTypes.ADDED;
-import static bot.rocketchat.websocket.MessageTypes.CHANGED;
-import static bot.rocketchat.websocket.MessageTypes.CONNECTED;
-import static bot.rocketchat.websocket.MessageTypes.PING;
-import static bot.rocketchat.websocket.MessageTypes.READY;
-import static bot.rocketchat.websocket.MessageTypes.RESULT;
-import static bot.rocketchat.websocket.MessageTypes.UPDATED;
-import static bot.rocketchat.websocket.messages.RecChangedStreamRoomMessages.COLLECTION;
+import static bot.rocketchat.websocket.RealTimeMessageTypes.ADDED;
+import static bot.rocketchat.websocket.RealTimeMessageTypes.CHANGED;
+import static bot.rocketchat.websocket.RealTimeMessageTypes.CONNECTED;
+import static bot.rocketchat.websocket.RealTimeMessageTypes.PING;
+import static bot.rocketchat.websocket.RealTimeMessageTypes.READY;
+import static bot.rocketchat.websocket.RealTimeMessageTypes.RESULT;
+import static bot.rocketchat.websocket.RealTimeMessageTypes.UPDATED;
+import static bot.rocketchat.websocket.messages.in.RecChangedStreamRoomMessages.COLLECTION;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,36 +18,41 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.websocket.DeploymentException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+
 import bot.CommonBase;
 import bot.ConnectionInfo;
+import bot.ThreadProvider;
 import bot.rocketchat.rest.RestClient;
-import bot.rocketchat.rest.Room;
-import bot.rocketchat.rest.Subscription;
+import bot.rocketchat.rest.entities.Room;
+import bot.rocketchat.rest.entities.Subscription;
 import bot.rocketchat.rest.responses.ChatCountersResponse;
 import bot.rocketchat.rest.responses.GenericHistoryResponse.HistoryMessage;
 import bot.rocketchat.tasks.LoginTask;
+import bot.rocketchat.tasks.RoomTrackerListener;
 import bot.rocketchat.tasks.RoomTrackerTask;
-import bot.rocketchat.tasks.RoomTrackerTask.RoomTrackerListener;
 import bot.rocketchat.util.ObjectHolder;
 import bot.rocketchat.util.Tuple;
 import bot.rocketchat.websocket.WebsocketClient;
 import bot.rocketchat.websocket.WebsocketClientListener;
 import bot.rocketchat.websocket.messages.Base;
-import bot.rocketchat.websocket.messages.RecChangedStreamRoomMessages;
-import bot.rocketchat.websocket.messages.RecChangedSub;
-import bot.rocketchat.websocket.messages.RecConnected;
-import bot.rocketchat.websocket.messages.RecLogin;
-import bot.rocketchat.websocket.messages.RecLogin.Result;
-import bot.rocketchat.websocket.messages.RecWithId;
-import bot.rocketchat.websocket.messages.SendConnect;
-import bot.rocketchat.websocket.messages.SendJoinRoom;
-import bot.rocketchat.websocket.messages.SendPong;
-import bot.rocketchat.websocket.messages.SendStreamRoomMessages;
+import bot.rocketchat.websocket.messages.WebsocketMessageProvider;
+import bot.rocketchat.websocket.messages.in.RecChangedStreamRoomMessages;
+import bot.rocketchat.websocket.messages.in.RecChangedSub;
+import bot.rocketchat.websocket.messages.in.RecConnected;
+import bot.rocketchat.websocket.messages.in.RecLogin;
+import bot.rocketchat.websocket.messages.in.RecLogin.Result;
+import bot.rocketchat.websocket.messages.in.RecWithId;
+import bot.rocketchat.websocket.messages.out.SendConnect;
+import bot.rocketchat.websocket.messages.out.SendJoinRoom;
+import bot.rocketchat.websocket.messages.out.SendPong;
+import bot.rocketchat.websocket.messages.out.SendStreamRoomMessages;
 
 public class RocketChatClient extends CommonBase implements WebsocketClientListener, RoomTrackerListener {
 
@@ -57,18 +62,36 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	private static final Logger logger = LoggerFactory.getLogger(RocketChatClient.class);
 
 	@Inject
+	private Gson json;
+
+	@Inject
 	private ConnectionInfo conInfo;
 	private RocketChatClientListener listener;
 
+	@Inject
 	private WebsocketClient wsClient;
+	@Inject
 	private RestClient rsClient;
 
 	private final Semaphore syncWaitForConnected = new Semaphore(0);
 	private final Semaphore syncWaitForLoggedIn = new Semaphore(0);
-	private Thread loginThread;
-	private ObjectHolder<RecLogin.Result> loginTokenHolder = new ObjectHolder<>();
 
-	private Thread roomTrackerThread;
+	@Inject
+	private ThreadProvider threadProvider;
+
+	@Inject
+	private LoginTask loginTask;
+	@Inject
+	private ObjectHolder<RecLogin.Result> loginTokenHolder;
+	@Inject
+	private RoomTrackerTask roomTrackerTask;
+
+	@Inject
+	private WebsocketMessageProvider wsMessages;
+	@Inject
+	private Provider<Room> roomProvider;
+	@Inject
+	private Provider<Message> messageProvider;
 
 	private State state = State.DISCONNECTED;
 
@@ -83,33 +106,37 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 		logger.debug("Starting RocketChatClient...");
 
 		state = State.CONNECTED;
-		wsClient = new WebsocketClient(conInfo, this);
-		rsClient = new RestClient(conInfo, loginTokenHolder);
+		wsClient.initialize(this);
+		rsClient.initialize(loginTokenHolder);
 
 		logger.trace("Opened to WebSocket, initialized REST client.");
 
-		wsClient.sendMessage(new SendConnect());
+		SendConnect sendConnectOut = wsMessages.get(SendConnect.class).initialize();
+		wsClient.sendMessage(sendConnectOut);
 		syncWaitForConnected.acquire();
 		logger.trace("Connected to real-time API (WebSocket).");
 
 		syncWaitForLoggedIn.drainPermits();
-		loginThread = new Thread(new LoginTask(conInfo, wsClient, LOGIN_THREAD_SLEEP_TIME_MILLIS));
-		loginThread.start();
+		loginTask.initialize(wsClient, LOGIN_THREAD_SLEEP_TIME_MILLIS);
+		threadProvider.create(loginTask, "login-thread").start();
 		syncWaitForLoggedIn.acquire();
 		logger.trace("Logged in via real-time API (WebSocket).");
 
-		roomTrackerThread = new Thread(new RoomTrackerTask(rsClient, ROOM_TRACKER_THREAD_SLEEP_TIME_MILLIS, this));
-		roomTrackerThread.start();
+		roomTrackerTask.initialize(rsClient, ROOM_TRACKER_THREAD_SLEEP_TIME_MILLIS, this);
+		threadProvider.create(roomTrackerTask, "room-tracker-thread").start();
 		logger.trace("Started room tracker to periodically join open channels.");
 
 		List<Subscription> subs = rsClient.getSubscriptions();
 		logger.trace("Subscribing to {} rooms...", subs.size());
-		for (Subscription sub : subs)
-			wsClient.sendMessage(new SendStreamRoomMessages(sub.getRoomId()));
+		for (Subscription sub : subs) {
+			SendStreamRoomMessages sendStreamRoomMessagesMsg = wsMessages.get(SendStreamRoomMessages.class);
+			sendStreamRoomMessagesMsg.initialize(sub.getRoomId());
+			wsClient.sendMessage(sendStreamRoomMessagesMsg);
+		}
 
 		logger.trace("Checking for unread messages in {} rooms...", subs.size());
 		for (Subscription sub : subs)
-			processRoom(new Room(sub));
+			processRoom(roomProvider.get().parse(sub));
 
 		logger.debug("RocketChatClient started!");
 	}
@@ -117,7 +144,8 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	public void stop() throws IOException {
 		logger.debug("Stopping RocketChatClient...");
 
-		loginThread.interrupt();
+		roomTrackerTask.stop();
+		loginTask.stop();
 		wsClient.close();
 		wsClient = null;
 		rsClient = null;
@@ -131,27 +159,32 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	public void onWebsocketClose(boolean initiatedByClient) {
 		logger.debug("WebsocketClient closed the session.");
 
-		loginThread.interrupt();
+		try {
+			stop();
+		} catch (IOException e) {
+			logger.error("Caught unexpected IOException, shutting down!", e);
+		}
+
 		listener.onRocketChatClientClose(initiatedByClient);
 	}
 
 	@Override
 	public void onWebsocketMessage(String message) {
-		Base entity = Base.parse(message);
+		Base entity = json.fromJson(message, Base.class);
 
-		if (PING.matches(entity)) {
+		if (entity.is(PING)) {
 			handleMessagePing();
-		} else if (CONNECTED.matches(entity)) {
+		} else if (entity.is(CONNECTED)) {
 			handleMessageConnected(message);
-		} else if (RESULT.matches(entity)) {
+		} else if (entity.is(RESULT)) {
 			handleMessageResult(message);
-		} else if (UPDATED.matches(entity)) {
+		} else if (entity.is(UPDATED)) {
 			// Do nothing
-		} else if (ADDED.matches(entity)) {
+		} else if (entity.is(ADDED)) {
 			// Do nothing
-		} else if (READY.matches(entity)) {
+		} else if (entity.is(READY)) {
 			// Do nothing, occurs on successful real-time stream subscription
-		} else if (CHANGED.matches(entity)) {
+		} else if (entity.is(CHANGED)) {
 			handleMessageChanged(message);
 		} else {
 			logger.warn("Unhandled message received in class '{}': '{}'!", getClass().getSimpleName(), message);
@@ -159,18 +192,19 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	}
 
 	private void handleMessagePing() {
-		wsClient.sendMessage(new SendPong());
+		SendPong sendPongMsg = wsMessages.get(SendPong.class).initialize();
+		wsClient.sendMessage(sendPongMsg);
 	}
 
 	private void handleMessageConnected(String message) {
-		RecConnected connected = RecConnected.parse(message);
+		RecConnected connected = json.fromJson(message, RecConnected.class);
 		logger.info("Connected and started session '{}'.", connected.getSession());
 
 		syncWaitForConnected.release();
 	}
 
 	private void handleMessageResult(String message) {
-		RecWithId recWithId = RecWithId.parse(message);
+		RecWithId recWithId = json.fromJson(message, RecWithId.class);
 		String id = recWithId.getId();
 
 		if (id.startsWith(LoginTask.ID_PREFIX)) {
@@ -183,10 +217,10 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	}
 
 	private void handleMessageChanged(String message) {
-		RecChangedSub changedSub = RecChangedSub.parse(message);
+		RecChangedSub changedSub = json.fromJson(message, RecChangedSub.class);
 
 		if (changedSub.getCollection().equals(COLLECTION)) {
-			RecChangedStreamRoomMessages stream = RecChangedStreamRoomMessages.parse(message);
+			RecChangedStreamRoomMessages stream = json.fromJson(message, RecChangedStreamRoomMessages.class);
 
 			Set<String> roomIds = new HashSet<>();
 
@@ -199,7 +233,7 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	}
 
 	private void handleLoginResult(String message) {
-		RecLogin login = RecLogin.parse(message);
+		RecLogin login = json.fromJson(message, RecLogin.class);
 		Result loginToken = login.getResult();
 		loginTokenHolder.set(loginToken);
 
@@ -212,12 +246,17 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 	@Override
 	public void onNewRooms(List<Room> newRooms) {
 		logger.trace("Joining {} new rooms...", newRooms.size());
-		for (Room room : newRooms)
-			wsClient.sendMessage(new SendJoinRoom(room.getId()));
+		for (Room room : newRooms) {
+			SendJoinRoom sendJoinRoomMsg = wsMessages.get(SendJoinRoom.class).initialize(room.getId());
+			wsClient.sendMessage(sendJoinRoomMsg);
+		}
 
 		logger.trace("Subscribing to {} rooms...", newRooms.size());
-		for (Room room : newRooms)
-			wsClient.sendMessage(new SendStreamRoomMessages(room.getId()));
+		for (Room room : newRooms) {
+			SendStreamRoomMessages sendStreamRoomMessagesMsg = wsMessages.get(SendStreamRoomMessages.class)
+					.initialize(room.getId());
+			wsClient.sendMessage(sendStreamRoomMessagesMsg);
+		}
 
 		logger.trace("Checking for unread messages in {} rooms...", newRooms.size());
 		for (Room room : newRooms)
@@ -226,7 +265,13 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 	private void processRoom(String roomId) {
 		Subscription sub = rsClient.getOneSubscription(roomId);
-		Room room = new Room(sub);
+
+		// If this bot hasn't entered the room yet, then there's no subscription.
+		// Unread messages will be processed later.
+		if (sub.getRoomId() == null)
+			return;
+
+		Room room = roomProvider.get().parse(sub);
 		processRoom(room);
 	}
 
@@ -240,8 +285,11 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 		if (!history.isEmpty()) {
 			rsClient.markSubscriptionRead(room.getId());
 
-			for (HistoryMessage hm : history)
-				listener.onRocketChatClientMessage(hm.toMessage());
+			for (HistoryMessage hm : history) {
+				Message m = messageProvider.get();
+				m.initialize(hm.getId(), hm.getText(), hm.getRoomId(), hm.getTimeStamp(), hm.getType());
+				listener.onRocketChatClientMessage(m);
+			}
 		}
 	}
 

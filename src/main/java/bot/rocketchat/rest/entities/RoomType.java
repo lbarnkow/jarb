@@ -1,4 +1,4 @@
-package bot.rocketchat.rest;
+package bot.rocketchat.rest.entities;
 
 public enum RoomType {
 	CHANNEL("c"), GROUP("p"), IM("d");

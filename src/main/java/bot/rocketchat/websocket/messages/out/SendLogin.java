@@ -1,4 +1,4 @@
-package bot.rocketchat.websocket.messages;
+package bot.rocketchat.websocket.messages.out;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -6,11 +6,15 @@ public class SendLogin extends SendMethod {
 	private static final String METHOD = "login";
 
 	@SuppressWarnings("unused")
-	private final Params[] params;
+	private Params[] params;
 
-	public SendLogin(String id, String username, String password) {
-		super(id, METHOD);
+	SendLogin() {
+	}
+
+	public SendLogin initialize(String id, String username, String password) {
+		super.initialize(id, METHOD);
 		this.params = new Params[] { new Params(username, password) };
+		return this;
 	}
 
 	private static class Params {
