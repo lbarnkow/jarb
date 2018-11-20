@@ -9,30 +9,44 @@ import org.slf4j.LoggerFactory;
 
 import bot.CommonBase;
 import bot.rocketchat.rest.RestClient;
-import bot.rocketchat.rest.Room;
-import bot.rocketchat.rest.Subscription;
+import bot.rocketchat.rest.entities.Room;
+import bot.rocketchat.rest.entities.Subscription;
 
 public class RoomTrackerTask extends CommonBase implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(RoomTrackerTask.class);
 
 	public static final String ID_PREFIX = UUID.randomUUID().toString() + "-";
 
-	private final RestClient rsClient;
-	private final long sleepTimeMillis;
+	private boolean initialized;
+	private volatile boolean alive;
+	private Thread myThread;
 
-	private final RoomTrackerListener listener;
+	private RestClient rsClient;
+	private long sleepTimeMillis;
+	private RoomTrackerListener listener;
 
-	public RoomTrackerTask(RestClient rsClient, long sleepTimeMillis, RoomTrackerListener listener) {
+	RoomTrackerTask() {
+	}
+
+	public void initialize(RestClient rsClient, long sleepTimeMillis, RoomTrackerListener listener) {
+		if (this.initialized)
+			throw new IllegalStateException("RoomTrackerTask already initialized!");
+
 		this.rsClient = rsClient;
 		this.sleepTimeMillis = sleepTimeMillis;
 		this.listener = listener;
+		this.initialized = true;
 	}
 
 	@Override
 	public void run() {
-		logger.debug("Unsubscribed public channel tracker refresh thread started.");
+		// TODO: How to notify task owner in case of exception!?
 
-		while (!Thread.interrupted()) {
+		logger.debug("Unsubscribed public channel tracker refresh thread started.");
+		myThread = Thread.currentThread();
+		alive = true;
+
+		while (alive) {
 			List<Room> channels = rsClient.getChannels();
 			List<Subscription> subs = rsClient.getSubscriptions();
 
@@ -56,8 +70,9 @@ public class RoomTrackerTask extends CommonBase implements Runnable {
 		logger.debug("Unsubscribed public channel tracker refresh thread stopped.");
 	}
 
-	public static interface RoomTrackerListener {
-		void onNewRooms(List<Room> newRooms);
+	public void stop() {
+		alive = false;
+		myThread.interrupt();
 	}
 
 	private boolean isRoomInSubscriptionList(Room room, List<Subscription> subs) {

@@ -3,10 +3,14 @@ package bot.rocketchat.rest.requests;
 import bot.CommonBase;
 
 public class SubscriptionsReadRequest extends CommonBase {
-	private final String rid;
+	private String rid;
 
-	public SubscriptionsReadRequest(String roomId) {
+	SubscriptionsReadRequest() {
+	}
+
+	public SubscriptionsReadRequest initialize(String roomId) {
 		rid = roomId;
+		return this;
 	}
 
 	public String getRoomId() {

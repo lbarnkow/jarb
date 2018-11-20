@@ -4,22 +4,28 @@ import java.time.Instant;
 
 import bot.CommonBase;
 
-public final class Message extends CommonBase {
-	private final String id;
-	private final String text;
-	private final String roomId;
-	private final Instant timestamp;
-	@SuppressWarnings("unused")
-	private final String rawType;
-	private final MessageType type;
+public class Message extends CommonBase {
+	private boolean initialized;
 
-	public Message(String id, String text, String roomId, Instant timestamp, String type) {
+	private String id;
+	private String text;
+	private String roomId;
+	private Instant timestamp;
+	@SuppressWarnings("unused")
+	private String rawType;
+	private MessageType type;
+
+	public synchronized void initialize(String id, String text, String roomId, Instant timestamp, MessageType type) {
+		if (this.initialized)
+			throw new IllegalStateException("Message already initialized!");
+
 		this.id = id;
 		this.text = text;
 		this.roomId = roomId;
 		this.timestamp = timestamp;
-		this.rawType = type;
-		this.type = MessageType.parse(type);
+		this.rawType = type.getRawType();
+		this.type = type;
+		this.initialized = true;
 	}
 
 	public String getId() {
@@ -40,29 +46,5 @@ public final class Message extends CommonBase {
 
 	public MessageType getType() {
 		return type;
-	}
-
-	public enum MessageType {
-		CHAT(""), USER_JOIN("uj"), USER_LEAVE("ul"), ADDED_USER("au"), REMOVE_USER("ru"), ROOM_CHANGED_NAME("r"),
-		ROOM_CHANGED_PRIVACY("room_changed_privacy"), ROOM_CHANGED_TOPIC("room_changed_topic"),
-		ROOM_CHANGED_ANNOUNCEMENT("room_changed_announcement"), ROOM_CHANGED_DESCRIPTION("room_changed_description"),
-		UNKNOWN(null);
-
-		private final String t;
-
-		private MessageType(String t) {
-			this.t = t;
-		}
-
-		public static MessageType parse(String t) {
-			if (t == null)
-				return UNKNOWN;
-
-			for (MessageType type : MessageType.values())
-				if (t.equals(type.t))
-					return type;
-
-			return UNKNOWN;
-		}
 	}
 }

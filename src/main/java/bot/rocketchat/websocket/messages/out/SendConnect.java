@@ -1,11 +1,17 @@
-package bot.rocketchat.websocket.messages;
+package bot.rocketchat.websocket.messages.out;
+
+import bot.rocketchat.websocket.messages.Base;
 
 public class SendConnect extends Base {
 	private String version = "1";
 	private String[] support = new String[] { "1" };
 
-	public SendConnect() {
-		super("connect");
+	SendConnect() {
+	}
+
+	public SendConnect initialize() {
+		super.initialize("connect");
+		return this;
 	}
 
 	public String getVersion() {
@@ -14,9 +20,5 @@ public class SendConnect extends Base {
 
 	public String[] getSupport() {
 		return support;
-	}
-
-	public static SendConnect parse(String json) {
-		return parse(json, SendConnect.class);
 	}
 }

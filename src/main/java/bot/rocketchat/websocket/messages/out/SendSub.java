@@ -1,4 +1,4 @@
-package bot.rocketchat.websocket.messages;
+package bot.rocketchat.websocket.messages.out;
 
 public abstract class SendSub extends SendWithId {
 	private static final String MSG = "sub";
@@ -6,8 +6,12 @@ public abstract class SendSub extends SendWithId {
 	@SuppressWarnings("unused")
 	private String name;
 
-	public SendSub(String name) {
-		super(MSG);
+	SendSub() {
+	}
+
+	public SendSub initialize(String name) {
+		super.initialize(MSG);
 		this.name = name;
+		return this;
 	}
 }

@@ -1,4 +1,4 @@
-package bot.rocketchat.websocket.messages;
+package bot.rocketchat.websocket.messages.in;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +9,9 @@ public class RecChangedStreamRoomMessages extends RecChangedSub {
 	public static final String COLLECTION = "stream-room-messages";
 
 	private Fields fields;
+
+	RecChangedStreamRoomMessages() {
+	}
 
 	public Fields getFields() {
 		return fields;
@@ -23,13 +26,12 @@ public class RecChangedStreamRoomMessages extends RecChangedSub {
 		return messages;
 	}
 
-	public static RecChangedStreamRoomMessages parse(String json) {
-		return parse(json, RecChangedStreamRoomMessages.class);
-	}
-
 	public static class Fields {
 		private String eventName;
 		private Args[] args;
+
+		Fields() {
+		}
 
 		public String getEventName() {
 			return eventName;
@@ -43,6 +45,9 @@ public class RecChangedStreamRoomMessages extends RecChangedSub {
 	public static class Args {
 		private String rid;
 		private String msg;
+
+		Args() {
+		}
 
 		public String getRoomId() {
 			return rid;

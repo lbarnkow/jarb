@@ -1,4 +1,4 @@
-package bot.rocketchat.rest;
+package bot.rocketchat.rest.entities;
 
 import bot.CommonBase;
 
@@ -7,6 +7,9 @@ public class Subscription extends CommonBase {
 	private String rid;
 	private String t;
 	private int unread;
+
+	Subscription() {
+	}
 
 	public String getSubId() {
 		return _id;

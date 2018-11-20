@@ -3,8 +3,9 @@ package bot.rocketchat.rest;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
@@ -15,6 +16,8 @@ import javax.ws.rs.core.Response.Status.Family;
 
 import bot.CommonBase;
 import bot.ConnectionInfo;
+import bot.rocketchat.rest.entities.Room;
+import bot.rocketchat.rest.entities.Subscription;
 import bot.rocketchat.rest.requests.SubscriptionsReadRequest;
 import bot.rocketchat.rest.responses.ChannelListResponse;
 import bot.rocketchat.rest.responses.ChatCountersResponse;
@@ -24,21 +27,38 @@ import bot.rocketchat.rest.responses.SubscriptionsGetOneResponse;
 import bot.rocketchat.rest.responses.SubscriptionsGetResponse;
 import bot.rocketchat.util.GsonJerseyProvider;
 import bot.rocketchat.util.ObjectHolder;
-import bot.rocketchat.websocket.messages.RecLogin;
+import bot.rocketchat.websocket.messages.in.RecLogin;
 
 public class RestClient extends CommonBase {
 
 //	private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
-	private final ObjectHolder<RecLogin.Result> loginTokenHolder;
-	private final Client client;
-	private final WebTarget baseTarget;
+	private boolean initialized;
 
-	public RestClient(ConnectionInfo conInfo, ObjectHolder<RecLogin.Result> loginTokenHolder) {
+	@Inject
+	private ClientProvider clientProvider;
+	@Inject
+	private ConnectionInfo conInfo;
+
+	private ObjectHolder<RecLogin.Result> loginTokenHolder;
+	private Client client;
+	private WebTarget baseTarget;
+
+	@Inject
+	private Provider<SubscriptionsReadRequest> subscriptionsReadRequestProvider;
+
+	RestClient() {
+	}
+
+	public synchronized void initialize(ObjectHolder<RecLogin.Result> loginTokenHolder) {
+		if (this.initialized)
+			throw new IllegalStateException("Message already initialized!");
+
 		this.loginTokenHolder = loginTokenHolder;
-		client = ClientBuilder.newClient();
+		client = clientProvider.newClient();
 		client.register(GsonJerseyProvider.class);
 		baseTarget = client.target(conInfo.getRestUrl());
+		this.initialized = true;
 	}
 
 	private MultivaluedHashMap<String, Object> authHeaders() {
@@ -120,7 +140,8 @@ public class RestClient extends CommonBase {
 	}
 
 	public boolean markSubscriptionRead(String roomId) {
-		SubscriptionsReadRequest payload = new SubscriptionsReadRequest(roomId);
+		SubscriptionsReadRequest payload = subscriptionsReadRequestProvider.get().initialize(roomId);
+		;
 		Response response = buildRequest("subscriptions.read").post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
 		return response.getStatusInfo().getFamily() == Family.SUCCESSFUL;

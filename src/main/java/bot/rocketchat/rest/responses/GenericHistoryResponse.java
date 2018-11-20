@@ -6,10 +6,13 @@ import java.util.Comparator;
 import java.util.List;
 
 import bot.CommonBase;
-import bot.rocketchat.Message;
+import bot.rocketchat.MessageType;
 
 public class GenericHistoryResponse extends CommonBase {
 	private List<HistoryMessage> messages;
+
+	GenericHistoryResponse() {
+	}
 
 	public List<HistoryMessage> getMessages() {
 		Collections.sort(messages, new Comparator<HistoryMessage>() {
@@ -29,29 +32,27 @@ public class GenericHistoryResponse extends CommonBase {
 		private String ts;
 		private String t = "";
 
-		public String get_id() {
+		HistoryMessage() {
+		}
+
+		public String getId() {
 			return _id;
 		}
 
-		public String getRid() {
+		public String getRoomId() {
 			return rid;
 		}
 
-		public String getMsg() {
+		public String getText() {
 			return msg;
 		}
 
-		public String getTimeStamp() {
-			return ts;
+		public Instant getTimeStamp() {
+			return Instant.parse(ts);
 		}
 
-		public String getType() {
-			return t;
-		}
-
-		public Message toMessage() {
-			Instant timestamp = Instant.parse(ts);
-			return new Message(_id, msg, rid, timestamp, t);
+		public MessageType getType() {
+			return MessageType.parse(t);
 		}
 	}
 }
