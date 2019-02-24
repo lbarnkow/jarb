@@ -32,8 +32,10 @@ import bot.ThreadProvider;
 import bot.rocketchat.rest.RestClient;
 import bot.rocketchat.rest.entities.Room;
 import bot.rocketchat.rest.entities.Subscription;
+import bot.rocketchat.rest.requests.MessageSendRequest.Attachment;
 import bot.rocketchat.rest.responses.ChatCountersResponse;
 import bot.rocketchat.rest.responses.GenericHistoryResponse.HistoryMessage;
+import bot.rocketchat.rest.responses.MessageSendResponse;
 import bot.rocketchat.tasks.LoginTask;
 import bot.rocketchat.tasks.RoomTrackerListener;
 import bot.rocketchat.tasks.RoomTrackerTask;
@@ -141,6 +143,11 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 		logger.debug("RocketChatClient started!");
 	}
 
+	public boolean sendMessage(String roomId, String text, Attachment... attachments) {
+		MessageSendResponse response = rsClient.sendMessage(roomId, text, attachments);
+		return response.isSuccessful();
+	}
+
 	public void stop() throws IOException {
 		logger.debug("Stopping RocketChatClient...");
 
@@ -187,7 +194,7 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 		} else if (entity.is(CHANGED)) {
 			handleMessageChanged(message);
 		} else {
-			logger.warn("Unhandled message received in class '{}': '{}'!", getClass().getSimpleName(), message);
+			logger.debug("Unhandled message received in class '{}': '{}'!", getClass().getSimpleName(), message);
 		}
 	}
 
@@ -268,7 +275,7 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 
 		// If this bot hasn't entered the room yet, then there's no subscription.
 		// Unread messages will be processed later.
-		if (sub.getRoomId() == null)
+		if (sub == null || sub.getRoomId() == null)
 			return;
 
 		Room room = roomProvider.get().parse(sub);

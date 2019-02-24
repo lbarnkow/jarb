@@ -1,6 +1,11 @@
 package bot;
 
+import java.io.IOException;
+
 import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -9,11 +14,13 @@ public class Main extends CommonBase {
 	@Inject
 	private ConnectionInfo conInfo;
 	@Inject
-	private Bot bot;
+	private LinkBot bot;
 	@Inject
 	private Runtime runtime;
 
-	public static void main(String... args) {
+	private final static Logger logger = LoggerFactory.getLogger(Main.class);
+
+	public static void main(String... args) throws IOException {
 //		String hostname = "rockettest.system.local";
 //		int port = 80;
 		String hostname = "localhost";
@@ -34,7 +41,9 @@ public class Main extends CommonBase {
 		runtime.addShutdownHook(new Thread() {
 			@Override
 			public void run() {
+				System.out.println("JVM is shutting down, stopping all thread/services...");
 				bot.stop();
+				System.out.println("All threads/service stopped.");
 			}
 		});
 

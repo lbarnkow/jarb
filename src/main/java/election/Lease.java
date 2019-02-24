@@ -44,6 +44,6 @@ public class Lease {
 	}
 
 	public void refreshExpiration() {
-		this.leaseExpiration = System.currentTimeMillis() + Config.LEASE_TIMETOLIVE_MSEC;
+		this.leaseExpiration = System.currentTimeMillis() + Config.LEASE_TIME_TO_LIVE_MSEC;
 	}
 }

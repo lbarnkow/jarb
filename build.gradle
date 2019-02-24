@@ -7,7 +7,7 @@ repositories {
     jcenter()
 }
 
-mainClassName = 'App'
+mainClassName = 'bot.Main'
 
 dependencies {
 	// SHA-256 digest

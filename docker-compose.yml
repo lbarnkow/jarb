@@ -14,7 +14,7 @@ services:
       MONGODB_DATABASE: rocketchat
 
   rocketchat:
-    image: rocketchat/rocket.chat:0.70.4
+    image: rocketchat/rocket.chat:0.73.2
     ports:
       - "8080:3000"
     networks:
