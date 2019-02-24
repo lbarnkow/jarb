@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import bot.rocketchat.Message;
 import bot.rocketchat.RocketChatClient;
 import bot.rocketchat.RocketChatClientListener;
+import bot.rocketchat.rest.requests.MessageSendRequest.Attachment;
 import election.LeaseManager;
 import election.LeaseManagerListener;
 import election.State;
@@ -26,10 +27,14 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 	@Inject
 	private ThreadProvider threadProvider;
 
-	private final LeaseManager leaseManager;
-	private final RocketChatClient rcClient;
+	@Inject
+	private LeaseManager leaseManager;
+	@Inject
+	private RocketChatClient rcClient;
+
 	private final Semaphore syncWaitForLease = new Semaphore(0);
 	private final Semaphore syncLostLease = new Semaphore(0);
+
 	private volatile boolean alive = false;
 	private Thread thread = null;
 
@@ -40,18 +45,14 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 	// this.pattern = Pattern.compile(regex);
 
 	@Inject
-	private Bot(ConnectionInfo conInfo, RocketChatClient rcClient, LeaseManager leaseManager) {
-		this.leaseManager = leaseManager;
-		this.rcClient = rcClient;
-
+	private void initAfterInjection() {
 		leaseManager.setListener(this);
 		rcClient.setListener(this);
 	}
 
 	@Override
 	public Message onRocketChatClientMessage(Message message) {
-		// TODO: inspect and respond
-		System.out.println(message);
+		// TODO: Make class and method abstract?
 		return null;
 	}
 
@@ -74,7 +75,7 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 				rcClient.stop();
 			}
 		} catch (InterruptedException e) {
-			logger.error("Caught InterruptedException, shutting down!", e);
+			logger.info("Caught InterruptedException, shutting down!");
 		} catch (URISyntaxException | DeploymentException | IOException e) {
 			logger.error("Caught unexpected exception, shutting down!", e);
 		}
@@ -100,8 +101,13 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 			thread.interrupt();
 	}
 
+	public boolean sendMessage(String roomId, String text, Attachment... attachments) {
+		return rcClient.sendMessage(roomId, text, attachments);
+	}
+
 	@Override
 	public void onStateChanged(String id, State oldState, State newState) {
+		System.out.println("----");
 		if (newState == LEADER)
 			syncWaitForLease.release();
 		else if (oldState == LEADER)

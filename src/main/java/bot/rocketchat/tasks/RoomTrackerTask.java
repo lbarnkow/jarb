@@ -73,6 +73,13 @@ public class RoomTrackerTask extends CommonBase implements Runnable {
 	public void stop() {
 		alive = false;
 		myThread.interrupt();
+
+		while (myThread.isAlive()) {
+			try {
+				Thread.sleep(150);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 	private boolean isRoomInSubscriptionList(Room room, List<Subscription> subs) {

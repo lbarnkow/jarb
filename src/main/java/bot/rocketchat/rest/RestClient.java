@@ -18,11 +18,14 @@ import bot.CommonBase;
 import bot.ConnectionInfo;
 import bot.rocketchat.rest.entities.Room;
 import bot.rocketchat.rest.entities.Subscription;
+import bot.rocketchat.rest.requests.MessageSendRequest;
+import bot.rocketchat.rest.requests.MessageSendRequest.Attachment;
 import bot.rocketchat.rest.requests.SubscriptionsReadRequest;
 import bot.rocketchat.rest.responses.ChannelListResponse;
 import bot.rocketchat.rest.responses.ChatCountersResponse;
 import bot.rocketchat.rest.responses.GenericHistoryResponse;
 import bot.rocketchat.rest.responses.GenericHistoryResponse.HistoryMessage;
+import bot.rocketchat.rest.responses.MessageSendResponse;
 import bot.rocketchat.rest.responses.SubscriptionsGetOneResponse;
 import bot.rocketchat.rest.responses.SubscriptionsGetResponse;
 import bot.rocketchat.util.GsonJerseyProvider;
@@ -46,6 +49,8 @@ public class RestClient extends CommonBase {
 
 	@Inject
 	private Provider<SubscriptionsReadRequest> subscriptionsReadRequestProvider;
+	@Inject
+	private Provider<MessageSendRequest> messageSendRequestProvider;
 
 	RestClient() {
 	}
@@ -139,9 +144,19 @@ public class RestClient extends CommonBase {
 		return messages;
 	}
 
+	public MessageSendResponse sendMessage(String roomId, String text, Attachment... attachments) {
+		MessageSendRequest payload = messageSendRequestProvider.get().initialize(roomId, text, attachments);
+		Response response = buildRequest("chat.postMessage").post(Entity.entity(payload, MediaType.APPLICATION_JSON));
+
+		if (response.getStatusInfo().getFamily() == Family.SUCCESSFUL)
+			return response.readEntity(MessageSendResponse.class);
+		else
+			throw new RuntimeException(
+					"Failed to send message to room '" + roomId + "'. Reason: " + response.readEntity(String.class));
+	}
+
 	public boolean markSubscriptionRead(String roomId) {
 		SubscriptionsReadRequest payload = subscriptionsReadRequestProvider.get().initialize(roomId);
-		;
 		Response response = buildRequest("subscriptions.read").post(Entity.entity(payload, MediaType.APPLICATION_JSON));
 
 		return response.getStatusInfo().getFamily() == Family.SUCCESSFUL;

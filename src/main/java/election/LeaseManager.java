@@ -59,12 +59,19 @@ public class LeaseManager implements Runnable {
 
 	@Override
 	public void run() {
+		String previousLeader = "";
 		alive = true;
 		state = INACTIVE;
 
 		while (alive) {
 			try {
 				Lease leaseFile = readLeaseFile();
+
+				if (leaseFile != null && !leaseFile.getLeaderId().equals(previousLeader)) {
+					previousLeader = leaseFile.getLeaderId();
+					logger.info("Lease is held by id '{}'", leaseFile.getLeaderId());
+				}
+
 				handleMissingLeaseFile(leaseFile);
 				handleStolenLeaseFile(leaseFile);
 				handleExpiredLeaseFile(leaseFile);
@@ -96,6 +103,12 @@ public class LeaseManager implements Runnable {
 
 	public void stop() {
 		alive = false;
+		while (state != INACTIVE) {
+			try {
+				Thread.sleep(150);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 
 	private Lease readLeaseFile() throws IOException {
