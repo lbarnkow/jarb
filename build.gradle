@@ -7,7 +7,7 @@ repositories {
     jcenter()
 }
 
-mainClassName = 'bot.Main'
+mainClassName = 'io.github.lbarnkow.rocketbot.Main'
 
 dependencies {
 	// SHA-256 digest
@@ -36,5 +36,13 @@ dependencies {
 	compile 'com.google.inject:guice:4.2.2:no_aop'
 	
     // Use JUnit test framework
-    testCompile 'junit:junit:4.12'
+	testCompile("org.junit.jupiter:junit-jupiter-api:5.4.0")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
+    
+    // Google Truth - Fluent assertions for Java
+	testCompile "com.google.truth:truth:0.43"
+}
+
+test {
+    useJUnitPlatform()
 }
