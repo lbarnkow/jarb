@@ -1,4 +1,4 @@
-package io.github.lbarnkow.rocketbot.guice;
+package io.github.lbarnkow.rocketbot.misc;
 
 import com.google.inject.AbstractModule;
 
