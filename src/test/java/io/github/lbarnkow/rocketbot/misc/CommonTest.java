@@ -17,7 +17,6 @@ class CommonTest {
 		String string = pojo.toString();
 
 		// then
-		System.out.println(string);
 		for (Field field : pojo.getClass().getDeclaredFields()) {
 			if (field.isSynthetic()) {
 				continue; // jacoco dynamically instruments classes

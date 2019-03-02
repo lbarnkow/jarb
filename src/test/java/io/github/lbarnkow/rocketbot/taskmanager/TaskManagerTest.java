@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 class TaskManagerTest {
 
 	private TaskManager manager = new TaskManager();
-	private DummyTask task1 = new DummyTask(20L);
-	private DummyTask task2 = new DummyTask(20L);
-	private DummyTask task3 = new DummyTask(20L);
+	private DummyTask task1 = new DummyTask(50L);
+	private DummyTask task2 = new DummyTask(50L);
+	private DummyTask task3 = new DummyTask(50L);
 
 	@Test
 	void testStart() throws InterruptedException {
@@ -19,11 +19,11 @@ class TaskManagerTest {
 
 		// when
 		manager.start(task1, task2, task3);
-		Thread.sleep(10L);
+		Thread.sleep(20L);
 		TaskState state1 = task1.getState();
 		TaskState state2 = task1.getState();
 		TaskState state3 = task1.getState();
-		Thread.sleep(10L);
+		Thread.sleep(100L);
 
 		// then
 		assertThat(manager.getTaskCount()).isEqualTo(3);
@@ -49,7 +49,7 @@ class TaskManagerTest {
 		// when
 		manager.start(task1, task2, task3);
 		manager.stopAll();
-		Thread.sleep(10L);
+		Thread.sleep(25L);
 
 		// then
 		assertThat(task1.getState()).isEqualTo(DEAD);
@@ -68,7 +68,7 @@ class TaskManagerTest {
 		// when
 		manager.start(task1, task2, task3);
 		manager.stop(task1, task3);
-		Thread.sleep(25L);
+		Thread.sleep(60L);
 
 		// then
 		assertThat(task1.getState()).isEqualTo(DEAD);
