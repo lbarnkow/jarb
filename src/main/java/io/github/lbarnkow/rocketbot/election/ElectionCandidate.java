@@ -4,7 +4,6 @@ import static io.github.lbarnkow.rocketbot.election.ElectionCandidateState.ACTIV
 import static io.github.lbarnkow.rocketbot.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.rocketbot.election.ElectionCandidateState.LEADER;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.UUID;
@@ -17,19 +16,18 @@ import io.github.lbarnkow.rocketbot.taskmanager.Task;
 public class ElectionCandidate extends Task {
 	private final static Logger logger = LoggerFactory.getLogger(ElectionCandidate.class);
 
-	static final long LEASE_REFRESH_MSEC = 300L;
-	static final long LEASE_CHALLENGE_MSEC = 100L;
 	static final long SLEEP_VARIANCE_MSEC = (long) (Math.random() * 100L);
 
 	private final String id = UUID.randomUUID().toString();
 
 	volatile ElectionCandidateState state = null;
-	private final ElectionCandidateListener listener;
-	private final File syncFile;
+	private ElectionCandidateListener listener;
+	private ElectionConfiguration config;
 
-	ElectionCandidate(ElectionCandidateListener listener, File syncFile) {
+	public ElectionCandidate configure(ElectionCandidateListener listener, ElectionConfiguration config) {
 		this.listener = listener;
-		this.syncFile = syncFile;
+		this.config = config;
+		return this;
 	}
 
 	public boolean isLeader() {
@@ -41,11 +39,11 @@ public class ElectionCandidate extends Task {
 	}
 
 	@Override
-	protected void initialize() throws Throwable {
+	protected void initializeTask() throws Throwable {
 	}
 
 	@Override
-	protected void run() throws Throwable {
+	protected void runTask() throws Throwable {
 		updateState(INACTIVE);
 
 		try {
@@ -80,7 +78,7 @@ public class ElectionCandidate extends Task {
 	}
 
 	private ElectionLease readLeaseFile() throws IOException {
-		ElectionLease lease = ElectionLease.load(syncFile);
+		ElectionLease lease = ElectionLease.load(config.getSyncFile());
 
 		if (lease == null) {
 			updateState(INACTIVE);
@@ -91,7 +89,7 @@ public class ElectionCandidate extends Task {
 
 	void writeLeaseFile(ElectionLease lease) throws IOException {
 		try {
-			ElectionLease.save(lease, syncFile);
+			ElectionLease.save(lease, config.getSyncFile());
 		} catch (IOException e) {
 			updateState(INACTIVE);
 			throw e;
@@ -100,7 +98,7 @@ public class ElectionCandidate extends Task {
 
 	private void releaseLease() throws IOException {
 		if (state == LEADER || state == ACTIVATING) {
-			Files.delete(syncFile.toPath());
+			Files.delete(config.getSyncFile().toPath());
 			logger.info("Released lease (deleted lease file)!");
 		}
 		updateState(INACTIVE);
@@ -108,7 +106,7 @@ public class ElectionCandidate extends Task {
 
 	private void challengeLease(ElectionLease leaseFile) throws IOException {
 		if (leaseFile == null || leaseFile.isExpired()) {
-			ElectionLease newLease = new ElectionLease(id);
+			ElectionLease newLease = new ElectionLease(id, config.getLeaseTimeToLive());
 			writeLeaseFile(newLease);
 
 			logger.info("Running for election w/ id '{}'", id);
@@ -118,7 +116,7 @@ public class ElectionCandidate extends Task {
 	}
 
 	private ElectionLease refreshLease(ElectionLease oldLease) throws IOException {
-		ElectionLease newLease = new ElectionLease(oldLease);
+		ElectionLease newLease = new ElectionLease(oldLease, config.getLeaseTimeToLive());
 		writeLeaseFile(newLease);
 
 		if (state == ACTIVATING) {
@@ -144,9 +142,9 @@ public class ElectionCandidate extends Task {
 		long sleepTime = SLEEP_VARIANCE_MSEC;
 
 		if (state == LEADER || state == ACTIVATING) {
-			sleepTime += LEASE_REFRESH_MSEC;
+			sleepTime += config.getLeaseRefreshInterval();
 		} else {
-			sleepTime += LEASE_CHALLENGE_MSEC;
+			sleepTime += config.getLeaseChallengeInterval();
 		}
 
 		Thread.sleep(sleepTime);

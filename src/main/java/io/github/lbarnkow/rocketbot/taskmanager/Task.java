@@ -17,26 +17,36 @@ public abstract class Task extends Common {
 
 	private TaskState state = UNUSED;
 	private Thread thread = null;
+	private String name = getClass().getSimpleName() + "-thread";
 
 	private Throwable lastError;
 
-	protected abstract void initialize() throws Throwable;
+	// TODO: remove?!
+	protected abstract void initializeTask() throws Throwable;
 
-	protected abstract void run() throws Throwable;
+	protected abstract void runTask() throws Throwable;
 
-	final void start() {
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	final void startTask() {
 		if (state != UNUSED) {
 			throw new IllegalStateException("Tasks can only be started once!");
 		}
 
 		state = ACTIVATING;
-		thread = new Thread(() -> execute());
+		thread = new Thread(() -> executeTask(), getName());
 		thread.start();
 	}
 
-	private void execute() {
+	private void executeTask() {
 		try {
-			initialize();
+			initializeTask();
 		} catch (Throwable t) {
 			lastError = t;
 			state = DEAD;
@@ -46,15 +56,17 @@ public abstract class Task extends Common {
 
 		state = ACTIVE;
 		try {
-			run();
+			runTask();
 		} catch (Throwable t) {
 			lastError = t;
 			logger.error("Task '{}' raised an unexpected exception!", getClass().getSimpleName(), t);
 		}
+
 		state = DEAD;
+		logger.info("Task '{}' finished.", getName());
 	}
 
-	final void stop() {
+	final void stopTask() {
 		state = DEACTIVATING;
 		thread.interrupt();
 	}

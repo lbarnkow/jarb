@@ -24,7 +24,6 @@ public class ElectionLease extends Common {
 	private final static Logger logger = LoggerFactory.getLogger(ElectionLease.class);
 
 	private static final int MAX_FILE_IO_RETRIES = 5;
-	static final long LEASE_TIME_TO_LIVE_MSEC = 1000L;
 
 	private final static ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());;
 
@@ -38,12 +37,12 @@ public class ElectionLease extends Common {
 		this.leaseExpiration = leaseExpiration;
 	}
 
-	public ElectionLease(String leaderId) {
-		this(leaderId, System.currentTimeMillis(), System.currentTimeMillis() + LEASE_TIME_TO_LIVE_MSEC);
+	public ElectionLease(String leaderId, long ttl) {
+		this(leaderId, System.currentTimeMillis(), System.currentTimeMillis() + ttl);
 	}
 
-	public ElectionLease(ElectionLease oldLease) {
-		this(oldLease.leaderId);
+	public ElectionLease(ElectionLease oldLease, long ttl) {
+		this(oldLease.leaderId, ttl);
 	}
 
 	// for Jackson deserialization

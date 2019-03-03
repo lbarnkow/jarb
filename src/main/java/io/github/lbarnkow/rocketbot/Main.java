@@ -14,29 +14,21 @@ public class Main extends Common {
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) {
-		logger.trace("Hello, World!");
+		logger.info("# # # W E L C O M E # # #");
 
 		Injector guice = Guice.createInjector(new GuiceModule());
-
-		// TaskManager taskManager = guice.getInstance(TaskManager.class);
-		// BotManager botManager = guice.getInstance(BotManager.class);
 
 		// TODO: Read configuration and enabled bots from config
 		// public static final String SYNC_FILE_NAME = "/tmp/" +
 		// ElectionConfig.class.getName() + ".json";
 		// public static final File SYNC_FILE = new File(SYNC_FILE_NAME);
 
-		Bot jiraBot = null;
-		Bot wikiBot = null;
-		Bot puppyBot = null;
-		Bot jokeBot = null;
+		Runtime runtime = guice.getInstance(Runtime.class);
 
-		BotManager botManager = null;
+		BotManager botManager = guice.getInstance(BotManager.class);
+		BotManagerConfiguration config = new BotManagerConfiguration();
 
-		botManager.initialize(jiraBot);
-		botManager.initialize(wikiBot, puppyBot, jokeBot);
-
-		Runtime.getRuntime().addShutdownHook(new Thread() {
+		runtime.addShutdownHook(new Thread("ShutdownHook") {
 			@Override
 			public void run() {
 				logger.info("JVM is shutting down, stopping all thread/services...");
@@ -45,6 +37,11 @@ public class Main extends Common {
 			}
 		});
 
-		botManager.start();
+		// Bot jiraBot = null;
+		// Bot wikiBot = null;
+		// Bot jokeBot = null;
+		Bot puppyBot = null;
+
+		botManager.start(config, puppyBot);
 	}
 }

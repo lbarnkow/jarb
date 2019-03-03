@@ -25,6 +25,10 @@ import io.github.lbarnkow.rocketbot.taskmanager.TaskManager;
 
 class ElectionCandidateTest implements ElectionCandidateListener {
 
+	private static final long DEFAULT_LEASE_TTL = 1000L;
+
+	private final ElectionConfiguration config = new ElectionConfiguration();
+
 	private Map<ElectionCandidate, ElectionCandidateState> states = new HashMap<>();
 
 	@Test
@@ -95,8 +99,9 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	@EnabledOnOs({ LINUX })
 	void testFailedLeaseFileWrite() {
 		// given
-		ElectionCandidate candidate = new ElectionCandidate(this, new File("/dev/rtc0"));
-		ElectionLease lease = new ElectionLease(candidate.getId());
+		config.syncFileName = "/dev/rtc0";
+		ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
+		ElectionLease lease = new ElectionLease(candidate.getId(), DEFAULT_LEASE_TTL);
 
 		candidate.state = LEADER;
 		assertThat(candidate.isLeader()).isTrue();
@@ -112,7 +117,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	@Test
 	void testMissingLease() {
 		// given
-		ElectionCandidate candidate = new ElectionCandidate(this, null);
+		ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
 		candidate.state = LEADER;
 		assertThat(candidate.isLeader()).isTrue();
 
@@ -127,9 +132,9 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	@Test
 	void testStolenLeaseFile() {
 		// given
-		ElectionLease lease = new ElectionLease("testing");
-		ElectionCandidate candidate1 = new ElectionCandidate(this, null);
-		ElectionCandidate candidate2 = new ElectionCandidate(this, null);
+		ElectionLease lease = new ElectionLease("testing", DEFAULT_LEASE_TTL);
+		ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
+		ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
 		candidate1.state = LEADER;
 		candidate2.state = ACTIVATING;
 		assertThat(candidate1.isLeader()).isTrue();
@@ -149,7 +154,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	@Test
 	void testExpiredLease() {
 		// given
-		ElectionCandidate candidate = new ElectionCandidate(this, null);
+		ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
 		candidate.state = LEADER;
 		assertThat(candidate.isLeader()).isTrue();
 		ElectionLease lease = new ElectionLease(candidate.getId(), 50L, 100L);
@@ -165,11 +170,13 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	ElectionCandidate[] generateCandidates(int n) throws IOException {
 		File tmpFile = Files.createTempFile(getClass().getSimpleName(), null).toFile();
 		tmpFile.deleteOnExit();
+		config.syncFileName = tmpFile.getAbsolutePath();
 
 		ElectionCandidate[] result = new ElectionCandidate[n];
 
 		for (int i = 0; i < n; i++) {
-			result[i] = new ElectionCandidate(this, tmpFile);
+			result[i] = new ElectionCandidate().configure(this, config);
+			result[i].setName(result[i].getName() + "-" + (i + 1));
 		}
 
 		return result;

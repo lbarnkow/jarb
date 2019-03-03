@@ -6,14 +6,11 @@ import java.util.List;
 import io.github.lbarnkow.rocketbot.misc.Common;
 
 public class TaskManager extends Common {
-	// private static final Logger logger =
-	// LoggerFactory.getLogger(TaskManager.class);
-
 	private final List<Task> tasks = new ArrayList<>();
 
 	public synchronized void start(Task... tasks) {
 		for (Task task : tasks) {
-			task.start();
+			task.startTask();
 			this.tasks.add(task);
 		}
 	}
@@ -26,7 +23,7 @@ public class TaskManager extends Common {
 
 	public void stop(Task... tasks) {
 		for (Task task : tasks) {
-			task.stop();
+			task.stopTask();
 		}
 	}
 
