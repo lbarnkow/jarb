@@ -14,6 +14,8 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 
 class ElectionLeaseTest {
 
+	private static final long DEFAULT_LEASE_TTL = 1000L;
+
 	private String id = UUID.randomUUID().toString();
 
 	@Test
@@ -33,8 +35,8 @@ class ElectionLeaseTest {
 	void testIsOwnedBy() {
 		// given
 		String id2 = UUID.randomUUID().toString();
-		ElectionLease lease1 = new ElectionLease(id);
-		ElectionLease lease2 = new ElectionLease(id2);
+		ElectionLease lease1 = new ElectionLease(id, 0L);
+		ElectionLease lease2 = new ElectionLease(id2, 0L);
 
 		// when
 		boolean idOwnsLease1 = lease1.isOwnedBy(id);
@@ -71,7 +73,7 @@ class ElectionLeaseTest {
 		ElectionLease lease1 = new ElectionLease(id, 1000L, 2000L);
 
 		// when
-		ElectionLease lease2 = new ElectionLease(lease1);
+		ElectionLease lease2 = new ElectionLease(lease1, DEFAULT_LEASE_TTL);
 
 		// then
 		assertThat(lease1).isNotSameAs(lease2);
@@ -84,7 +86,7 @@ class ElectionLeaseTest {
 	void testLoadAndSave() throws IOException {
 		// given
 		File tmpFile = Files.createTempFile("test", null).toFile();
-		ElectionLease lease = new ElectionLease(id);
+		ElectionLease lease = new ElectionLease(id, DEFAULT_LEASE_TTL);
 
 		// when
 		ElectionLease.save(lease, tmpFile);
@@ -122,7 +124,7 @@ class ElectionLeaseTest {
 	@Test
 	void testSaveWithBadTargetPath() {
 		// given
-		ElectionLease lease = new ElectionLease(id);
+		ElectionLease lease = new ElectionLease(id, DEFAULT_LEASE_TTL);
 
 		// when
 		assertThrows(IOException.class, () -> {

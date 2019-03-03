@@ -1,5 +1,8 @@
 package io.github.lbarnkow.rocketbot.misc;
 
+import javax.websocket.ContainerProvider;
+import javax.websocket.WebSocketContainer;
+
 import com.google.inject.AbstractModule;
 
 public class GuiceModule extends AbstractModule {
@@ -8,6 +11,6 @@ public class GuiceModule extends AbstractModule {
 		super.configure();
 
 		bind(Runtime.class).toInstance(Runtime.getRuntime());
-//		bind(Interface.class).to(Implementation.class);
+		bind(WebSocketContainer.class).toInstance(ContainerProvider.getWebSocketContainer());
 	}
 }

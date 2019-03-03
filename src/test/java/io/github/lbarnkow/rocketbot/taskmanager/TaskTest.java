@@ -15,13 +15,13 @@ class TaskTest {
 	@Test
 	void testSuccessfulTaskLifecycle() throws InterruptedException {
 		// given
-		DummyTask task = new DummyTask(10L, false, false);
+		DummyTask task = new DummyTask(20L, false, false);
 
 		// when
-		task.start();
+		task.startTask();
 		Thread.sleep(5L);
-		task.stop();
-		Thread.sleep(10L);
+		task.stopTask();
+		Thread.sleep(40L);
 
 		// then
 		assertThat(task.stateOnConstruction).isEqualTo(UNUSED);
@@ -38,10 +38,10 @@ class TaskTest {
 		DummyTask task = new DummyTask(0L, false, false);
 
 		// when
-		task.start();
+		task.startTask();
 
 		// then
-		assertThrows(IllegalStateException.class, () -> task.start());
+		assertThrows(IllegalStateException.class, () -> task.startTask());
 	}
 
 	@Test
@@ -50,7 +50,7 @@ class TaskTest {
 		DummyTask task = new DummyTask(10L, true, false);
 
 		// when
-		task.start();
+		task.startTask();
 		Thread.sleep(5L);
 
 		// then
@@ -63,7 +63,7 @@ class TaskTest {
 		DummyTask task = new DummyTask(10L, false, true);
 
 		// when
-		task.start();
+		task.startTask();
 		Thread.sleep(5L);
 
 		// then

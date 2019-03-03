@@ -39,15 +39,18 @@ dependencies {
     // Google Truth - Fluent assertions for Java
 	testCompile "com.google.truth:truth:0.43"
 
+
+
+	// TODO: REMOVE !!!!
 	// Simple File read/write
-	//compile 'commons-io:commons-io:2.6'
+	compile 'commons-io:commons-io:2.6'
 	
 	// simple json implementation
-	//compile 'com.google.code.gson:gson:2.8.5'
+	compile 'com.google.code.gson:gson:2.8.5'
 	
 	// yaml / pojo mapping with jackson
 	//compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
-	//compile 'org.glassfish.jersey.inject:jersey-hk2:2.28'
+	compile 'org.glassfish.jersey.inject:jersey-hk2:2.28'
 }
 
 test {

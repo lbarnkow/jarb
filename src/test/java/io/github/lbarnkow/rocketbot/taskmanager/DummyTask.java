@@ -28,7 +28,7 @@ public final class DummyTask extends Task {
 	}
 
 	@Override
-	protected void initialize() throws Throwable {
+	protected void initializeTask() throws Throwable {
 		stateOnInitialization = getState();
 
 		if (failInitialize) {
@@ -37,7 +37,7 @@ public final class DummyTask extends Task {
 	}
 
 	@Override
-	protected void run() throws Throwable {
+	protected void runTask() throws Throwable {
 		stateOnRun = getState();
 
 		if (failRun) {
