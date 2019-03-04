@@ -39,6 +39,8 @@ dependencies {
     // Google Truth - Fluent assertions for Java
 	testCompile "com.google.truth:truth:0.43"
 
+	// Mocking Framework für unit tests
+	testCompile 'org.mockito:mockito-core:2.24.5'
 
 
 	// TODO: REMOVE !!!!

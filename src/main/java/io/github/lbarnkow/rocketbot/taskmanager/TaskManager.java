@@ -17,9 +17,10 @@ public class TaskManager extends Common {
 
 	private final List<Task> tasks = new ArrayList<>();
 
+	private final Task[] managementTasks = new Task[] { new TaskTableLoggerTask(this), new DeadTaskPrunerTask(this) };
+
 	public TaskManager() {
-		start(new TaskTableLoggerTask(this));
-		start(new DeadTaskPrunerTask(this));
+		start(managementTasks);
 	}
 
 	public synchronized void start(Task... tasks) {
@@ -51,6 +52,10 @@ public class TaskManager extends Common {
 
 	public int getTaskCount() {
 		return tasks.size();
+	}
+
+	public int getNumberOfManagementTasks() {
+		return managementTasks.length;
 	}
 
 	public List<Task> getTasks() {
