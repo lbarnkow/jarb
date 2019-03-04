@@ -67,8 +67,10 @@ public abstract class Task extends Common {
 	}
 
 	final void stopTask() {
-		state = DEACTIVATING;
-		thread.interrupt();
+		if (state == TaskState.ACTIVATING || state == TaskState.ACTIVE) {
+			state = DEACTIVATING;
+			thread.interrupt();
+		}
 	}
 
 	public final TaskState getState() {

@@ -2,8 +2,6 @@ package io.github.lbarnkow.rocketbot;
 
 import static io.github.lbarnkow.rocketbot.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.rocketbot.election.ElectionCandidateState.LEADER;
-import static io.github.lbarnkow.rocketbot.taskmanager.TaskState.DEAD;
-import static io.github.lbarnkow.rocketbot.taskmanager.TaskState.UNUSED;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -116,7 +114,6 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 			logger.info("Stopping all background tasks...");
 			tasks.stopAll();
-			waitForAllTasksToFinish();
 
 			logger.info("Closing websocket session...");
 			// TODO
@@ -144,25 +141,6 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 		// done starting :)
 
-	}
-
-	private void waitForAllTasksToFinish() {
-		boolean finished = false;
-		while (!finished) {
-			finished = true;
-			for (Task task : tasks.getTasks()) {
-				if (task.getState() != UNUSED && task.getState() != DEAD) {
-					finished = false;
-				}
-			}
-
-			try {
-				Thread.sleep(100L);
-			} catch (InterruptedException e) {
-				logger.error("Caught InterruptedException during shutdown! Not waiting any longer!");
-				finished = true;
-			}
-		}
 	}
 
 	@Override
