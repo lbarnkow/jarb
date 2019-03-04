@@ -15,9 +15,15 @@ public class TaskTableLoggerTask extends Task {
 	private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
 
 	private final TaskManager manager;
+	private final long taskInterval;
 
 	public TaskTableLoggerTask(TaskManager manager) {
+		this(manager, TASK_INTERVAL_MSEC);
+	}
+
+	TaskTableLoggerTask(TaskManager manager, long taskInterval) {
 		this.manager = manager;
+		this.taskInterval = taskInterval;
 	}
 
 	@Override
@@ -27,44 +33,56 @@ public class TaskTableLoggerTask extends Task {
 	@Override
 	protected void runTask() throws Throwable {
 		while (true) {
-			int unused = 0;
-			int activating = 0;
-			int active = 0;
-			int deactivating = 0;
-			int dead = 0;
-			int total = 0;
-
 			logger.info("Logging running background tasks");
 
-			for (Task task : manager.getTasks()) {
-				logger.debug("{} : {}", task.getName(), task.getState());
+			TaskStates tasks = countTasks();
 
-				if (task.getState() == UNUSED) {
-					unused++;
-				} else if (task.getState() == ACTIVATING) {
-					activating++;
-				} else if (task.getState() == ACTIVE) {
-					active++;
-				} else if (task.getState() == DEACTIVATING) {
-					deactivating++;
-				} else if (task.getState() == DEAD) {
-					dead++;
-				}
-				total++;
-			}
-
-			logger.info("UNUSED......: {}", unused);
-			logger.info("ACTIVATING..: {}", activating);
-			logger.info("ACTIVE......: {}", active);
-			logger.info("DEACTIVATING: {}", deactivating);
-			logger.info("DEAD........: {}", dead);
-			logger.info("TOTAL.......: {}", total);
+			logger.info("UNUSED......: {}", tasks.unused);
+			logger.info("ACTIVATING..: {}", tasks.activating);
+			logger.info("ACTIVE......: {}", tasks.active);
+			logger.info("DEACTIVATING: {}", tasks.deactivating);
+			logger.info("DEAD........: {}", tasks.dead);
+			logger.info("TOTAL.......: {}", tasks.getTotal());
 
 			try {
-				Thread.sleep(TASK_INTERVAL_MSEC);
+				Thread.sleep(taskInterval);
 			} catch (InterruptedException e) {
 				break;
 			}
+		}
+	}
+
+	TaskStates countTasks() {
+		TaskStates result = new TaskStates();
+
+		for (Task task : manager.getTasks()) {
+			logger.debug("{} : {}", task.getName(), task.getState());
+
+			if (task.getState() == UNUSED) {
+				result.unused++;
+			} else if (task.getState() == ACTIVATING) {
+				result.activating++;
+			} else if (task.getState() == ACTIVE) {
+				result.active++;
+			} else if (task.getState() == DEACTIVATING) {
+				result.deactivating++;
+			} else if (task.getState() == DEAD) {
+				result.dead++;
+			}
+		}
+
+		return result;
+	}
+
+	static class TaskStates {
+		int unused = 0;
+		int activating = 0;
+		int active = 0;
+		int deactivating = 0;
+		int dead = 0;
+
+		int getTotal() {
+			return unused + activating + active + deactivating + dead;
 		}
 	}
 }

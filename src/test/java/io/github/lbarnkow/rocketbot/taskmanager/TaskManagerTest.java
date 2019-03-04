@@ -3,6 +3,7 @@ package io.github.lbarnkow.rocketbot.taskmanager;
 import static com.google.common.truth.Truth.assertThat;
 import static io.github.lbarnkow.rocketbot.taskmanager.TaskState.ACTIVE;
 import static io.github.lbarnkow.rocketbot.taskmanager.TaskState.DEAD;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +27,8 @@ class TaskManagerTest {
 		Thread.sleep(100L);
 
 		// then
-		assertThat(manager.getTaskCount()).isEqualTo(3);
-		assertThat(manager.getTasks()).containsExactly(task3, task2, task1);
+		assertThat(manager.getTaskCount() - manager.getNumberOfManagementTasks()).isEqualTo(3);
+		assertThat(manager.getTasks()).containsAllOf(task3, task2, task1);
 
 		assertThat(task1.succeeded).isTrue();
 		assertThat(task2.succeeded).isTrue();
@@ -78,5 +79,31 @@ class TaskManagerTest {
 		assertThat(task1.succeeded).isFalse();
 		assertThat(task2.succeeded).isTrue();
 		assertThat(task3.succeeded).isFalse();
+	}
+
+	@Test
+	void testPrune() {
+		// given
+		assertThat(manager.getTasks()).hasSize(manager.getNumberOfManagementTasks());
+		Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
+
+		// when
+		manager.stopAll();
+		manager.prune(tasksArray);
+
+		// then
+		assertThat(manager.getTasks()).isEmpty();
+		assertThat(manager.getTaskCount());
+	}
+
+	@Test
+	void testPruneLiveTask() {
+		// given
+		Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
+
+		// when
+		assertThrows(IllegalStateException.class, () -> manager.prune(tasksArray));
+
+		// then
 	}
 }

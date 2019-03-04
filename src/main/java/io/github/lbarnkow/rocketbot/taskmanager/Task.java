@@ -73,7 +73,7 @@ public abstract class Task extends Common {
 		}
 	}
 
-	public final TaskState getState() {
+	public TaskState getState() {
 		return state;
 	}
 
