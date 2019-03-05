@@ -2,10 +2,10 @@ package io.github.lbarnkow.rocketbot.rocketchat.realtime.messages;
 
 import bot.rocketchat.websocket.messages.Base;
 
-public class ConnectedIn extends Base {
+public class ReceiveConnected extends Base {
 	private String session;
 
-	ConnectedIn() {
+	ReceiveConnected() {
 	}
 
 	public String getSession() {

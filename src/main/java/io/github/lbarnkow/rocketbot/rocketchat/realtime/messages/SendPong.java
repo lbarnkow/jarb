@@ -1,7 +1,7 @@
 package io.github.lbarnkow.rocketbot.rocketchat.realtime.messages;
 
-public class PongOut extends Base {
-	public PongOut() {
+public class SendPong extends Base {
+	public SendPong() {
 		super("pong");
 	}
 }

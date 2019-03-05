@@ -1,11 +1,11 @@
 package io.github.lbarnkow.rocketbot.rocketchat.realtime.messages;
 
-public class ConnectOut extends Base {
+public class SendConnect extends Base {
 
 	private String version = "1";
 	private String[] support = new String[] { "1" };
 
-	public ConnectOut() {
+	public SendConnect() {
 		super("connect");
 	}
 
