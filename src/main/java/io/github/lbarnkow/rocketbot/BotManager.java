@@ -3,6 +3,7 @@ package io.github.lbarnkow.rocketbot;
 import static io.github.lbarnkow.rocketbot.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.rocketbot.election.ElectionCandidateState.LEADER;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.ACQUIRED_LEADERSHIP;
+import static io.github.lbarnkow.rocketbot.misc.EventTypes.AUTH_TOKEN_REFRESHED;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.LOST_LEADERSHIP;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.REALTIME_SESSION_CLOSED;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.REALTIME_SESSION_ESTABLISHED;
@@ -20,8 +21,6 @@ import javax.websocket.DeploymentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import io.github.lbarnkow.rocketbot.api.Bot;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidate;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidateListener;
@@ -29,11 +28,12 @@ import io.github.lbarnkow.rocketbot.election.ElectionCandidateState;
 import io.github.lbarnkow.rocketbot.misc.EventTypes;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClientListener;
-import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendLogin;
 import io.github.lbarnkow.rocketbot.taskmanager.Task;
 import io.github.lbarnkow.rocketbot.taskmanager.TaskManager;
+import io.github.lbarnkow.rocketbot.tasks.LoginTask;
+import io.github.lbarnkow.rocketbot.tasks.LoginTask.LoginTaskListener;
 
-public class BotManager extends Task implements ElectionCandidateListener, RealtimeClientListener {
+public class BotManager extends Task implements ElectionCandidateListener, RealtimeClientListener, LoginTaskListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(BotManager.class);
 
@@ -120,6 +120,9 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		} else if (event.type == REALTIME_SESSION_CLOSED) {
 			keepGoing = handleRealtimeSessionClosed(event);
 
+		} else if (event.type == EventTypes.AUTH_TOKEN_REFRESHED) {
+			keepGoing = handleAuthTokenRefreshed(event);
+
 		}
 
 		return keepGoing;
@@ -139,27 +142,11 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		logger.info("Real-time session established; logging in bots...");
 
 		for (Bot bot : bots) {
-			try {
-				SendLogin message = new SendLogin("demobot", "demobot");
-				logger.error(message.toString());
-				String string = realtimeClient.sendMessageAndWait(message);
-				logger.info(string);
-			} catch (JsonProcessingException | InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			LoginTask loginTask = new LoginTask(bot, realtimeClient, this);
+			tasks.start(loginTask);
 		}
 
 		return true;
-		// login all bots (login task per bot)
-		// -- if a login fails, shutdown!
-
-		// On each successful login ->
-		//// (add real-time subscription to all joined rooms for all bots)
-		//// catch up on all channels for all bots
-		//// start room-join-task (per bot?)
-		//// done starting :)
-
 	}
 
 	private boolean handleRealtimeSessionClosed(Event event) {
@@ -168,6 +155,21 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 			logger.info("Realtime connection was closed by other side; shutting down!");
 		}
 		return false;
+	}
+
+	private boolean handleAuthTokenRefreshed(Event event) {
+		logger.info(".......");
+		logger.info(".......");
+		logger.info(".......");
+		logger.info(".......");
+		logger.info(".......");
+		logger.info(".......");
+		return true;
+		// On each successful login ->
+		//// (add real-time subscription to all joined rooms for all bots)
+		//// catch up on all channels for all bots
+		//// start room-join-task (per bot?)
+		//// done starting :)
 	}
 
 	@Override
@@ -191,6 +193,12 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	@Override
 	public void onRealtimeClientSessionClose(boolean initiatedByClient) {
 		Event event = new Event(REALTIME_SESSION_CLOSED, initiatedByClient);
+		enqueueEvent(event);
+	}
+
+	@Override
+	public void onLoginAuthTokenRefreshed(Bot bot, LoginTask loginTask) {
+		Event event = new Event(AUTH_TOKEN_REFRESHED, bot);
 		enqueueEvent(event);
 	}
 

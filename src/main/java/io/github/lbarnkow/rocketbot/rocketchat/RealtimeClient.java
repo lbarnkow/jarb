@@ -17,9 +17,11 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.github.lbarnkow.rocketbot.misc.Tuple;
+import io.github.lbarnkow.rocketbot.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.WebsocketClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.WebsocketClientListener;
-import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.Base;
+import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.BaseMessage;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendConnect;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendPong;
 
@@ -53,7 +55,8 @@ public class RealtimeClient implements WebsocketClientListener {
 		client.sendMessage(json);
 	}
 
-	public String sendMessageAndWait(Base message, long timeout) throws JsonProcessingException, InterruptedException {
+	public <X> X sendMessageAndWait(BaseMessage message, long timeout, Class<X> replyType)
+			throws InterruptedException, ReplyErrorException, IOException {
 		if (message.getId() == null) {
 			throw new IllegalArgumentException(
 					"Messages must have a unique id to be used with 'sendMessageAndWait()'!");
@@ -61,13 +64,22 @@ public class RealtimeClient implements WebsocketClientListener {
 
 		Semaphore sem = new Semaphore(0);
 		unansweredRequests.put(message.getId(), sem);
+
 		sendMessage(message);
 		sem.tryAcquire(timeout, MILLISECONDS);
-		return (String) unansweredRequests.remove(message.getId());
+
+		@SuppressWarnings("unchecked")
+		Tuple<BaseMessage, String> reply = (Tuple<BaseMessage, String>) unansweredRequests.remove(message.getId());
+		if (reply.getFirst().getError() != null) {
+			throw new ReplyErrorException(reply.getFirst().getError());
+		}
+
+		return MAPPER.readValue(reply.getSecond(), replyType);
 	}
 
-	public String sendMessageAndWait(Base message) throws JsonProcessingException, InterruptedException {
-		return sendMessageAndWait(message, 1000L * 60L);
+	public <X> X sendMessageAndWait(BaseMessage message, Class<X> replyType)
+			throws InterruptedException, ReplyErrorException, IOException {
+		return sendMessageAndWait(message, 1000L * 60L, replyType);
 	}
 
 	@Override
@@ -78,7 +90,7 @@ public class RealtimeClient implements WebsocketClientListener {
 	@Override
 	public void onWebsocketMessage(String message) {
 		try {
-			Base baseMessage = MAPPER.readValue(message, Base.class);
+			BaseMessage baseMessage = MAPPER.readValue(message, BaseMessage.class);
 
 			if ("connected".equals(baseMessage.getMsg())) {
 				handleConnected();
@@ -106,13 +118,13 @@ public class RealtimeClient implements WebsocketClientListener {
 		sendMessage(new SendPong());
 	}
 
-	private void handleMessageWithId(Base message, String rawJson) {
+	private void handleMessageWithId(BaseMessage message, String rawJson) {
 		if (unansweredRequests.containsKey(message.getId())) {
 			Semaphore semaphore = (Semaphore) unansweredRequests.remove(message.getId());
-			unansweredRequests.put(message.getId(), rawJson);
+			unansweredRequests.put(message.getId(), new Tuple<>(message, rawJson));
 			semaphore.release();
 		} else {
-			logger.debug("Unhandled message: {}", rawJson);
+			logger.debug("Unhandled message with id: {}", rawJson);
 		}
 	}
 }

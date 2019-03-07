@@ -1,5 +1,6 @@
 package io.github.lbarnkow.rocketbot;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +8,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
+import io.github.lbarnkow.rocketbot.api.Channel;
+import io.github.lbarnkow.rocketbot.api.Message;
 import io.github.lbarnkow.rocketbot.misc.Common;
 import io.github.lbarnkow.rocketbot.misc.GuiceModule;
 
@@ -19,10 +22,6 @@ public class Main extends Common {
 		Injector guice = Guice.createInjector(new GuiceModule());
 
 		// TODO: Read configuration and enabled bots from config
-		// public static final String SYNC_FILE_NAME = "/tmp/" +
-		// ElectionConfig.class.getName() + ".json";
-		// public static final File SYNC_FILE = new File(SYNC_FILE_NAME);
-
 		Runtime runtime = guice.getInstance(Runtime.class);
 
 		BotManager botManager = guice.getInstance(BotManager.class);
@@ -37,11 +36,48 @@ public class Main extends Common {
 			}
 		});
 
-		// Bot jiraBot = null;
-		// Bot wikiBot = null;
-		// Bot jokeBot = null;
-		Bot puppyBot = null;
+		Bot demoBot = new DummyBot("demobot", "demobot");
+		Bot jiraBot = new DummyBot("jirabot", "jirabot");
+		Bot wikiBot = new DummyBot("wikibot", "wikibot");
 
-		botManager.start(config, puppyBot);
+		botManager.start(config, demoBot, jiraBot, wikiBot);
+	}
+
+	public static class DummyBot extends Bot {
+
+		private final Credentials credentials;
+
+		public DummyBot(String username, String password) {
+			String passwordHash = DigestUtils.sha256Hex(password);
+			this.credentials = new Credentials(username, passwordHash);
+		}
+
+		@Override
+		public void initialize() {
+		}
+
+		@Override
+		public String getName() {
+			return credentials.getUsername();
+		}
+
+		@Override
+		public Credentials getCredentials() {
+			return credentials;
+		}
+
+		@Override
+		public boolean getAutojoinPublicChannels() {
+			return false;
+		}
+
+		@Override
+		public boolean offerToJoinChannel(Channel channel) {
+			return false;
+		}
+
+		@Override
+		public void offerMessage(Channel channel, Message message) {
+		}
 	}
 }
