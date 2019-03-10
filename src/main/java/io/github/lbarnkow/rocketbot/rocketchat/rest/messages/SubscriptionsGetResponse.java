@@ -1,4 +1,4 @@
-package io.github.lbarnkow.rocketbot.rocketchat.rest.model;
+package io.github.lbarnkow.rocketbot.rocketchat.rest.messages;
 
 import java.time.Instant;
 import java.util.List;

@@ -68,16 +68,6 @@ public class Main extends Common {
 		}
 
 		@Override
-		public boolean getAutojoinPublicChannels() {
-			return false;
-		}
-
-		@Override
-		public boolean offerToJoinChannel(Channel channel) {
-			return false;
-		}
-
-		@Override
 		public void offerMessage(Channel channel, Message message) {
 		}
 	}

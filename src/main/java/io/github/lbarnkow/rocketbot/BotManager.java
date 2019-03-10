@@ -28,10 +28,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Provider;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
+import io.github.lbarnkow.rocketbot.api.Bot.AuthInfo;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidate;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidateListener;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidateState;
 import io.github.lbarnkow.rocketbot.misc.EventTypes;
+import io.github.lbarnkow.rocketbot.misc.Triple;
 import io.github.lbarnkow.rocketbot.misc.Tuple;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClientListener;
@@ -40,6 +42,7 @@ import io.github.lbarnkow.rocketbot.taskmanager.Task;
 import io.github.lbarnkow.rocketbot.taskmanager.TaskManager;
 import io.github.lbarnkow.rocketbot.tasks.LoginTask;
 import io.github.lbarnkow.rocketbot.tasks.LoginTask.LoginTaskListener;
+import io.github.lbarnkow.rocketbot.tasks.PublicChannelAutoJoinerTask;
 import io.github.lbarnkow.rocketbot.tasks.SubscriptionsTrackerTask;
 import io.github.lbarnkow.rocketbot.tasks.SubscriptionsTrackerTask.SubscriptionsTrackerTaskListener;
 
@@ -193,27 +196,33 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	}
 
 	private boolean handleAuthTokenRefreshed(Event event) throws JsonProcessingException {
-		Bot bot = (Bot) event.data;
-		RealtimeClient realtimeClient = realtimeClients.get(bot);
+		@SuppressWarnings("unchecked")
+		Tuple<Bot, AuthInfo> tuple = (Tuple<Bot, AuthInfo>) event.data;
 
-		tasks.start(new SubscriptionsTrackerTask(bot, realtimeClient, this));
+		Bot bot = tuple.getFirst();
+		AuthInfo previousAuthInfo = tuple.getSecond();
+		AuthInfo authInfo = bot.getAuthHolder().get();
+
+		if (authInfo.isValid() && !previousAuthInfo.isValid()) {
+			RealtimeClient realtimeClient = realtimeClients.get(bot);
+			tasks.start(new SubscriptionsTrackerTask(bot, realtimeClient, this));
+			tasks.start(new PublicChannelAutoJoinerTask(bot, restClient, realtimeClient));
+		}
 
 		return true;
-		// TODO:
-		// On each successful login ->
-		//// catch up on all channels for all bots
-		//// start room-join-task (per bot?)
-		//// done starting :)
 	}
 
 	private boolean handleNewSubscription(Event event) {
 		@SuppressWarnings("unchecked")
-		Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
-		Bot bot = tuple.getFirst();
-		String roomId = tuple.getSecond();
+		Triple<Bot, String, String> triple = (Triple<Bot, String, String>) event.data;
+		Bot bot = triple.getFirst();
+		String roomId = triple.getSecond();
+		String roomName = triple.getThird();
 
 		// TODO: add real-time subscription to room for bot
-		logger.info("Adding realtime sub to room '{}' for bot '{}'...", roomId, bot.getName());
+		// TODO: catch up on all channels for all bots --> processRoom(…)
+		logger.info("Added realtime subscription to room '{}' (id '{}') for bot '{}'...", //
+				roomName, roomId, bot.getName());
 
 		return true;
 	}
@@ -245,15 +254,16 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	}
 
 	@Override
-	public void onLoginAuthTokenRefreshed(LoginTask loginTask) {
-		Event event = new Event(AUTH_TOKEN_REFRESHED, loginTask.getBot());
+	public void onLoginAuthTokenRefreshed(Bot bot, AuthInfo previousAuthInfo) {
+		Tuple<Bot, AuthInfo> tuple = new Tuple<>(bot, previousAuthInfo);
+		Event event = new Event(AUTH_TOKEN_REFRESHED, tuple);
 		enqueueEvent(event);
 	}
 
 	@Override
-	public void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId) {
-		Tuple<Bot, String> tuple = new Tuple<>(subscriptionsTrackerTask.getBot(), roomId);
-		Event event = new Event(NEW_SUBSCRIPTION, tuple);
+	public void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName) {
+		Triple<Bot, String, String> triple = new Triple<>(subscriptionsTrackerTask.getBot(), roomId, roomName);
+		Event event = new Event(NEW_SUBSCRIPTION, triple);
 		enqueueEvent(event);
 	}
 

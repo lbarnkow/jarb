@@ -2,6 +2,7 @@ package io.github.lbarnkow.rocketbot.rocketchat.rest;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,7 +18,9 @@ import io.github.lbarnkow.rocketbot.api.Bot;
 import io.github.lbarnkow.rocketbot.api.Bot.AuthInfo;
 import io.github.lbarnkow.rocketbot.misc.Common;
 import io.github.lbarnkow.rocketbot.rocketchat.ConnectionConfiguration;
-import io.github.lbarnkow.rocketbot.rocketchat.rest.model.SubscriptionsGetResponse;
+import io.github.lbarnkow.rocketbot.rocketchat.rest.messages.ChannelListJoinedReply;
+import io.github.lbarnkow.rocketbot.rocketchat.rest.messages.ChannelListReply;
+import io.github.lbarnkow.rocketbot.rocketchat.rest.messages.SubscriptionsGetResponse;
 
 public class RestClient extends Common {
 
@@ -47,12 +50,27 @@ public class RestClient extends Common {
 		}
 
 		Response response = buildRequest(bot, "subscriptions.get", params).get();
-
-		if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-			throw new RestClientException(response.getStatusInfo());
-		}
+		handleBadHttpResponseCodes(response);
 
 		return response.readEntity(SubscriptionsGetResponse.class);
+	}
+
+	public ChannelListReply getChannelList(Bot bot) throws RestClientException {
+		List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
+
+		Response response = buildRequest(bot, "channels.list", params).get();
+		handleBadHttpResponseCodes(response);
+
+		return response.readEntity(ChannelListReply.class);
+	}
+
+	public ChannelListJoinedReply getChannelListJoined(Bot bot) throws RestClientException {
+		List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
+
+		Response response = buildRequest(bot, "channels.list.joined", params).get();
+		handleBadHttpResponseCodes(response);
+
+		return response.readEntity(ChannelListJoinedReply.class);
 	}
 
 //	public Subscription getOneSubscription(String roomId) {
@@ -131,6 +149,12 @@ public class RestClient extends Common {
 //			throw new IllegalArgumentException("Unrecognized room type '" + room.getType() + "'!");
 //		}
 //	}
+
+	private void handleBadHttpResponseCodes(Response response) throws RestClientException {
+		if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+			throw new RestClientException(response.getStatusInfo());
+		}
+	}
 
 	private Builder buildRequest(Bot bot, String path, List<QueryParam> params) {
 		WebTarget target = baseTarget;
