@@ -1,7 +1,7 @@
 package io.github.lbarnkow.rocketbot.rocketchat;
 
 public interface RealtimeClientListener {
-	void onRealtimeClientSessionEstablished();
+	void onRealtimeClientSessionEstablished(RealtimeClient source);
 
-	void onRealtimeClientSessionClose(boolean initiatedByClient);
+	void onRealtimeClientSessionClose(RealtimeClient source, boolean initiatedByClient);
 }

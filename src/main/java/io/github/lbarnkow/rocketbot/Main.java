@@ -37,10 +37,11 @@ public class Main extends Common {
 		});
 
 		Bot demoBot = new DummyBot("demobot", "demobot");
-		Bot jiraBot = new DummyBot("jirabot", "jirabot");
-		Bot wikiBot = new DummyBot("wikibot", "wikibot");
+//		Bot jiraBot = new DummyBot("jirabot", "jirabot");
+//		Bot wikiBot = new DummyBot("wikibot", "wikibot");
 
-		botManager.start(config, demoBot, jiraBot, wikiBot);
+		botManager.start(config, demoBot);
+//		botManager.start(config, demoBot, jiraBot, wikiBot);
 	}
 
 	public static class DummyBot extends Bot {
