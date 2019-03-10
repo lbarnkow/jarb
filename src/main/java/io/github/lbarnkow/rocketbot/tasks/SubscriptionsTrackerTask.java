@@ -8,24 +8,21 @@ import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply.Subscription;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendGetSubscriptions;
-import io.github.lbarnkow.rocketbot.taskmanager.Task;
 
-public class SubscriptionsTrackerTask extends Task {
+public class SubscriptionsTrackerTask extends AbstractBotNamesTask {
 
 //	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
-	private static final long DEFAULT_SLEEP_TIME = 1000L * 5L; // 5 seconds
+	private static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
-	private Bot bot;
 	private RealtimeClient realtimeClient;
 	private final long sleepTime;
 	private final SubscriptionsTrackerTaskListener listener;
 
-	private Set<String> knownIds = new HashSet<>();
-
 	SubscriptionsTrackerTask(Bot bot, RealtimeClient realtimeClient, long sleepTime,
 			SubscriptionsTrackerTaskListener listener) {
-		this.bot = bot;
+		super(bot);
+
 		this.realtimeClient = realtimeClient;
 		this.sleepTime = sleepTime;
 		this.listener = listener;
@@ -35,16 +32,13 @@ public class SubscriptionsTrackerTask extends Task {
 		this(bot, realtimeClient, DEFAULT_SLEEP_TIME, listener);
 	}
 
-	public Bot getBot() {
-		return bot;
-	}
-
 	@Override
 	protected void initializeTask() throws Throwable {
 	}
 
 	@Override
 	protected void runTask() throws Throwable {
+		Set<String> knownIds = new HashSet<>();
 		try {
 			while (true) {
 				SendGetSubscriptions message = new SendGetSubscriptions();
@@ -57,7 +51,7 @@ public class SubscriptionsTrackerTask extends Task {
 					newIds.add(sub.getId());
 
 					if (!knownIds.contains(sub.getId())) {
-						listener.onNewSubscription(this, sub.getRid());
+						listener.onNewSubscription(this, sub.getRid(), sub.getName());
 					}
 				}
 
@@ -70,6 +64,6 @@ public class SubscriptionsTrackerTask extends Task {
 	}
 
 	public static interface SubscriptionsTrackerTaskListener {
-		void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId);
+		void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName);
 	}
 }

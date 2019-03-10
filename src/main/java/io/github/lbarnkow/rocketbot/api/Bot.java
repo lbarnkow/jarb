@@ -17,9 +17,9 @@ public abstract class Bot {
 		return getClass().getSimpleName();
 	}
 
-	public abstract boolean getAutojoinPublicChannels();
-
-	public abstract boolean offerToJoinChannel(Channel channel);
+	public boolean getAutojoinPublicChannels() {
+		return true;
+	}
 
 	public abstract void offerMessage(Channel channel, Message message);
 

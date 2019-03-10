@@ -12,28 +12,23 @@ import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveLoginReply;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendLogin;
-import io.github.lbarnkow.rocketbot.taskmanager.Task;
 
-public class LoginTask extends Task {
+public class LoginTask extends AbstractBotNamesTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginTask.class);
 
 	private static final long MAX_TOKEN_REFRESH_INTERVAL = Duration.ofMinutes(60L).toMillis();
 
-	private final Bot bot;
 	private final RealtimeClient realtimeClient;
 	private final LoginTaskListener listener;
 
 	public LoginTask(Bot bot, RealtimeClient realtimeClient, LoginTaskListener listener) {
+		super(bot);
+
 		this.setName(getClass().getSimpleName() + "-" + bot.getName() + "-thread");
 
-		this.bot = bot;
 		this.realtimeClient = realtimeClient;
 		this.listener = listener;
-	}
-
-	public Bot getBot() {
-		return bot;
 	}
 
 	@Override
@@ -42,6 +37,8 @@ public class LoginTask extends Task {
 
 	@Override
 	protected void runTask() throws Throwable {
+		Bot bot = getBot();
+
 		try {
 			while (true) {
 				String username = bot.getCredentials().getUsername();
@@ -55,8 +52,9 @@ public class LoginTask extends Task {
 
 				if (authInfo.isValid()) {
 					logger.info("Successfully acquired auth token for bot '{}'!", bot.getName());
+					AuthInfo previousAuthInfo = bot.getAuthHolder().get();
 					bot.getAuthHolder().set(authInfo);
-					listener.onLoginAuthTokenRefreshed(this);
+					listener.onLoginAuthTokenRefreshed(bot, previousAuthInfo);
 
 					sleepTime = calculateSleepTime(authInfo);
 					logger.info("Refreshing auth token in {} minutes.", Duration.ofMillis(sleepTime).toMinutes());
@@ -91,6 +89,6 @@ public class LoginTask extends Task {
 	}
 
 	public static interface LoginTaskListener {
-		void onLoginAuthTokenRefreshed(LoginTask loginTask);
+		void onLoginAuthTokenRefreshed(Bot bot, AuthInfo previousAuthInfo);
 	}
 }
