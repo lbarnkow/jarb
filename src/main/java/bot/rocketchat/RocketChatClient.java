@@ -124,9 +124,10 @@ public class RocketChatClient extends CommonBase implements WebsocketClientListe
 		syncWaitForLoggedIn.acquire();
 		logger.trace("Logged in via real-time API (WebSocket).");
 
-		roomTrackerTask.initialize(rsClient, ROOM_TRACKER_THREAD_SLEEP_TIME_MILLIS, this);
-		threadProvider.create(roomTrackerTask, "room-tracker-thread").start();
-		logger.trace("Started room tracker to periodically join open channels.");
+		// roomTrackerTask.initialize(rsClient, ROOM_TRACKER_THREAD_SLEEP_TIME_MILLIS,
+		// this);
+		// threadProvider.create(roomTrackerTask, "room-tracker-thread").start();
+		// logger.trace("Started room tracker to periodically join open channels.");
 
 		List<Subscription> subs = rsClient.getSubscriptions();
 		logger.trace("Subscribing to {} rooms...", subs.size());

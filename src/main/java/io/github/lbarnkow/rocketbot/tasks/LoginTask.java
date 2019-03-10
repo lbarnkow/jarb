@@ -25,9 +25,15 @@ public class LoginTask extends Task {
 	private final LoginTaskListener listener;
 
 	public LoginTask(Bot bot, RealtimeClient realtimeClient, LoginTaskListener listener) {
+		this.setName(getClass().getSimpleName() + "-" + bot.getName() + "-thread");
+
 		this.bot = bot;
 		this.realtimeClient = realtimeClient;
 		this.listener = listener;
+	}
+
+	public Bot getBot() {
+		return bot;
 	}
 
 	@Override
@@ -50,7 +56,7 @@ public class LoginTask extends Task {
 				if (authInfo.isValid()) {
 					logger.info("Successfully acquired auth token for bot '{}'!", bot.getName());
 					bot.getAuthHolder().set(authInfo);
-					listener.onLoginAuthTokenRefreshed(bot, this);
+					listener.onLoginAuthTokenRefreshed(this);
 
 					sleepTime = calculateSleepTime(authInfo);
 					logger.info("Refreshing auth token in {} minutes.", Duration.ofMillis(sleepTime).toMinutes());
@@ -85,6 +91,6 @@ public class LoginTask extends Task {
 	}
 
 	public static interface LoginTaskListener {
-		void onLoginAuthTokenRefreshed(Bot bot, LoginTask loginTask);
+		void onLoginAuthTokenRefreshed(LoginTask loginTask);
 	}
 }

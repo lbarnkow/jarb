@@ -47,7 +47,10 @@ public class RealtimeClient implements WebsocketClientListener {
 		client.initialize(config, this);
 
 		sendMessage(new SendConnect());
-		// TODO: send connect message, wait for reply
+	}
+
+	public void disconnect() throws IOException {
+		client.close();
 	}
 
 	public void sendMessage(Object message) throws JsonProcessingException {
@@ -84,7 +87,7 @@ public class RealtimeClient implements WebsocketClientListener {
 
 	@Override
 	public void onWebsocketClose(boolean initiatedByClient) {
-		listener.onRealtimeClientSessionClose(initiatedByClient);
+		listener.onRealtimeClientSessionClose(this, initiatedByClient);
 	}
 
 	@Override
@@ -111,7 +114,7 @@ public class RealtimeClient implements WebsocketClientListener {
 	}
 
 	private void handleConnected() {
-		listener.onRealtimeClientSessionEstablished();
+		listener.onRealtimeClientSessionEstablished(this);
 	}
 
 	private void handlePing() throws JsonProcessingException {
