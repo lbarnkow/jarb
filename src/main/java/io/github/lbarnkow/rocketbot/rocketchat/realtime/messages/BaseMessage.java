@@ -6,6 +6,7 @@ public class BaseMessage extends Common {
 
 	private String msg;
 	private String id;
+	private String collection;
 	private Error error;
 
 	// for deserialization
@@ -28,6 +29,10 @@ public class BaseMessage extends Common {
 
 	public String getId() {
 		return id;
+	}
+
+	public String getCollection() {
+		return collection;
 	}
 
 	public Error getError() {

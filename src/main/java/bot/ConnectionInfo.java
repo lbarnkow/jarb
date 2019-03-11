@@ -9,7 +9,6 @@ public class ConnectionInfo extends CommonBase {
 	private String hostname;
 	private int port;
 	private String username;
-	// TODO: Don't store password as String? Must be SHA-256 for login anyways.
 	private String password;
 
 	public synchronized void initialize(boolean encrypted, String hostname, int port, String username,

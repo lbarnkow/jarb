@@ -21,8 +21,8 @@ public abstract class Task extends Common {
 
 	private Throwable lastError;
 
-	// TODO: remove?!
-	protected abstract void initializeTask() throws Throwable;
+	protected void initializeTask() throws Throwable {
+	};
 
 	protected abstract void runTask() throws Throwable;
 
@@ -51,6 +51,7 @@ public abstract class Task extends Common {
 			lastError = t;
 			state = DEAD;
 			logger.error("Initialization of Task '{}' raised an unexpected exception!", getClass().getSimpleName(), t);
+			// TODO: notify listener about error!
 			return;
 		}
 
@@ -60,6 +61,7 @@ public abstract class Task extends Common {
 		} catch (Throwable t) {
 			lastError = t;
 			logger.error("Task '{}' raised an unexpected exception!", getClass().getSimpleName(), t);
+			// TODO: notify listener about error!
 		}
 
 		state = DEAD;
