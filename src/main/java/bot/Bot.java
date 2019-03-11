@@ -38,12 +38,6 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 	private volatile boolean alive = false;
 	private Thread thread = null;
 
-	// TODO:
-	// String regex = "^(?:(?:BOTNAME\\s.*)|(?:@BOTNAME\\s.*))";
-	// regex = regex.replaceAll("BOTNAME", "demobot");
-	//
-	// this.pattern = Pattern.compile(regex);
-
 	@Inject
 	private void initAfterInjection() {
 		leaseManager.setListener(this);
@@ -52,7 +46,6 @@ public class Bot extends CommonBase implements Runnable, LeaseManagerListener, R
 
 	@Override
 	public Message onRocketChatClientMessage(Message message) {
-		// TODO: Make class and method abstract?
 		return null;
 	}
 

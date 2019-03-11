@@ -37,6 +37,7 @@ import io.github.lbarnkow.rocketbot.misc.Triple;
 import io.github.lbarnkow.rocketbot.misc.Tuple;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClientListener;
+import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendStreamRoomMessages;
 import io.github.lbarnkow.rocketbot.rocketchat.rest.RestClient;
 import io.github.lbarnkow.rocketbot.taskmanager.Task;
 import io.github.lbarnkow.rocketbot.taskmanager.TaskManager;
@@ -108,10 +109,6 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	}
 
 	@Override
-	protected void initializeTask() throws Throwable {
-	}
-
-	@Override
 	protected void runTask() throws Throwable {
 		boolean keepGoing = true;
 
@@ -166,8 +163,8 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	}
 
 	private boolean handleAcquiredLeadershipEvent() throws URISyntaxException, DeploymentException, IOException {
-		for (RealtimeClient rtc : realtimeClients.values()) {
-			rtc.connect(this, config.getConnection());
+		for (RealtimeClient realtimeClient : realtimeClients.values()) {
+			realtimeClient.connect(this, config.getConnection());
 		}
 		return true;
 	}
@@ -212,16 +209,19 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		return true;
 	}
 
-	private boolean handleNewSubscription(Event event) {
+	private boolean handleNewSubscription(Event event) throws JsonProcessingException {
 		@SuppressWarnings("unchecked")
 		Triple<Bot, String, String> triple = (Triple<Bot, String, String>) event.data;
 		Bot bot = triple.getFirst();
 		String roomId = triple.getSecond();
 		String roomName = triple.getThird();
 
-		// TODO: add real-time subscription to room for bot
+		SendStreamRoomMessages message = new SendStreamRoomMessages(roomId);
+		RealtimeClient realtimeClient = realtimeClients.get(bot);
+		realtimeClient.sendMessage(message);
+
 		// TODO: catch up on all channels for all bots --> processRoom(…)
-		logger.info("Added realtime subscription to room '{}' (id '{}') for bot '{}'...", //
+		logger.info("Added realtime subscription to room '{}' (id '{}') for bot '{}'.", //
 				roomName, roomId, bot.getName());
 
 		return true;
@@ -251,6 +251,13 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		Tuple<Bot, Boolean> tuple = new Tuple<>(findBotFor(source), initiatedByClient);
 		Event event = new Event(REALTIME_SESSION_CLOSED, tuple);
 		enqueueEvent(event);
+	}
+
+	@Override
+	public void onRealtimeClientStreamRoomMessagesUpdate(RealtimeClient source, String roomId) {
+		Bot bot = findBotFor(source);
+		logger.error("Bot '{}' needs to process room '{}'!", bot.getName(), roomId);
+		// TODO:
 	}
 
 	@Override
@@ -291,5 +298,4 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 			this.data = data;
 		}
 	}
-
 }

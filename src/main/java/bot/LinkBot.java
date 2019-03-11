@@ -11,7 +11,6 @@ public class LinkBot extends Bot {
 
 	@Override
 	public Message onRocketChatClientMessage(Message message) {
-		// TODO: inspect and respond
 		Instant threshold = Instant.now().minus(5, ChronoUnit.MINUTES);
 		if (message.getTimestamp().isBefore(threshold)) {
 			System.out.println("Message too old, discarding...");

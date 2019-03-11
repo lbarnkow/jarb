@@ -23,10 +23,6 @@ public class DeadTaskPrunerTask extends Task {
 	}
 
 	@Override
-	protected void initializeTask() throws Throwable {
-	}
-
-	@Override
 	protected void runTask() throws Throwable {
 		while (true) {
 			pruneTasks();

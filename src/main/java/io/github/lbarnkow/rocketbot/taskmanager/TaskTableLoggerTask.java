@@ -27,10 +27,6 @@ public class TaskTableLoggerTask extends Task {
 	}
 
 	@Override
-	protected void initializeTask() throws Throwable {
-	}
-
-	@Override
 	protected void runTask() throws Throwable {
 		while (true) {
 			logger.info("Logging running background tasks");

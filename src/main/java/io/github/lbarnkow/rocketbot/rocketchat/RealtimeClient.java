@@ -4,6 +4,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
@@ -14,7 +15,9 @@ import javax.websocket.DeploymentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.github.lbarnkow.rocketbot.misc.Tuple;
@@ -22,8 +25,11 @@ import io.github.lbarnkow.rocketbot.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.WebsocketClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.WebsocketClientListener;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.BaseMessage;
+import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveStreamRoomMessagesSubscriptionUpdate;
+import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveStreamRoomMessagesSubscriptionUpdate.Arg;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendConnect;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendPong;
+import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendStreamRoomMessages;
 
 public class RealtimeClient implements WebsocketClientListener {
 
@@ -97,10 +103,16 @@ public class RealtimeClient implements WebsocketClientListener {
 
 			if ("connected".equals(baseMessage.getMsg())) {
 				handleConnected();
+
 			} else if ("ping".equals(baseMessage.getMsg())) {
 				handlePing();
+
+			} else if ("changed".equals(baseMessage.getMsg()) && baseMessage.getCollection() != null) {
+				handleSubscriptionUpdate(baseMessage, message);
+
 			} else if (baseMessage.getId() != null) {
 				handleMessageWithId(baseMessage, message);
+
 			}
 
 		} catch (IOException e) {
@@ -128,6 +140,22 @@ public class RealtimeClient implements WebsocketClientListener {
 			semaphore.release();
 		} else {
 			logger.debug("Unhandled message with id: {}", rawJson);
+		}
+	}
+
+	private void handleSubscriptionUpdate(BaseMessage message, String rawJson)
+			throws JsonParseException, JsonMappingException, IOException {
+		if (SendStreamRoomMessages.COLLECTION.equals(message.getCollection())) {
+			ReceiveStreamRoomMessagesSubscriptionUpdate subscriptionUpdate = MAPPER.readValue(rawJson,
+					ReceiveStreamRoomMessagesSubscriptionUpdate.class);
+			List<Arg> args = subscriptionUpdate.getFields().getArgs();
+			for (Arg arg : args) {
+				listener.onRealtimeClientStreamRoomMessagesUpdate(this, arg.getRid());
+			}
+
+		} else {
+			logger.debug("Unhandled subscription update for collection '{}'.", message.getCollection());
+
 		}
 	}
 }

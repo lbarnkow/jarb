@@ -48,8 +48,6 @@ public class LoginTask extends CommonBase implements Runnable {
 
 	@Override
 	public void run() {
-		// TODO: How to notify task owner in case of exception!?
-
 		logger.debug("Login / token refresh thread started.");
 		myThread = Thread.currentThread();
 		alive = true;
