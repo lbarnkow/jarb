@@ -2,13 +2,15 @@ package io.github.lbarnkow.rocketbot.api;
 
 import io.github.lbarnkow.rocketbot.misc.Common;
 
-public class User extends Common {
+public class Room extends Common {
 	private final String id;
 	private final String name;
+	private final RoomType type;
 
-	public User(String id, String name) {
+	public Room(String id, String name, RoomType type) {
 		this.id = id;
 		this.name = name;
+		this.type = type;
 	}
 
 	public String getId() {
@@ -17,5 +19,9 @@ public class User extends Common {
 
 	public String getName() {
 		return name;
+	}
+
+	public RoomType getType() {
+		return type;
 	}
 }

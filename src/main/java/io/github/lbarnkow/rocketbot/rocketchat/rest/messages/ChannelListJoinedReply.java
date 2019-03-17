@@ -4,15 +4,9 @@ import java.util.List;
 
 import io.github.lbarnkow.rocketbot.misc.Common;
 
-public class ChannelListJoinedReply extends Common {
-
-	private boolean success;
+public class ChannelListJoinedReply extends BaseReply {
 
 	private List<Channel> channels;
-
-	public boolean isSuccess() {
-		return success;
-	}
 
 	public List<Channel> getChannels() {
 		return channels;

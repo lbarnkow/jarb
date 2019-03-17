@@ -8,7 +8,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
-import io.github.lbarnkow.rocketbot.api.Channel;
 import io.github.lbarnkow.rocketbot.api.Message;
 import io.github.lbarnkow.rocketbot.misc.Common;
 import io.github.lbarnkow.rocketbot.misc.GuiceModule;
@@ -45,7 +44,6 @@ public class Main extends Common {
 	}
 
 	public static class DummyBot extends Bot {
-
 		private final Credentials credentials;
 
 		public DummyBot(String username, String password) {
@@ -68,7 +66,9 @@ public class Main extends Common {
 		}
 
 		@Override
-		public void offerMessage(Channel channel, Message message) {
+		public void offerMessage(Message message) {
+			logger.error("{} - {} - {} - {}", message.getTimestamp(), message.getId(), message.getUser().getName(),
+					message.getMessage());
 		}
 	}
 }
