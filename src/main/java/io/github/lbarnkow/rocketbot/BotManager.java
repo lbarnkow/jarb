@@ -6,6 +6,7 @@ import static io.github.lbarnkow.rocketbot.misc.EventTypes.ACQUIRED_LEADERSHIP;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.AUTH_TOKEN_REFRESHED;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.LOST_LEADERSHIP;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.NEW_SUBSCRIPTION;
+import static io.github.lbarnkow.rocketbot.misc.EventTypes.PROCESS_ROOM;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.REALTIME_SESSION_CLOSED;
 import static io.github.lbarnkow.rocketbot.misc.EventTypes.REALTIME_SESSION_ESTABLISHED;
 
@@ -29,16 +30,18 @@ import com.google.inject.Provider;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
 import io.github.lbarnkow.rocketbot.api.Bot.AuthInfo;
+import io.github.lbarnkow.rocketbot.api.RoomType;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidate;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidateListener;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidateState;
 import io.github.lbarnkow.rocketbot.misc.EventTypes;
-import io.github.lbarnkow.rocketbot.misc.Triple;
 import io.github.lbarnkow.rocketbot.misc.Tuple;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClientListener;
+import io.github.lbarnkow.rocketbot.rocketchat.RestClient;
+import io.github.lbarnkow.rocketbot.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendStreamRoomMessages;
-import io.github.lbarnkow.rocketbot.rocketchat.rest.RestClient;
+import io.github.lbarnkow.rocketbot.rocketchat.rest.RestClientException;
 import io.github.lbarnkow.rocketbot.taskmanager.Task;
 import io.github.lbarnkow.rocketbot.taskmanager.TaskManager;
 import io.github.lbarnkow.rocketbot.tasks.LoginTask;
@@ -64,13 +67,16 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	private Semaphore eventPool = new Semaphore(0);
 	private BlockingDeque<Event> eventQueue = new LinkedBlockingDeque<>();
 
+	private RoomProcessor roomProcessor;
+
 	@Inject
 	BotManager(TaskManager taskManager, ElectionCandidate election, Provider<RealtimeClient> realtimeClientProvider,
-			RestClient restClient) {
+			RestClient restClient, RoomProcessor roomProcessor) {
 		this.tasks = taskManager;
 		this.election = election;
 		this.realtimeClientProvider = realtimeClientProvider;
 		this.restClient = restClient;
+		this.roomProcessor = roomProcessor;
 	}
 
 	public void start(BotManagerConfiguration config, Bot... bots) {
@@ -89,9 +95,6 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 	public void stop() {
 		if (shuttingDown.getAndSet(true) == false) {
-			logger.info("Stopping all real-time subscriptions...");
-			// TODO
-
 			logger.info("Stopping all background tasks...");
 			tasks.stopAll();
 
@@ -131,7 +134,8 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		stop();
 	}
 
-	private boolean handleEvent(Event event) throws URISyntaxException, DeploymentException, IOException {
+	private boolean handleEvent(Event event) throws URISyntaxException, DeploymentException, IOException,
+			RestClientException, InterruptedException, ReplyErrorException {
 		boolean keepGoing = true;
 
 		if (event.type == ACQUIRED_LEADERSHIP) {
@@ -151,6 +155,9 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 		} else if (event.type == NEW_SUBSCRIPTION) {
 			keepGoing = handleNewSubscription(event);
+
+		} else if (event.type == EventTypes.PROCESS_ROOM) {
+			keepGoing = handleProcessRoom(event);
 
 		}
 
@@ -211,18 +218,33 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 	private boolean handleNewSubscription(Event event) throws JsonProcessingException {
 		@SuppressWarnings("unchecked")
-		Triple<Bot, String, String> triple = (Triple<Bot, String, String>) event.data;
-		Bot bot = triple.getFirst();
-		String roomId = triple.getSecond();
-		String roomName = triple.getThird();
+		Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
+		Bot bot = tuple.getFirst();
+		String roomId = tuple.getSecond();
 
+		// Add realtime subscription
 		SendStreamRoomMessages message = new SendStreamRoomMessages(roomId);
 		RealtimeClient realtimeClient = realtimeClients.get(bot);
 		realtimeClient.sendMessage(message);
 
-		// TODO: catch up on all channels for all bots --> processRoom(…)
-		logger.info("Added realtime subscription to room '{}' (id '{}') for bot '{}'.", //
-				roomName, roomId, bot.getName());
+		logger.info("Added real-time subscription for bot '{}' to room '{}'.", bot.getName(), roomId);
+
+		// catch-up on unread messages
+		Event newEvent = new Event(PROCESS_ROOM, event.data);
+		enqueueEvent(newEvent);
+
+		return true;
+	}
+
+	private boolean handleProcessRoom(Event event)
+			throws RestClientException, InterruptedException, ReplyErrorException, IOException {
+		@SuppressWarnings("unchecked")
+		Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
+		Bot bot = tuple.getFirst();
+		String roomId = tuple.getSecond();
+
+		RealtimeClient realtimeClient = realtimeClients.get(bot);
+		roomProcessor.processRoom(realtimeClient, restClient, bot, roomId);
 
 		return true;
 	}
@@ -256,8 +278,9 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	@Override
 	public void onRealtimeClientStreamRoomMessagesUpdate(RealtimeClient source, String roomId) {
 		Bot bot = findBotFor(source);
-		logger.error("Bot '{}' needs to process room '{}'!", bot.getName(), roomId);
-		// TODO:
+		Tuple<Bot, String> tuple = new Tuple<>(bot, roomId);
+		Event event = new Event(PROCESS_ROOM, tuple);
+		enqueueEvent(event);
 	}
 
 	@Override
@@ -268,9 +291,11 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	}
 
 	@Override
-	public void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName) {
-		Triple<Bot, String, String> triple = new Triple<>(subscriptionsTrackerTask.getBot(), roomId, roomName);
-		Event event = new Event(NEW_SUBSCRIPTION, triple);
+	public void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName,
+			RoomType roomType) {
+		roomProcessor.cacheRoomData(roomId, roomName, roomType);
+		Tuple<Bot, String> tuple = new Tuple<>(subscriptionsTrackerTask.getBot(), roomId);
+		Event event = new Event(NEW_SUBSCRIPTION, tuple);
 		enqueueEvent(event);
 	}
 

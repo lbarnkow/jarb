@@ -8,8 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
+import io.github.lbarnkow.rocketbot.rocketchat.RestClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendJoinRoom;
-import io.github.lbarnkow.rocketbot.rocketchat.rest.RestClient;
 import io.github.lbarnkow.rocketbot.rocketchat.rest.messages.ChannelListJoinedReply;
 import io.github.lbarnkow.rocketbot.rocketchat.rest.messages.ChannelListReply;
 

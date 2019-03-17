@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
+import io.github.lbarnkow.rocketbot.api.RoomType;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply.Subscription;
@@ -51,7 +52,7 @@ public class SubscriptionsTrackerTask extends AbstractBotNamesTask {
 					newIds.add(sub.getId());
 
 					if (!knownIds.contains(sub.getId())) {
-						listener.onNewSubscription(this, sub.getRid(), sub.getName());
+						listener.onNewSubscription(this, sub.getRid(), sub.getName(), RoomType.parse(sub.getT()));
 					}
 				}
 
@@ -64,6 +65,7 @@ public class SubscriptionsTrackerTask extends AbstractBotNamesTask {
 	}
 
 	public static interface SubscriptionsTrackerTaskListener {
-		void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName);
+		void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName,
+				RoomType roomType);
 	}
 }

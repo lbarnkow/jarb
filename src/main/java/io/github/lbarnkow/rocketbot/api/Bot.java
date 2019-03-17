@@ -2,10 +2,14 @@ package io.github.lbarnkow.rocketbot.api;
 
 import java.time.Instant;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.lbarnkow.rocketbot.misc.Common;
 import io.github.lbarnkow.rocketbot.misc.Holder;
 
 public abstract class Bot {
+	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final Holder<AuthInfo> authHolder = new Holder<>(AuthInfo.INVALID);
 
@@ -21,7 +25,7 @@ public abstract class Bot {
 		return true;
 	}
 
-	public abstract void offerMessage(Channel channel, Message message);
+	public abstract void offerMessage(Message message);
 
 	public Holder<AuthInfo> getAuthHolder() {
 		return authHolder;
