@@ -8,40 +8,45 @@ import static io.github.lbarnkow.rocketbot.taskmanager.TaskState.UNUSED;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MockHelper {
-	public static List<Task> generateTaskMocks(int unused, int activating, int active, int deactivating, int dead) {
-		List<Task> result = new ArrayList<>();
+	public static Map<Task, TaskWrapper> generateTaskMocks(int unused, int activating, int active, int deactivating,
+			int dead) {
+		Map<Task, TaskWrapper> result = new HashMap<>();
 
 		for (int i = 0; i < unused; i++) {
 			Task task = mock(Task.class);
-			when(task.getState()).thenReturn(UNUSED);
-			result.add(task);
+			TaskWrapper wrapper = mock(TaskWrapper.class);
+			when(wrapper.getState()).thenReturn(UNUSED);
+			result.put(task, wrapper);
 		}
 		for (int i = 0; i < activating; i++) {
 			Task task = mock(Task.class);
-			when(task.getState()).thenReturn(ACTIVATING);
-			result.add(task);
+			TaskWrapper wrapper = mock(TaskWrapper.class);
+			when(wrapper.getState()).thenReturn(ACTIVATING);
+			result.put(task, wrapper);
 		}
 		for (int i = 0; i < active; i++) {
 			Task task = mock(Task.class);
-			when(task.getState()).thenReturn(ACTIVE);
-			result.add(task);
+			TaskWrapper wrapper = mock(TaskWrapper.class);
+			when(wrapper.getState()).thenReturn(ACTIVE);
+			result.put(task, wrapper);
 		}
 		for (int i = 0; i < deactivating; i++) {
 			Task task = mock(Task.class);
-			when(task.getState()).thenReturn(DEACTIVATING);
-			result.add(task);
+			TaskWrapper wrapper = mock(TaskWrapper.class);
+			when(wrapper.getState()).thenReturn(DEACTIVATING);
+			result.put(task, wrapper);
 		}
 		for (int i = 0; i < dead; i++) {
 			Task task = mock(Task.class);
-			when(task.getState()).thenReturn(DEAD);
-			result.add(task);
+			TaskWrapper wrapper = mock(TaskWrapper.class);
+			when(wrapper.getState()).thenReturn(DEAD);
+			result.put(task, wrapper);
 		}
 
 		return result;
 	}
-
 }

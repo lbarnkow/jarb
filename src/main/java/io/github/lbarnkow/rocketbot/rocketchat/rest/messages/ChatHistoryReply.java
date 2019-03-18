@@ -14,6 +14,7 @@ public class ChatHistoryReply extends BaseReply {
 
 	public static class Message extends Common {
 		private String _id;
+		private String t;
 		private String rid;
 		private String msg;
 		private String ts;
@@ -21,6 +22,10 @@ public class ChatHistoryReply extends BaseReply {
 
 		public String get_id() {
 			return _id;
+		}
+
+		public String getT() {
+			return t;
 		}
 
 		public String getRid() {

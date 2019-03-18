@@ -52,17 +52,18 @@ public class TaskTableLoggerTask extends Task {
 		TaskStates result = new TaskStates();
 
 		for (Task task : manager.getTasks()) {
-			logger.debug("{} : {}", task.getName(), task.getState());
+			TaskState state = manager.getTaskState(task);
+			logger.debug("{} : {}", task.getName(), state);
 
-			if (task.getState() == UNUSED) {
+			if (state == UNUSED) {
 				result.unused++;
-			} else if (task.getState() == ACTIVATING) {
+			} else if (state == ACTIVATING) {
 				result.activating++;
-			} else if (task.getState() == ACTIVE) {
+			} else if (state == ACTIVE) {
 				result.active++;
-			} else if (task.getState() == DEACTIVATING) {
+			} else if (state == DEACTIVATING) {
 				result.deactivating++;
-			} else if (task.getState() == DEAD) {
+			} else if (state == DEAD) {
 				result.dead++;
 			}
 		}
