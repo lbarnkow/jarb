@@ -3,8 +3,10 @@ package io.github.lbarnkow.rocketbot.taskmanager;
 import static io.github.lbarnkow.rocketbot.taskmanager.TaskState.DEAD;
 import static io.github.lbarnkow.rocketbot.taskmanager.TaskState.UNUSED;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +17,7 @@ public class TaskManager extends Common {
 
 	private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
-	private final List<Task> tasks = new ArrayList<>();
+	private final Map<Task, TaskWrapper> tasks = new HashMap<>();
 
 	private final Task[] managementTasks = new Task[] { new TaskTableLoggerTask(this), new DeadTaskPrunerTask(this) };
 
@@ -25,25 +27,27 @@ public class TaskManager extends Common {
 
 	public synchronized void start(Task... tasks) {
 		for (Task task : tasks) {
-			task.startTask();
-			this.tasks.add(task);
+			TaskWrapper wrapper = new TaskWrapper(task);
+			wrapper.startTask();
+			this.tasks.put(task, wrapper);
 		}
 	}
 
 	public synchronized void stopAll() {
-		tasks.stream().forEach(task -> stop(task));
+		tasks.keySet().stream().forEach(task -> stop(task));
 		waitForAllTasksToFinish();
 	}
 
 	public void stop(Task... tasks) {
 		for (Task task : tasks) {
-			task.stopTask();
+			this.tasks.get(task).stopTask();
 		}
 	}
 
 	public void prune(Task... tasks) {
 		for (Task task : tasks) {
-			if (task.getState() != DEAD) {
+			TaskWrapper wrapper = this.tasks.get(task);
+			if (wrapper.getState() != DEAD) {
 				throw new IllegalStateException("Only tasks in state " + DEAD + " can be pruned!");
 			}
 			this.tasks.remove(task);
@@ -58,18 +62,22 @@ public class TaskManager extends Common {
 		return managementTasks.length;
 	}
 
-	public List<Task> getTasks() {
-		return new ArrayList<>(tasks);
+	public Set<Task> getTasks() {
+		return new HashSet<>(tasks.keySet());
+	}
+
+	public TaskState getTaskState(Task task) {
+		return tasks.get(task).getState();
 	}
 
 	private void waitForAllTasksToFinish() {
 		try {
-			boolean finished = false;
-			while (!finished) {
-				finished = true;
-				for (Task task : getTasks()) {
-					if (task.getState() != UNUSED && task.getState() != DEAD) {
-						finished = false;
+			boolean done = false;
+			while (!done) {
+				done = true;
+				for (TaskWrapper wrapper : tasks.values()) {
+					if (wrapper.getState() != UNUSED && wrapper.getState() != DEAD) {
+						done = false;
 					}
 				}
 				Thread.sleep(50L);

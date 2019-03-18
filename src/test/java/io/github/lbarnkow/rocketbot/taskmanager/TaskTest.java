@@ -15,59 +15,64 @@ class TaskTest {
 	@Test
 	void testSuccessfulTaskLifecycle() throws InterruptedException {
 		// given
-		DummyTask task = new DummyTask(20L, false, false);
+		DummyTaskForUnitTesting task = new DummyTaskForUnitTesting(20L, false, false);
+		TaskWrapper wrapper = new TaskWrapper(task);
+		task.captureStateBeforeInitialization(wrapper);
 
 		// when
-		task.startTask();
+		wrapper.startTask();
 		Thread.sleep(5L);
-		task.stopTask();
+		wrapper.stopTask();
 		Thread.sleep(40L);
 
 		// then
-		assertThat(task.stateOnConstruction).isEqualTo(UNUSED);
+		assertThat(task.stateBeforeInitialization).isEqualTo(UNUSED);
 		assertThat(task.stateOnInitialization).isEqualTo(ACTIVATING);
 		assertThat(task.stateOnRun).isEqualTo(ACTIVE);
 		assertThat(task.stateOnInterruption).isEqualTo(DEACTIVATING);
-		assertThat(task.getState()).isEqualTo(DEAD);
-		assertThat(task.getLastError()).isNull();
+		assertThat(wrapper.getState()).isEqualTo(DEAD);
+		assertThat(wrapper.getLastError()).isNull();
 	}
 
 	@Test
-	void testTryTaskTwice() {
+	void testTryStartingTaskTwice() {
 		// given
-		DummyTask task = new DummyTask(0L, false, false);
+		DummyTaskForUnitTesting task = new DummyTaskForUnitTesting(0L, false, false);
+		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		task.startTask();
+		wrapper.startTask();
 
 		// then
-		assertThrows(IllegalStateException.class, () -> task.startTask());
+		assertThrows(IllegalStateException.class, () -> wrapper.startTask());
 	}
 
 	@Test
-	void testFailedInitialization() throws InterruptedException {
+	void testTaskThrowingExceptionDuringInitialization() throws InterruptedException {
 		// given
-		DummyTask task = new DummyTask(10L, true, false);
+		DummyTaskForUnitTesting task = new DummyTaskForUnitTesting(10L, true, false);
+		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		task.startTask();
-		Thread.sleep(5L);
+		wrapper.startTask();
+		Thread.sleep(15L);
 
 		// then
-		assertThat(task.getLastError()).isInstanceOf(DummyTask.InitializeException.class);
+		assertThat(wrapper.getLastError()).isInstanceOf(DummyTaskForUnitTesting.InitializeException.class);
 	}
 
 	@Test
-	void testFailedRun() throws InterruptedException {
+	void testTaskThrowingExceptionDuringRun() throws InterruptedException {
 		// given
-		DummyTask task = new DummyTask(10L, false, true);
+		DummyTaskForUnitTesting task = new DummyTaskForUnitTesting(10L, false, true);
+		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		task.startTask();
-		Thread.sleep(5L);
+		wrapper.startTask();
+		Thread.sleep(15L);
 
 		// then
-		assertThat(task.getLastError()).isInstanceOf(DummyTask.RunException.class);
+		assertThat(wrapper.getLastError()).isInstanceOf(DummyTaskForUnitTesting.RunException.class);
 	}
 
 }

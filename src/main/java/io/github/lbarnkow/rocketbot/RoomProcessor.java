@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
 import io.github.lbarnkow.rocketbot.api.Message;
+import io.github.lbarnkow.rocketbot.api.MessageType;
 import io.github.lbarnkow.rocketbot.api.Room;
 import io.github.lbarnkow.rocketbot.api.RoomType;
 import io.github.lbarnkow.rocketbot.api.User;
@@ -42,19 +43,23 @@ public class RoomProcessor {
 		Room room = resolveRoomType(restClient, bot, roomId);
 
 		ChatCountersReply countersBefore = restClient.getChatCounters(bot, room.getType(), room.getId());
-		logger.debug("Bot '{}' needs to process '{}' unread messages in room '{}'.", bot.getName(),
-				countersBefore.getUnreads(), room.getName());
+		if (countersBefore.isJoined()) {
+			logger.debug("Bot '{}' needs to process '{}' unread messages in room '{}'.", bot.getName(),
+					countersBefore.getUnreads(), room.getName());
 
-		restClient.markSubscriptionRead(bot, roomId);
-		ChatCountersReply countersAfter = restClient.getChatCounters(bot, room.getType(), room.getId());
+			restClient.markSubscriptionRead(bot, roomId);
+			ChatCountersReply countersAfter = restClient.getChatCounters(bot, room.getType(), room.getId());
 
-		List<Message> history = getHistory(restClient, bot, room, countersBefore, countersAfter);
-		for (Message message : history) {
-			try {
-				bot.offerMessage(message);
-			} catch (Throwable e) {
-				logger.error("Bot '{}' failed to process message '{}'!", bot.getName(), message);
+			List<Message> history = getHistory(restClient, bot, room, countersBefore, countersAfter);
+			for (Message message : history) {
+				try {
+					bot.offerMessage(message);
+				} catch (Throwable e) {
+					logger.error("Bot '{}' failed to process message '{}'!", bot.getName(), message);
+				}
 			}
+		} else {
+			logger.debug("Not processing room '{}', because bot '{}' is not a member.", room.getName(), bot.getName());
 		}
 	}
 
@@ -76,12 +81,14 @@ public class RoomProcessor {
 		List<Message> result = new ArrayList<>();
 
 		Instant oldest = Instant.parse(before.getUnreadsFrom());
-		Instant latest = Instant.parse(after.getLatest());
+		Instant latest = Instant.parse(after.getUnreadsFrom());
 
 		ChatHistoryReply history = restClient.getChatHistory(bot, room, latest, oldest, true);
 		for (ChatHistoryReply.Message rawMsg : history.getMessages()) {
+			MessageType type = MessageType.parse(rawMsg.getT());
 			User user = new User(rawMsg.getU().get_id(), rawMsg.getU().getUsername());
-			Message message = new Message(room, user, rawMsg.get_id(), rawMsg.getMsg(), Instant.parse(rawMsg.getTs()));
+			Message message = new Message(type, room, user, rawMsg.get_id(), rawMsg.getMsg(),
+					Instant.parse(rawMsg.getTs()));
 			result.add(message);
 		}
 

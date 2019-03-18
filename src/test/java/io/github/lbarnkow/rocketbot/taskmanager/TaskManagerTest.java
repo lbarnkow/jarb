@@ -10,9 +10,9 @@ import org.junit.jupiter.api.Test;
 class TaskManagerTest {
 
 	private TaskManager manager = new TaskManager();
-	private DummyTask task1 = new DummyTask(50L);
-	private DummyTask task2 = new DummyTask(50L);
-	private DummyTask task3 = new DummyTask(50L);
+	private DummyTaskForUnitTesting task1 = new DummyTaskForUnitTesting(50L);
+	private DummyTaskForUnitTesting task2 = new DummyTaskForUnitTesting(50L);
+	private DummyTaskForUnitTesting task3 = new DummyTaskForUnitTesting(50L);
 
 	@Test
 	void testStart() throws InterruptedException {
@@ -21,9 +21,9 @@ class TaskManagerTest {
 		// when
 		manager.start(task1, task2, task3);
 		Thread.sleep(20L);
-		TaskState state1 = task1.getState();
-		TaskState state2 = task1.getState();
-		TaskState state3 = task1.getState();
+		TaskState state1 = manager.getTaskState(task1);
+		TaskState state2 = manager.getTaskState(task2);
+		TaskState state3 = manager.getTaskState(task3);
 		Thread.sleep(100L);
 
 		// then
@@ -38,9 +38,9 @@ class TaskManagerTest {
 		assertThat(state2).isEqualTo(ACTIVE);
 		assertThat(state3).isEqualTo(ACTIVE);
 
-		assertThat(task1.getState()).isEqualTo(DEAD);
-		assertThat(task2.getState()).isEqualTo(DEAD);
-		assertThat(task3.getState()).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task1)).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task2)).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task3)).isEqualTo(DEAD);
 	}
 
 	@Test
@@ -53,9 +53,9 @@ class TaskManagerTest {
 		Thread.sleep(25L);
 
 		// then
-		assertThat(task1.getState()).isEqualTo(DEAD);
-		assertThat(task2.getState()).isEqualTo(DEAD);
-		assertThat(task3.getState()).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task1)).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task2)).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task3)).isEqualTo(DEAD);
 
 		assertThat(task1.succeeded).isFalse();
 		assertThat(task2.succeeded).isFalse();
@@ -72,9 +72,9 @@ class TaskManagerTest {
 		Thread.sleep(60L);
 
 		// then
-		assertThat(task1.getState()).isEqualTo(DEAD);
-		assertThat(task2.getState()).isEqualTo(DEAD);
-		assertThat(task3.getState()).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task1)).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task2)).isEqualTo(DEAD);
+		assertThat(manager.getTaskState(task3)).isEqualTo(DEAD);
 
 		assertThat(task1.succeeded).isFalse();
 		assertThat(task2.succeeded).isTrue();

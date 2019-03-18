@@ -1,7 +1,8 @@
 package io.github.lbarnkow.rocketbot.taskmanager;
 
-public final class DummyTask extends Task {
-	TaskState stateOnConstruction;
+public final class DummyTaskForUnitTesting extends Task {
+	TaskWrapper myWrapper;
+	TaskState stateBeforeInitialization;
 	TaskState stateOnInitialization;
 	TaskState stateOnRun;
 	TaskState stateOnInterruption;
@@ -11,25 +12,30 @@ public final class DummyTask extends Task {
 	private boolean failInitialize;
 	private boolean failRun;
 
-	public DummyTask(long sleepMillis, boolean failInitialize, boolean failRun) {
+	public DummyTaskForUnitTesting(long sleepMillis, boolean failInitialize, boolean failRun) {
 		this.sleepMillis = sleepMillis;
 		this.failInitialize = failInitialize;
 		this.failRun = failRun;
-
-		stateOnConstruction = getState();
 	}
 
-	public DummyTask(long sleepMillis) {
+	public DummyTaskForUnitTesting(long sleepMillis) {
 		this(sleepMillis, false, false);
 	}
 
-	public DummyTask() {
+	public DummyTaskForUnitTesting() {
 		this(0L);
+	}
+
+	void captureStateBeforeInitialization(TaskWrapper wrapper) {
+		myWrapper = wrapper;
+		stateBeforeInitialization = wrapper.getState();
 	}
 
 	@Override
 	protected void initializeTask() throws Throwable {
-		stateOnInitialization = getState();
+		if (myWrapper != null) {
+			stateOnInitialization = myWrapper.getState();
+		}
 
 		if (failInitialize) {
 			throw new InitializeException();
@@ -38,7 +44,9 @@ public final class DummyTask extends Task {
 
 	@Override
 	protected void runTask() throws Throwable {
-		stateOnRun = getState();
+		if (myWrapper != null) {
+			stateOnRun = myWrapper.getState();
+		}
 
 		if (failRun) {
 			throw new RunException();
@@ -48,7 +56,9 @@ public final class DummyTask extends Task {
 			Thread.sleep(sleepMillis);
 			succeeded = true;
 		} catch (InterruptedException e) {
-			stateOnInterruption = getState();
+			if (myWrapper != null) {
+				stateOnInterruption = myWrapper.getState();
+			}
 		}
 	}
 

@@ -39,8 +39,8 @@ public class DeadTaskPrunerTask extends Task {
 		int pruned = 0;
 
 		for (Task task : manager.getTasks()) {
-			if (task.getState() == DEAD) {
-				logger.debug("Pruning task '{}' in state '{}'.", task.getName(), task.getState());
+			if (manager.getTaskState(task) == DEAD) {
+				logger.debug("Pruning task '{}' in state '{}'.", task.getName(), DEAD);
 				pruned++;
 				manager.prune(task);
 			}

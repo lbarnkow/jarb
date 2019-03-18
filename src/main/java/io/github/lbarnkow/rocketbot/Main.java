@@ -67,8 +67,7 @@ public class Main extends Common {
 
 		@Override
 		public void offerMessage(Message message) {
-			logger.error("{} - {} - {} - {}", message.getTimestamp(), message.getId(), message.getUser().getName(),
-					message.getMessage());
+			logger.error(message.toString());
 		}
 	}
 }
