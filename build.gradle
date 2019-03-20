@@ -7,7 +7,7 @@ repositories {
     jcenter()
 }
 
-mainClassName = 'io.github.lbarnkow.rocketbot.Main'
+mainClassName = 'io.github.lbarnkow.jarb.Main'
 
 dependencies {
 	// SHA-256 digest to hash passwords
