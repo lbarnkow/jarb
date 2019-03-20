@@ -28,13 +28,14 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Provider;
 
+import io.github.lbarnkow.rocketbot.api.AuthInfo;
 import io.github.lbarnkow.rocketbot.api.Bot;
-import io.github.lbarnkow.rocketbot.api.Bot.AuthInfo;
-import io.github.lbarnkow.rocketbot.api.RoomType;
+import io.github.lbarnkow.rocketbot.api.Room;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidate;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidateListener;
 import io.github.lbarnkow.rocketbot.election.ElectionCandidateState;
 import io.github.lbarnkow.rocketbot.misc.EventTypes;
+import io.github.lbarnkow.rocketbot.misc.Holder;
 import io.github.lbarnkow.rocketbot.misc.Tuple;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClientListener;
@@ -60,8 +61,9 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 	private BotManagerConfiguration config;
 	private Provider<RealtimeClient> realtimeClientProvider;
-	private Map<Bot, RealtimeClient> realtimeClients = new ConcurrentHashMap<>();
+	private Map<Bot, BotDataStruct> bots = new ConcurrentHashMap<>();
 	private RestClient restClient;
+
 	private AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
 	private Semaphore eventPool = new Semaphore(0);
@@ -83,7 +85,9 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		this.config = config;
 
 		for (Bot bot : bots) {
-			realtimeClients.put(bot, realtimeClientProvider.get());
+			BotDataStruct dataStruct = new BotDataStruct();
+			dataStruct.realtimeClient = realtimeClientProvider.get();
+			this.bots.put(bot, dataStruct);
 		}
 		restClient.initialize(config.getConnection());
 
@@ -99,11 +103,14 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 			tasks.stopAll();
 
 			logger.info("Closing websocket session...");
-			for (RealtimeClient realtimeClient : realtimeClients.values()) {
+
+			for (Map.Entry<Bot, BotDataStruct> entry : bots.entrySet()) {
+				Bot bot = entry.getKey();
+				BotDataStruct data = entry.getValue();
+
 				try {
-					realtimeClient.disconnect();
+					data.realtimeClient.disconnect();
 				} catch (IOException e) {
-					Bot bot = findBotFor(realtimeClient);
 					logger.error("Caught {} while disconnecting realtimeClient for bot '{}'!",
 							e.getClass().getSimpleName(), bot.getName(), e);
 				}
@@ -170,19 +177,21 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	}
 
 	private boolean handleAcquiredLeadershipEvent() throws URISyntaxException, DeploymentException, IOException {
-		for (RealtimeClient realtimeClient : realtimeClients.values()) {
-			realtimeClient.connect(this, config.getConnection());
+		for (BotDataStruct data : bots.values()) {
+			data.realtimeClient.connect(this, config.getConnection());
 		}
 		return true;
 	}
 
 	private boolean handleRealtimeSessionEstablishedEvent(Event event) {
 		Bot bot = (Bot) event.data;
-		RealtimeClient realtimeClient = realtimeClients.get(bot);
+		BotDataStruct dataStruct = bots.get(bot);
+		RealtimeClient realtimeClient = dataStruct.realtimeClient;
 
 		logger.info("Real-time session established for bot '{}'; logging in bot...", bot.getName());
 
 		LoginTask loginTask = new LoginTask(bot, realtimeClient, this);
+		dataStruct.loginTask = loginTask;
 		tasks.start(loginTask);
 
 		return true;
@@ -204,13 +213,24 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		Tuple<Bot, AuthInfo> tuple = (Tuple<Bot, AuthInfo>) event.data;
 
 		Bot bot = tuple.getFirst();
-		AuthInfo previousAuthInfo = tuple.getSecond();
-		AuthInfo authInfo = bot.getAuthHolder().get();
+		AuthInfo newAuthInfo = tuple.getSecond();
 
-		if (authInfo.isValid() && !previousAuthInfo.isValid()) {
-			RealtimeClient realtimeClient = realtimeClients.get(bot);
-			tasks.start(new SubscriptionsTrackerTask(bot, realtimeClient, this));
-			tasks.start(new PublicChannelAutoJoinerTask(bot, restClient, realtimeClient));
+		BotDataStruct dataStruct = bots.get(bot);
+		AuthInfo previousAuthInfo = dataStruct.authInfo.get();
+
+		if (newAuthInfo.isValid() && !previousAuthInfo.isValid()) {
+			dataStruct.authInfo.set(newAuthInfo);
+
+			SubscriptionsTrackerTask subscriptionsTrackerTask = new SubscriptionsTrackerTask(bot,
+					dataStruct.realtimeClient, this);
+			PublicChannelAutoJoinerTask autoJoinerTask = new PublicChannelAutoJoinerTask(restClient,
+					dataStruct.realtimeClient, bot, dataStruct.authInfo);
+
+			dataStruct.subscriptionsTrackerTask = subscriptionsTrackerTask;
+			dataStruct.autoJoinerTask = autoJoinerTask;
+
+			tasks.start(subscriptionsTrackerTask);
+			tasks.start(autoJoinerTask);
 		}
 
 		return true;
@@ -218,19 +238,21 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 	private boolean handleNewSubscription(Event event) throws JsonProcessingException {
 		@SuppressWarnings("unchecked")
-		Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
+		Tuple<Bot, Room> tuple = (Tuple<Bot, Room>) event.data;
 		Bot bot = tuple.getFirst();
-		String roomId = tuple.getSecond();
+		Room room = tuple.getSecond();
+		BotDataStruct dataStruct = bots.get(bot);
 
 		// Add realtime subscription
-		SendStreamRoomMessages message = new SendStreamRoomMessages(roomId);
-		RealtimeClient realtimeClient = realtimeClients.get(bot);
+		SendStreamRoomMessages message = new SendStreamRoomMessages(room);
+		RealtimeClient realtimeClient = dataStruct.realtimeClient;
 		realtimeClient.sendMessage(message);
 
-		logger.info("Added real-time subscription for bot '{}' to room '{}'.", bot.getName(), roomId);
+		logger.info("Added real-time subscription for bot '{}' to room '{}'.", bot.getName(), room.getName());
 
 		// catch-up on unread messages
-		Event newEvent = new Event(PROCESS_ROOM, event.data);
+		Tuple<Bot, String> newTuple = new Tuple<>(bot, room.getId());
+		Event newEvent = new Event(PROCESS_ROOM, newTuple);
 		enqueueEvent(newEvent);
 
 		return true;
@@ -242,9 +264,9 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
 		Bot bot = tuple.getFirst();
 		String roomId = tuple.getSecond();
+		BotDataStruct dataStruct = bots.get(bot);
 
-		RealtimeClient realtimeClient = realtimeClients.get(bot);
-		roomProcessor.processRoom(realtimeClient, restClient, bot, roomId);
+		roomProcessor.processRoom(dataStruct.realtimeClient, restClient, dataStruct.authInfo.get(), bot, roomId);
 
 		return true;
 	}
@@ -263,46 +285,48 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 
 	@Override
 	public void onRealtimeClientSessionEstablished(RealtimeClient source) {
-		Bot bot = findBotFor(source);
+		Bot bot = lookupBotFor(source);
 		Event event = new Event(REALTIME_SESSION_ESTABLISHED, bot);
 		enqueueEvent(event);
 	}
 
 	@Override
 	public void onRealtimeClientSessionClose(RealtimeClient source, boolean initiatedByClient) {
-		Tuple<Bot, Boolean> tuple = new Tuple<>(findBotFor(source), initiatedByClient);
+		Tuple<Bot, Boolean> tuple = new Tuple<>(lookupBotFor(source), initiatedByClient);
 		Event event = new Event(REALTIME_SESSION_CLOSED, tuple);
 		enqueueEvent(event);
 	}
 
 	@Override
 	public void onRealtimeClientStreamRoomMessagesUpdate(RealtimeClient source, String roomId) {
-		Bot bot = findBotFor(source);
+		Bot bot = lookupBotFor(source);
 		Tuple<Bot, String> tuple = new Tuple<>(bot, roomId);
 		Event event = new Event(PROCESS_ROOM, tuple);
 		enqueueEvent(event);
 	}
 
 	@Override
-	public void onLoginAuthTokenRefreshed(Bot bot, AuthInfo previousAuthInfo) {
-		Tuple<Bot, AuthInfo> tuple = new Tuple<>(bot, previousAuthInfo);
+	public void onLoginAuthTokenRefreshed(LoginTask source, Bot bot, AuthInfo authInfo) {
+		Tuple<Bot, AuthInfo> tuple = new Tuple<>(bot, authInfo);
 		Event event = new Event(AUTH_TOKEN_REFRESHED, tuple);
 		enqueueEvent(event);
 	}
 
 	@Override
-	public void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName,
-			RoomType roomType) {
-		roomProcessor.cacheRoomData(roomId, roomName, roomType);
-		Tuple<Bot, String> tuple = new Tuple<>(subscriptionsTrackerTask.getBot(), roomId);
+	public void onNewSubscription(SubscriptionsTrackerTask source, Bot bot, Room room) {
+		roomProcessor.cacheRoom(room);
+		Tuple<Bot, Room> tuple = new Tuple<>(bot, room);
 		Event event = new Event(NEW_SUBSCRIPTION, tuple);
 		enqueueEvent(event);
 	}
 
-	private Bot findBotFor(RealtimeClient realtimeClient) {
-		for (Map.Entry<Bot, RealtimeClient> entry : realtimeClients.entrySet()) {
-			if (entry.getValue() == realtimeClient) {
-				return entry.getKey();
+	private Bot lookupBotFor(RealtimeClient realtimeClient) {
+		for (Map.Entry<Bot, BotDataStruct> entry : bots.entrySet()) {
+			Bot bot = entry.getKey();
+			BotDataStruct dataStruct = entry.getValue();
+
+			if (dataStruct.realtimeClient == realtimeClient) {
+				return bot;
 			}
 		}
 
@@ -322,5 +346,14 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 			this.type = type;
 			this.data = data;
 		}
+	}
+
+	@SuppressWarnings("unused")
+	private static class BotDataStruct {
+		private RealtimeClient realtimeClient;
+		private Holder<AuthInfo> authInfo = new Holder<>(AuthInfo.INVALID);
+		private LoginTask loginTask;
+		private SubscriptionsTrackerTask subscriptionsTrackerTask;
+		private PublicChannelAutoJoinerTask autoJoinerTask;
 	}
 }

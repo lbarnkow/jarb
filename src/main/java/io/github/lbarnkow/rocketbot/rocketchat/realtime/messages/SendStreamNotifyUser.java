@@ -1,16 +1,16 @@
 package io.github.lbarnkow.rocketbot.rocketchat.realtime.messages;
 
-import io.github.lbarnkow.rocketbot.api.Bot;
+import io.github.lbarnkow.rocketbot.api.AuthInfo;
 
 public class SendStreamNotifyUser extends BaseSubscription {
 	private static final String NAME = "stream-notify-user";
 
 	private final Object[] params;
 
-	public SendStreamNotifyUser(Bot bot) {
+	public SendStreamNotifyUser(AuthInfo authInfo) {
 		super(NAME);
 
-		String param1 = bot.getAuthHolder().get().getUserId() + "/" + Event.SUBSCRIPTIONS_CHANGED.rawEvent;
+		String param1 = authInfo.getUserId() + "/" + Event.SUBSCRIPTIONS_CHANGED.rawEvent;
 		params = new Object[] { param1, false };
 	}
 

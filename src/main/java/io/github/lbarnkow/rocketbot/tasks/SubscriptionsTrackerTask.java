@@ -3,27 +3,33 @@ package io.github.lbarnkow.rocketbot.tasks;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.github.lbarnkow.rocketbot.api.Bot;
+import io.github.lbarnkow.rocketbot.api.Room;
 import io.github.lbarnkow.rocketbot.api.RoomType;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply.Subscription;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendGetSubscriptions;
 
-public class SubscriptionsTrackerTask extends AbstractBotNamesTask {
+public class SubscriptionsTrackerTask extends AbstractBaseTask {
 
-//	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
 	private static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
-	private RealtimeClient realtimeClient;
+	private final Bot bot;
+	private final RealtimeClient realtimeClient;
 	private final long sleepTime;
 	private final SubscriptionsTrackerTaskListener listener;
 
 	SubscriptionsTrackerTask(Bot bot, RealtimeClient realtimeClient, long sleepTime,
 			SubscriptionsTrackerTaskListener listener) {
-		super(bot);
+		super(bot.getName());
 
+		this.bot = bot;
 		this.realtimeClient = realtimeClient;
 		this.sleepTime = sleepTime;
 		this.listener = listener;
@@ -52,12 +58,13 @@ public class SubscriptionsTrackerTask extends AbstractBotNamesTask {
 					newIds.add(sub.getId());
 
 					if (!knownIds.contains(sub.getId())) {
-						listener.onNewSubscription(this, sub.getRid(), sub.getName(), RoomType.parse(sub.getT()));
+						Room room = new Room(sub.getRid(), sub.getName(), RoomType.parse(sub.getT()));
+						logger.debug("Bot '{}' has a subscription to room '{}'.", bot.getName(), room.getName());
+						listener.onNewSubscription(this, bot, room);
 					}
 				}
 
 				knownIds = newIds;
-
 				Thread.sleep(sleepTime);
 			}
 		} catch (InterruptedException e) {
@@ -65,7 +72,6 @@ public class SubscriptionsTrackerTask extends AbstractBotNamesTask {
 	}
 
 	public static interface SubscriptionsTrackerTaskListener {
-		void onNewSubscription(SubscriptionsTrackerTask subscriptionsTrackerTask, String roomId, String roomName,
-				RoomType roomType);
+		void onNewSubscription(SubscriptionsTrackerTask source, Bot bot, Room room);
 	}
 }

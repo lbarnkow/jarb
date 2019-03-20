@@ -6,33 +6,41 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.lbarnkow.rocketbot.api.AuthInfo;
 import io.github.lbarnkow.rocketbot.api.Bot;
+import io.github.lbarnkow.rocketbot.misc.Holder;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.RestClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendJoinRoom;
 import io.github.lbarnkow.rocketbot.rocketchat.rest.messages.ChannelListJoinedReply;
 import io.github.lbarnkow.rocketbot.rocketchat.rest.messages.ChannelListReply;
 
-public class PublicChannelAutoJoinerTask extends AbstractBotNamesTask {
+public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
 	private static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
-	private RestClient restClient;
-	private RealtimeClient realtimeClient;
+	private final RestClient restClient;
+	private final RealtimeClient realtimeClient;
+	private final Bot bot;
+	private final Holder<AuthInfo> authInfo;
 	private final long sleepTime;
 
-	PublicChannelAutoJoinerTask(Bot bot, RestClient restClient, RealtimeClient realtimeClient, long sleepTime) {
-		super(bot);
+	PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
+			Holder<AuthInfo> authInfo, long sleepTime) {
+		super(bot.getName());
 
 		this.restClient = restClient;
 		this.realtimeClient = realtimeClient;
+		this.bot = bot;
+		this.authInfo = authInfo;
 		this.sleepTime = sleepTime;
 	}
 
-	public PublicChannelAutoJoinerTask(Bot bot, RestClient restClient, RealtimeClient realtimeClient) {
-		this(bot, restClient, realtimeClient, DEFAULT_SLEEP_TIME);
+	public PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
+			Holder<AuthInfo> authInfo) {
+		this(restClient, realtimeClient, bot, authInfo, DEFAULT_SLEEP_TIME);
 	}
 
 	@Override
@@ -41,12 +49,10 @@ public class PublicChannelAutoJoinerTask extends AbstractBotNamesTask {
 
 	@Override
 	protected void runTask() throws Throwable {
-		Bot bot = getBot();
-
 		try {
 			while (true) {
-				ChannelListReply channels = restClient.getChannelList(bot);
-				ChannelListJoinedReply joinedChannels = restClient.getChannelListJoined(bot);
+				ChannelListReply channels = restClient.getChannelList(authInfo.get());
+				ChannelListJoinedReply joinedChannels = restClient.getChannelListJoined(authInfo.get());
 
 				Map<String, ChannelListReply.Channel> roomIdsNotJoined = new HashMap<>();
 				for (ChannelListReply.Channel channel : channels.getChannels()) {
@@ -57,6 +63,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotNamesTask {
 				}
 
 				for (String roomId : roomIdsNotJoined.keySet()) {
+					// TODO: offer room to bot!
 					SendJoinRoom message = new SendJoinRoom(roomId);
 					realtimeClient.sendMessage(message);
 
