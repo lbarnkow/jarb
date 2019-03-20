@@ -69,7 +69,7 @@ class TaskTest {
 
 		// when
 		wrapper.startTask();
-		Thread.sleep(15L);
+		Thread.sleep(25L);
 
 		// then
 		assertThat(wrapper.getLastError()).isInstanceOf(DummyTaskForUnitTesting.RunException.class);

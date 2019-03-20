@@ -6,29 +6,29 @@ import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.lbarnkow.rocketbot.api.AuthInfo;
 import io.github.lbarnkow.rocketbot.api.Bot;
-import io.github.lbarnkow.rocketbot.api.Bot.AuthInfo;
 import io.github.lbarnkow.rocketbot.rocketchat.RealtimeClient;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.ReceiveLoginReply;
 import io.github.lbarnkow.rocketbot.rocketchat.realtime.messages.SendLogin;
 
-public class LoginTask extends AbstractBotNamesTask {
+public class LoginTask extends AbstractBaseTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginTask.class);
 
 	private static final long MAX_TOKEN_REFRESH_INTERVAL = Duration.ofMinutes(60L).toMillis();
 
+	private final Bot bot;
 	private final RealtimeClient realtimeClient;
 	private final LoginTaskListener listener;
 
 	public LoginTask(Bot bot, RealtimeClient realtimeClient, LoginTaskListener listener) {
-		super(bot);
-
-		this.setName(getClass().getSimpleName() + "-" + bot.getName() + "-thread");
+		super(bot.getName());
 
 		this.realtimeClient = realtimeClient;
 		this.listener = listener;
+		this.bot = bot;
 	}
 
 	@Override
@@ -37,8 +37,6 @@ public class LoginTask extends AbstractBotNamesTask {
 
 	@Override
 	protected void runTask() throws Throwable {
-		Bot bot = getBot();
-
 		try {
 			while (true) {
 				String username = bot.getCredentials().getUsername();
@@ -51,10 +49,8 @@ public class LoginTask extends AbstractBotNamesTask {
 				long sleepTime = 100L;
 
 				if (authInfo.isValid()) {
-					logger.info("Successfully acquired auth token for bot '{}'!", bot.getName());
-					AuthInfo previousAuthInfo = bot.getAuthHolder().get();
-					bot.getAuthHolder().set(authInfo);
-					listener.onLoginAuthTokenRefreshed(bot, previousAuthInfo);
+					logger.info("Successfully acquired auth token!");
+					listener.onLoginAuthTokenRefreshed(this, bot, authInfo);
 
 					sleepTime = calculateSleepTime(authInfo);
 					logger.info("Refreshing auth token in {} minutes.", Duration.ofMillis(sleepTime).toMinutes());
@@ -64,12 +60,11 @@ public class LoginTask extends AbstractBotNamesTask {
 			}
 
 		} catch (ReplyErrorException e) {
-			logger.error("Login failed, stopping logins for bot '{}'! Message: '{}'.", bot.getName(),
-					e.getError().getMessage());
+			logger.error("Login failed, stopping logins! Message: '{}'.", e.getError().getMessage());
 		} catch (InterruptedException e) {
 		}
 
-		logger.info("Stopped login task for bot '{}'.", bot.getName());
+		logger.info("Stopped login task.");
 	}
 
 	private AuthInfo convertReply(ReceiveLoginReply reply) {
@@ -89,6 +84,6 @@ public class LoginTask extends AbstractBotNamesTask {
 	}
 
 	public static interface LoginTaskListener {
-		void onLoginAuthTokenRefreshed(Bot bot, AuthInfo previousAuthInfo);
+		void onLoginAuthTokenRefreshed(LoginTask source, Bot bot, AuthInfo authInfo);
 	}
 }

@@ -1,5 +1,7 @@
 package io.github.lbarnkow.rocketbot;
 
+import java.util.Optional;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +10,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.github.lbarnkow.rocketbot.api.Bot;
+import io.github.lbarnkow.rocketbot.api.Credentials;
 import io.github.lbarnkow.rocketbot.api.Message;
+import io.github.lbarnkow.rocketbot.api.Room;
 import io.github.lbarnkow.rocketbot.misc.Common;
 import io.github.lbarnkow.rocketbot.misc.GuiceModule;
 
@@ -66,8 +70,14 @@ public class Main extends Common {
 		}
 
 		@Override
-		public void offerMessage(Message message) {
+		public Optional<Message> offerMessage(Message message) {
 			logger.error(message.toString());
+			return Optional.empty();
+		}
+
+		@Override
+		public boolean offerRoom(Room room) {
+			return true;
 		}
 	}
 }
