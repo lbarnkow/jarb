@@ -1,0 +1,11 @@
+package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
+
+import io.github.lbarnkow.jarb.misc.Common;
+
+public class ReceiveConnected extends Common {
+	private String session;
+
+	public String getSession() {
+		return session;
+	}
+}
