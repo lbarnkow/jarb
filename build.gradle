@@ -7,24 +7,56 @@ repositories {
     jcenter()
 }
 
-mainClassName = 'App'
+mainClassName = 'io.github.lbarnkow.rocketbot.Main'
 
 dependencies {
-	// SHA-256 digest
-	compile 'commons-codec:commons-codec:1.11'
+	// SHA-256 digest to hash passwords
+	compile 'commons-codec:commons-codec:1.12'
 	
-	// Simple File read/write
-	compile 'commons-io:commons-io:2.6'
+	// ToStringBuilder
+	compile 'org.apache.commons:commons-lang3:3.8.1'
 	
 	// Logging
-	compile 'org.slf4j:slf4j-simple:1.7.25'
+	compile 'org.slf4j:slf4j-simple:1.7.26'
 	
 	// javax.websocket implementation
-	compile 'org.glassfish.tyrus:tyrus-container-jdk-client:1.14'
+	compile 'org.glassfish.tyrus:tyrus-container-jdk-client:1.15'
+	
+	// REST client and JSON bindings for jaxrs (via jackson)
+	compile 'org.glassfish.jersey.core:jersey-client:2.28'
+	compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.28'
+	//compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.8'
+	
+	// YAML bindings for jackson 
+	compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8'
+	
+	// JSR-330 dependency injection; implemented by Google guice
+	compile 'com.google.inject:guice:4.2.2:no_aop'
+	
+    // Use JUnit test framework
+	testCompile("org.junit.jupiter:junit-jupiter-api:5.4.0")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.0")
+    
+    // Google Truth - Fluent assertions for Java
+	testCompile "com.google.truth:truth:0.43"
+
+	// Mocking Framework für unit tests
+	testCompile 'org.mockito:mockito-core:2.24.5'
+
+
+	// TODO: REMOVE !!!!
+	// Simple File read/write
+	compile 'commons-io:commons-io:2.6'
 	
 	// simple json implementation
 	compile 'com.google.code.gson:gson:2.8.5'
 	
-    // Use JUnit test framework
-    testCompile 'junit:junit:4.12'
+	// yaml / pojo mapping with jackson
+	//compile 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
+	compile 'org.glassfish.jersey.inject:jersey-hk2:2.28'
+}
+
+test {
+    useJUnitPlatform()
+    //testLogging.showStandardStreams = true    
 }
