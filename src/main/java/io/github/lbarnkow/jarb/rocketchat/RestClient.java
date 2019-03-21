@@ -22,7 +22,6 @@ import javax.ws.rs.core.Response.Status.Family;
 import io.github.lbarnkow.jarb.api.AuthInfo;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
-import io.github.lbarnkow.jarb.misc.Common;
 import io.github.lbarnkow.jarb.rocketchat.rest.RestClientException;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListJoinedReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListReply;
@@ -31,8 +30,7 @@ import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChatHistoryReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.SubscriptionsGetOneReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.SubscriptionsReadReply;
 
-public class RestClient extends Common {
-
+public class RestClient {
 //	private static final Logger logger = LoggerFactory.getLogger(RestClient.class);
 
 	private final Client client;

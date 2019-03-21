@@ -1,21 +1,12 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
-import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonAlias;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.Data;
 
-public class RawDate extends Common {
-	private long $date;
-
-	// Contents will be deserialized from JSON.
-	RawDate() {
-	}
-
-	public RawDate(Instant date) {
-		this.$date = date.getEpochSecond();
-	}
-
-	public long get$date() {
-		return $date;
-	}
+@MyJsonSettings
+@Data
+public class RawDate {
+	@JsonAlias("$date")
+	private long date;
 }

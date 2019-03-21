@@ -1,24 +1,15 @@
 package io.github.lbarnkow.jarb.rocketchat.rest.messages;
 
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@MyJsonSettings
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ChatCountersReply extends BaseReply {
 	private boolean joined;
 	private int unreads;
 	private String unreadsFrom;
 	private String latest;
-
-	public boolean isJoined() {
-		return joined;
-	}
-
-	public int getUnreads() {
-		return unreads;
-	}
-
-	public String getUnreadsFrom() {
-		return unreadsFrom;
-	}
-
-	public String getLatest() {
-		return latest;
-	}
 }

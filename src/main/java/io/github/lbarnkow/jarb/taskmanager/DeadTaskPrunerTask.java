@@ -5,6 +5,11 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.AllArgsConstructor;
+import lombok.ToString;
+
+@ToString
+@AllArgsConstructor
 public class DeadTaskPrunerTask extends Task {
 	private static final Logger logger = LoggerFactory.getLogger(DeadTaskPrunerTask.class);
 
@@ -15,11 +20,6 @@ public class DeadTaskPrunerTask extends Task {
 
 	public DeadTaskPrunerTask(TaskManager manager) {
 		this(manager, TASK_INTERVAL_MSEC);
-	}
-
-	DeadTaskPrunerTask(TaskManager manager, long taskInterval) {
-		this.manager = manager;
-		this.taskInterval = taskInterval;
 	}
 
 	@Override

@@ -2,34 +2,25 @@ package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
 import java.util.List;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@MyJsonSettings
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ReceiveStreamRoomMessagesSubscriptionUpdate extends BaseMessage {
-
 	private Fields fields;
 
-	// Contents will be deserialized from JSON.
-	private ReceiveStreamRoomMessagesSubscriptionUpdate() {
-		super(null, null);
-	}
-
-	public Fields getFields() {
-		return fields;
-	}
-
-	public static class Fields extends Common {
+	@MyJsonSettings
+	@Data
+	public static class Fields {
 		private List<Arg> args;
-
-		public List<Arg> getArgs() {
-			return args;
-		}
 	}
 
-	public static class Arg extends Common {
+	@MyJsonSettings
+	@Data
+	public static class Arg {
 		private String rid;
-
-		public String getRid() {
-			return rid;
-		}
 	}
 }

@@ -1,27 +1,12 @@
 package io.github.lbarnkow.jarb.api;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.Builder;
+import lombok.Data;
 
-public class Room extends Common {
+@Data
+@Builder
+public class Room {
 	private final String id;
 	private final String name;
 	private final RoomType type;
-
-	public Room(String id, String name, RoomType type) {
-		this.id = id;
-		this.name = name;
-		this.type = type;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public RoomType getType() {
-		return type;
-	}
 }

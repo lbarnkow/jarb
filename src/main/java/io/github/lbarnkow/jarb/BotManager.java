@@ -46,11 +46,13 @@ import io.github.lbarnkow.jarb.rocketchat.rest.RestClientException;
 import io.github.lbarnkow.jarb.taskmanager.Task;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import io.github.lbarnkow.jarb.tasks.LoginTask;
+import io.github.lbarnkow.jarb.tasks.LoginTask.LoginTaskListener;
 import io.github.lbarnkow.jarb.tasks.PublicChannelAutoJoinerTask;
 import io.github.lbarnkow.jarb.tasks.SubscriptionsTrackerTask;
-import io.github.lbarnkow.jarb.tasks.LoginTask.LoginTaskListener;
 import io.github.lbarnkow.jarb.tasks.SubscriptionsTrackerTask.SubscriptionsTrackerTaskListener;
+import lombok.ToString;
 
+@ToString
 public class BotManager extends Task implements ElectionCandidateListener, RealtimeClientListener, LoginTaskListener,
 		SubscriptionsTrackerTaskListener {
 
@@ -216,10 +218,10 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		AuthInfo newAuthInfo = tuple.getSecond();
 
 		BotDataStruct dataStruct = bots.get(bot);
-		AuthInfo previousAuthInfo = dataStruct.authInfo.get();
+		AuthInfo previousAuthInfo = dataStruct.authInfo.getValue();
 
 		if (newAuthInfo.isValid() && !previousAuthInfo.isValid()) {
-			dataStruct.authInfo.set(newAuthInfo);
+			dataStruct.authInfo.setValue(newAuthInfo);
 
 			SubscriptionsTrackerTask subscriptionsTrackerTask = new SubscriptionsTrackerTask(bot,
 					dataStruct.realtimeClient, this);
@@ -266,7 +268,7 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 		String roomId = tuple.getSecond();
 		BotDataStruct dataStruct = bots.get(bot);
 
-		roomProcessor.processRoom(dataStruct.realtimeClient, restClient, dataStruct.authInfo.get(), bot, roomId);
+		roomProcessor.processRoom(dataStruct.realtimeClient, restClient, dataStruct.authInfo.getValue(), bot, roomId);
 
 		return true;
 	}

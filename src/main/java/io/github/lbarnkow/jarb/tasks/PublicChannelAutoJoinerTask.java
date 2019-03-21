@@ -15,9 +15,12 @@ import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendJoinRoom;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListJoinedReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListReply;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawChannel;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@ToString
+@EqualsAndHashCode(callSuper = true)
 public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
-
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
 	private static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
@@ -52,8 +55,8 @@ public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
 	protected void runTask() throws Throwable {
 		try {
 			while (true) {
-				ChannelListReply channels = restClient.getChannelList(authInfo.get());
-				ChannelListJoinedReply joinedChannels = restClient.getChannelListJoined(authInfo.get());
+				ChannelListReply channels = restClient.getChannelList(authInfo.getValue());
+				ChannelListJoinedReply joinedChannels = restClient.getChannelListJoined(authInfo.getValue());
 
 				Map<String, RawChannel> roomIdsNotJoined = new HashMap<>();
 				for (RawChannel channel : channels.getChannels()) {

@@ -1,41 +1,22 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawDate;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@MyJsonSettings
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ReceiveLoginReply extends BaseMessage {
-
 	private LoginResult result;
 
-	// Contents will be deserialized from JSON.
-	private ReceiveLoginReply() {
-		super(null, null);
-	}
-
-	public LoginResult getResult() {
-		return result;
-	}
-
-	public static class LoginResult extends Common {
+	@MyJsonSettings
+	@Data
+	public static class LoginResult {
 		private String id;
 		private String token;
 		private RawDate tokenExpires;
 		private String type;
-
-		public String getId() {
-			return id;
-		}
-
-		public String getToken() {
-			return token;
-		}
-
-		public RawDate getTokenExpires() {
-			return tokenExpires;
-		}
-
-		public String getType() {
-			return type;
-		}
 	}
 }
