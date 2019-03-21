@@ -1,15 +1,9 @@
 package io.github.lbarnkow.jarb.taskmanager;
 
-import lombok.Getter;
-import lombok.Setter;
+public interface Task {
+	String getName();
 
-public abstract class Task {
-	@Getter
-	@Setter
-	private String name = getClass().getSimpleName() + "-thread";
+	void initializeTask() throws Throwable;
 
-	protected void initializeTask() throws Throwable {
-	};
-
-	protected abstract void runTask() throws Throwable;
+	void runTask() throws Throwable;
 }

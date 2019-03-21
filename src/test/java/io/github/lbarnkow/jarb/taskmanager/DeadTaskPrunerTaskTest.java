@@ -59,7 +59,7 @@ class DeadTaskPrunerTaskTest {
 		TaskWrapper wrapper = new TaskWrapper(pruner);
 
 		// when
-		wrapper.startTask();
+		wrapper.startTask(null);
 		Thread.sleep(10L);
 		wrapper.stopTask();
 

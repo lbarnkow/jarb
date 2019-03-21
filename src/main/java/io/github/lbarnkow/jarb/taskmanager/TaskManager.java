@@ -26,9 +26,13 @@ public class TaskManager {
 	}
 
 	public synchronized void start(Task... tasks) {
+		start(null, tasks);
+	}
+
+	public synchronized void start(TaskEndedCallback callback, Task... tasks) {
 		for (Task task : tasks) {
 			TaskWrapper wrapper = new TaskWrapper(task);
-			wrapper.startTask();
+			wrapper.startTask(callback);
 			this.tasks.put(task, wrapper);
 		}
 	}

@@ -20,24 +20,21 @@ public class TaskWrapper {
 	private TaskState state = UNUSED;
 	private Throwable lastError;
 
-	public void startTask() {
+	public void startTask(TaskEndedCallback callback) {
 		if (state != UNUSED) {
 			throw new IllegalStateException("Tasks can only be started once!");
 		}
 
 		state = ACTIVATING;
-		thread = new Thread(() -> executeTask(), task.getName());
+		thread = new Thread(() -> executeTask(callback), task.getName());
 		thread.start();
 	}
 
-	private void executeTask() {
+	private void executeTask(TaskEndedCallback callback) {
 		try {
 			task.initializeTask();
 		} catch (Throwable t) {
-			lastError = t;
-			state = DEAD;
-			logger.error("Initialization of Task '{}' raised an unexpected exception!", task.getName(), t);
-			// TODO: notify listener about error!
+			handleError("Initialization", t, callback);
 			return;
 		}
 
@@ -45,9 +42,8 @@ public class TaskWrapper {
 		try {
 			task.runTask();
 		} catch (Throwable t) {
-			lastError = t;
-			logger.error("Task '{}' raised an unexpected exception!", task.getName(), t);
-			// TODO: notify listener about error!
+			handleError("Execution", t, callback);
+			return;
 		}
 
 		state = DEAD;
@@ -58,6 +54,16 @@ public class TaskWrapper {
 		if (state == TaskState.ACTIVATING || state == TaskState.ACTIVE) {
 			state = DEACTIVATING;
 			thread.interrupt();
+		}
+	}
+
+	private void handleError(String stage, Throwable t, TaskEndedCallback callback) {
+		lastError = t;
+		logger.error("{} of task '{}' raised an unexpected exception!", stage, task.getName(), t);
+		TaskEndedEvent event = new TaskEndedEvent(task, state, lastError);
+		state = DEAD;
+		if (callback != null) {
+			callback.onTaskEnded(event);
 		}
 	}
 }
