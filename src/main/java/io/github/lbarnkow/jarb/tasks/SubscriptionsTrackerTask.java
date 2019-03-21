@@ -11,8 +11,8 @@ import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
 import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply;
-import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply.Subscription;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendGetSubscriptions;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawSubscription;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -58,10 +58,10 @@ public class SubscriptionsTrackerTask extends AbstractBaseTask {
 
 				Set<String> newIds = new HashSet<>();
 
-				for (Subscription sub : reply.getResult()) {
-					newIds.add(sub.getId());
+				for (RawSubscription sub : reply.getResult()) {
+					newIds.add(sub.get_id());
 
-					if (!knownIds.contains(sub.getId())) {
+					if (!knownIds.contains(sub.get_id())) {
 						String roomId = sub.getRid();
 						String roomName = sub.getName();
 						RoomType roomType = RoomType.parse(sub.getT());

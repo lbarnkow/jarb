@@ -68,6 +68,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
 
 				for (String roomId : roomIdsNotJoined.keySet()) {
 					// TODO: offer room to bot!
+					// TODO: What about rooms with join code?!
 					SendJoinRoom message = new SendJoinRoom(roomId);
 					realtimeClient.sendMessage(message);
 
