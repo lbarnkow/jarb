@@ -1,16 +1,10 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.Data;
 
-public class RawUser extends Common {
+@MyJsonSettings
+@Data
+public class RawUser {
 	private String _id;
 	private String username;
-
-	public String get_id() {
-		return _id;
-	}
-
-	public String getUsername() {
-		return username;
-	}
 }

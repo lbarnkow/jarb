@@ -9,24 +9,16 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.Data;
 
-public class TaskWrapper extends Common {
-
+@Data
+public class TaskWrapper {
 	static Logger logger = LoggerFactory.getLogger(TaskWrapper.class);
 
-	private Task task = null;
-	private TaskState state = UNUSED;
+	private final Task task;
 	private Thread thread = null;
+	private TaskState state = UNUSED;
 	private Throwable lastError;
-
-	public TaskWrapper(Task task) {
-		if (task == null) {
-			throw new IllegalArgumentException("Paramter task cannot be null!");
-		}
-
-		this.task = task;
-	}
 
 	public void startTask() {
 		if (state != UNUSED) {
@@ -67,13 +59,5 @@ public class TaskWrapper extends Common {
 			state = DEACTIVATING;
 			thread.interrupt();
 		}
-	}
-
-	public TaskState getState() {
-		return state;
-	}
-
-	public final Throwable getLastError() {
-		return lastError;
 	}
 }

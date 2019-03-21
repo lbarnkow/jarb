@@ -11,10 +11,10 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.ToString;
 
-public class TaskManager extends Common {
-
+@ToString
+public class TaskManager {
 	private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
 	private final Map<Task, TaskWrapper> tasks = new HashMap<>();

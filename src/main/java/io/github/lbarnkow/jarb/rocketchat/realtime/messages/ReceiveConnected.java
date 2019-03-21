@@ -1,11 +1,10 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
+import lombok.Data;
 
-public class ReceiveConnected extends Common {
+@MyJsonSettings
+@Data
+public class ReceiveConnected {
 	private String session;
-
-	public String getSession() {
-		return session;
-	}
 }

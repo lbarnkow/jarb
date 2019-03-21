@@ -70,10 +70,10 @@ public class LoginTask extends AbstractBaseTask {
 	private AuthInfo convertReply(ReceiveLoginReply reply) {
 		String userId = reply.getResult().getId();
 		String token = reply.getResult().getToken();
-		long epochExpires = reply.getResult().getTokenExpires().get$date();
+		long epochExpires = reply.getResult().getTokenExpires().getDate();
 		Instant expires = Instant.ofEpochMilli(epochExpires);
 
-		return new AuthInfo(userId, token, expires);
+		return AuthInfo.builder().userId(userId).authToken(token).expires(expires).build();
 	}
 
 	private long calculateSleepTime(AuthInfo authInfo) {

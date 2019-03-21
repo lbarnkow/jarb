@@ -17,10 +17,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ElectionLease extends Common {
+@Data
+public class ElectionLease {
 	private final static Logger logger = LoggerFactory.getLogger(ElectionLease.class);
 
 	private static final int MAX_FILE_IO_RETRIES = 5;
@@ -48,18 +49,6 @@ public class ElectionLease extends Common {
 	// for Jackson deserialization
 	@SuppressWarnings("unused")
 	private ElectionLease() {
-	}
-
-	public String getLeaderId() {
-		return leaderId;
-	}
-
-	public long getLeaseAcquired() {
-		return leaseAcquired;
-	}
-
-	public long getLeaseExpiration() {
-		return leaseExpiration;
 	}
 
 	public boolean isExpired() {

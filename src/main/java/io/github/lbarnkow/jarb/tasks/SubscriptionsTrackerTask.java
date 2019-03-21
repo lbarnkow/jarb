@@ -11,9 +11,13 @@ import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
 import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply;
-import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendGetSubscriptions;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply.Subscription;
+import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendGetSubscriptions;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@ToString
+@EqualsAndHashCode(callSuper = true)
 public class SubscriptionsTrackerTask extends AbstractBaseTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
@@ -58,7 +62,10 @@ public class SubscriptionsTrackerTask extends AbstractBaseTask {
 					newIds.add(sub.getId());
 
 					if (!knownIds.contains(sub.getId())) {
-						Room room = new Room(sub.getRid(), sub.getName(), RoomType.parse(sub.getT()));
+						String roomId = sub.getRid();
+						String roomName = sub.getName();
+						RoomType roomType = RoomType.parse(sub.getT());
+						Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
 						logger.debug("Bot '{}' has a subscription to room '{}'.", bot.getName(), room.getName());
 						listener.onNewSubscription(this, bot, room);
 					}

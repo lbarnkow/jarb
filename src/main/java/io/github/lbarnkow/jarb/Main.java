@@ -13,10 +13,9 @@ import io.github.lbarnkow.jarb.api.Bot;
 import io.github.lbarnkow.jarb.api.Credentials;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.Room;
-import io.github.lbarnkow.jarb.misc.Common;
 import io.github.lbarnkow.jarb.misc.GuiceModule;
 
-public class Main extends Common {
+public class Main {
 	private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) {
@@ -52,7 +51,7 @@ public class Main extends Common {
 
 		public DummyBot(String username, String password) {
 			String passwordHash = DigestUtils.sha256Hex(password);
-			this.credentials = new Credentials(username, passwordHash);
+			this.credentials = Credentials.builder().username(username).passwordHash(passwordHash).build();
 		}
 
 		@Override
