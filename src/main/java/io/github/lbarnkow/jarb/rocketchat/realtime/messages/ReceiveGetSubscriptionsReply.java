@@ -5,6 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonAlias;
 
 import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawDate;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawUser;
 
 public class ReceiveGetSubscriptionsReply extends BaseMessage {
 
@@ -21,26 +23,26 @@ public class ReceiveGetSubscriptionsReply extends BaseMessage {
 
 	public static class Subscription extends Common {
 		private String t; // "t": "d"
-		private Date ts; // "ts": { "$date": 1480377601 }
-		private Date ls; // "ls": { "$date": 1480377601 }
+		private RawDate ts; // "ts": { "$date": 1480377601 }
+		private RawDate ls; // "ls": { "$date": 1480377601 }
 		private String name; // "name": "username"
 		private String rid; // "rid": "room-id"
-		private User u; // "u": { "_id": "user-id", "username": "username" }
+		private RawUser u; // "u": { "_id": "user-id", "username": "username" }
 		private boolean open; // "open": true
 		private boolean alert; // "alert": false
 		private int unread; // "unread": 0
-		private Date updatedAt; // "_updatedAt": { "$date": 1480377601 }
+		private RawDate updatedAt; // "_updatedAt": { "$date": 1480377601 }
 		private String id; // "_id": "subscription-id"
 
 		public String getT() {
 			return t;
 		}
 
-		public Date getTs() {
+		public RawDate getTs() {
 			return ts;
 		}
 
-		public Date getLs() {
+		public RawDate getLs() {
 			return ls;
 		}
 
@@ -52,7 +54,7 @@ public class ReceiveGetSubscriptionsReply extends BaseMessage {
 			return rid;
 		}
 
-		public User getU() {
+		public RawUser getU() {
 			return u;
 		}
 
@@ -68,36 +70,13 @@ public class ReceiveGetSubscriptionsReply extends BaseMessage {
 			return unread;
 		}
 
-		public Date getUpdatedAt() {
+		public RawDate getUpdatedAt() {
 			return updatedAt;
 		}
 
 		@JsonAlias("_id")
 		public String getId() {
 			return id;
-		}
-	}
-
-	public static class Date extends Common {
-		private long date;
-
-		@JsonAlias("$date")
-		public long getDate() {
-			return date;
-		}
-	}
-
-	public static class User extends Common {
-		private String id;
-		private String username;
-
-		@JsonAlias("_id")
-		public String getId() {
-			return id;
-		}
-
-		public String getUsername() {
-			return username;
 		}
 	}
 }

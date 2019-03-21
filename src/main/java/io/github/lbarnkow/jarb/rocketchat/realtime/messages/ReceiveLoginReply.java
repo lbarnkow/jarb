@@ -1,8 +1,7 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-
 import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawDate;
 
 public class ReceiveLoginReply extends BaseMessage {
 
@@ -20,7 +19,7 @@ public class ReceiveLoginReply extends BaseMessage {
 	public static class LoginResult extends Common {
 		private String id;
 		private String token;
-		private TokenExpires tokenExpires;
+		private RawDate tokenExpires;
 		private String type;
 
 		public String getId() {
@@ -31,21 +30,12 @@ public class ReceiveLoginReply extends BaseMessage {
 			return token;
 		}
 
-		public TokenExpires getTokenExpires() {
+		public RawDate getTokenExpires() {
 			return tokenExpires;
 		}
 
 		public String getType() {
 			return type;
-		}
-
-		public static class TokenExpires extends Common {
-			private long date;
-
-			@JsonAlias("$date")
-			public long getDate() {
-				return date;
-			}
 		}
 	}
 }

@@ -14,6 +14,7 @@ import io.github.lbarnkow.jarb.rocketchat.RestClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendJoinRoom;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListJoinedReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListReply;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawChannel;
 
 public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
 
@@ -54,11 +55,11 @@ public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
 				ChannelListReply channels = restClient.getChannelList(authInfo.get());
 				ChannelListJoinedReply joinedChannels = restClient.getChannelListJoined(authInfo.get());
 
-				Map<String, ChannelListReply.Channel> roomIdsNotJoined = new HashMap<>();
-				for (ChannelListReply.Channel channel : channels.getChannels()) {
+				Map<String, RawChannel> roomIdsNotJoined = new HashMap<>();
+				for (RawChannel channel : channels.getChannels()) {
 					roomIdsNotJoined.put(channel.get_id(), channel);
 				}
-				for (ChannelListJoinedReply.Channel channel : joinedChannels.getChannels()) {
+				for (RawChannel channel : joinedChannels.getChannels()) {
 					roomIdsNotJoined.remove(channel.get_id());
 				}
 
