@@ -43,7 +43,7 @@ import io.github.lbarnkow.jarb.rocketchat.RestClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendStreamRoomMessages;
 import io.github.lbarnkow.jarb.rocketchat.rest.RestClientException;
-import io.github.lbarnkow.jarb.taskmanager.Task;
+import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import io.github.lbarnkow.jarb.tasks.LoginTask;
 import io.github.lbarnkow.jarb.tasks.LoginTask.LoginTaskListener;
@@ -53,8 +53,8 @@ import io.github.lbarnkow.jarb.tasks.SubscriptionsTrackerTask.SubscriptionsTrack
 import lombok.ToString;
 
 @ToString
-public class BotManager extends Task implements ElectionCandidateListener, RealtimeClientListener, LoginTaskListener,
-		SubscriptionsTrackerTaskListener {
+public class BotManager extends AbstractBaseTask implements ElectionCandidateListener, RealtimeClientListener,
+		LoginTaskListener, SubscriptionsTrackerTaskListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(BotManager.class);
 
@@ -121,7 +121,7 @@ public class BotManager extends Task implements ElectionCandidateListener, Realt
 	}
 
 	@Override
-	protected void runTask() throws Throwable {
+	public void runTask() throws Throwable {
 		boolean keepGoing = true;
 
 		try {

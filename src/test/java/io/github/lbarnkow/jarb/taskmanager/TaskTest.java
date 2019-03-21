@@ -20,7 +20,7 @@ class TaskTest {
 		task.captureStateBeforeInitialization(wrapper);
 
 		// when
-		wrapper.startTask();
+		wrapper.startTask(null);
 		Thread.sleep(5L);
 		wrapper.stopTask();
 		Thread.sleep(40L);
@@ -41,10 +41,10 @@ class TaskTest {
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		wrapper.startTask();
+		wrapper.startTask(null);
 
 		// then
-		assertThrows(IllegalStateException.class, () -> wrapper.startTask());
+		assertThrows(IllegalStateException.class, () -> wrapper.startTask(null));
 	}
 
 	@Test
@@ -54,7 +54,7 @@ class TaskTest {
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		wrapper.startTask();
+		wrapper.startTask(null);
 		Thread.sleep(15L);
 
 		// then
@@ -68,7 +68,7 @@ class TaskTest {
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		wrapper.startTask();
+		wrapper.startTask(null);
 		Thread.sleep(25L);
 
 		// then

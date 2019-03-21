@@ -60,7 +60,7 @@ class TaskTableLoggerTaskTest {
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		wrapper.startTask();
+		wrapper.startTask(null);
 		Thread.sleep(10L);
 		wrapper.stopTask();
 		Thread.sleep(10L);

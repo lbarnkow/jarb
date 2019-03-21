@@ -13,30 +13,26 @@ import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveLoginReply;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendLogin;
 
-public class LoginTask extends AbstractBaseTask {
+public class LoginTask extends AbstractBotSpecificTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginTask.class);
 
 	private static final long MAX_TOKEN_REFRESH_INTERVAL = Duration.ofMinutes(60L).toMillis();
 
-	private final Bot bot;
 	private final RealtimeClient realtimeClient;
 	private final LoginTaskListener listener;
 
 	public LoginTask(Bot bot, RealtimeClient realtimeClient, LoginTaskListener listener) {
-		super(bot.getName());
+		super(bot);
 
 		this.realtimeClient = realtimeClient;
 		this.listener = listener;
-		this.bot = bot;
 	}
 
 	@Override
-	protected void initializeTask() throws Throwable {
-	}
+	public void runTask() throws Throwable {
+		Bot bot = getBot();
 
-	@Override
-	protected void runTask() throws Throwable {
 		try {
 			while (true) {
 				String username = bot.getCredentials().getUsername();

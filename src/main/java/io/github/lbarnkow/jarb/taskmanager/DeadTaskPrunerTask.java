@@ -10,7 +10,7 @@ import lombok.ToString;
 
 @ToString
 @AllArgsConstructor
-public class DeadTaskPrunerTask extends Task {
+public class DeadTaskPrunerTask extends AbstractBaseTask {
 	private static final Logger logger = LoggerFactory.getLogger(DeadTaskPrunerTask.class);
 
 	private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
@@ -23,7 +23,7 @@ public class DeadTaskPrunerTask extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Throwable {
+	public void runTask() throws Throwable {
 		while (true) {
 			pruneTasks();
 

@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
-public class TaskTableLoggerTask extends Task {
+public class TaskTableLoggerTask extends AbstractBaseTask {
 	private static final Logger logger = LoggerFactory.getLogger(TaskTableLoggerTask.class);
 
 	private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
@@ -29,7 +29,7 @@ public class TaskTableLoggerTask extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Throwable {
+	public void runTask() throws Throwable {
 		while (true) {
 			logger.info("Logging running background tasks");
 

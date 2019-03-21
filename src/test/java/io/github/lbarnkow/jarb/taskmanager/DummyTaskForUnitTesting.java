@@ -1,6 +1,6 @@
 package io.github.lbarnkow.jarb.taskmanager;
 
-public final class DummyTaskForUnitTesting extends Task {
+public final class DummyTaskForUnitTesting extends AbstractBaseTask {
 	TaskWrapper myWrapper;
 	TaskState stateBeforeInitialization;
 	TaskState stateOnInitialization;
@@ -32,7 +32,7 @@ public final class DummyTaskForUnitTesting extends Task {
 	}
 
 	@Override
-	protected void initializeTask() throws Throwable {
+	public void initializeTask() throws Throwable {
 		if (myWrapper != null) {
 			stateOnInitialization = myWrapper.getState();
 		}
@@ -43,7 +43,7 @@ public final class DummyTaskForUnitTesting extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Throwable {
+	public void runTask() throws Throwable {
 		if (myWrapper != null) {
 			stateOnRun = myWrapper.getState();
 		}

@@ -23,24 +23,22 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
+public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
 	private static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
 	private final RestClient restClient;
 	private final RealtimeClient realtimeClient;
-	private final Bot bot;
 	private final Holder<AuthInfo> authInfo;
 	private final long sleepTime;
 
 	PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
 			Holder<AuthInfo> authInfo, long sleepTime) {
-		super(bot.getName());
+		super(bot);
 
 		this.restClient = restClient;
 		this.realtimeClient = realtimeClient;
-		this.bot = bot;
 		this.authInfo = authInfo;
 		this.sleepTime = sleepTime;
 	}
@@ -51,11 +49,9 @@ public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
 	}
 
 	@Override
-	protected void initializeTask() throws Throwable {
-	}
+	public void runTask() throws Throwable {
+		Bot bot = getBot();
 
-	@Override
-	protected void runTask() throws Throwable {
 		try {
 			while (true) {
 				ChannelListReply channels = restClient.getChannelList(authInfo.getValue());

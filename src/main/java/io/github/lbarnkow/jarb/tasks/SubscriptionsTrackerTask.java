@@ -18,7 +18,7 @@ import lombok.ToString;
 
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class SubscriptionsTrackerTask extends AbstractBaseTask {
+public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
@@ -31,7 +31,7 @@ public class SubscriptionsTrackerTask extends AbstractBaseTask {
 
 	SubscriptionsTrackerTask(Bot bot, RealtimeClient realtimeClient, long sleepTime,
 			SubscriptionsTrackerTaskListener listener) {
-		super(bot.getName());
+		super(bot);
 
 		this.bot = bot;
 		this.realtimeClient = realtimeClient;
@@ -44,11 +44,7 @@ public class SubscriptionsTrackerTask extends AbstractBaseTask {
 	}
 
 	@Override
-	protected void initializeTask() throws Throwable {
-	}
-
-	@Override
-	protected void runTask() throws Throwable {
+	public void runTask() throws Throwable {
 		Set<String> knownIds = new HashSet<>();
 		try {
 			while (true) {

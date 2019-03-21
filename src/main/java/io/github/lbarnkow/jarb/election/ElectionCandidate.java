@@ -11,9 +11,9 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.github.lbarnkow.jarb.taskmanager.Task;
+import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 
-public class ElectionCandidate extends Task {
+public class ElectionCandidate extends AbstractBaseTask {
 	private final static Logger logger = LoggerFactory.getLogger(ElectionCandidate.class);
 
 	static final long SLEEP_VARIANCE_MSEC = (long) (Math.random() * 100L);
@@ -39,7 +39,7 @@ public class ElectionCandidate extends Task {
 	}
 
 	@Override
-	protected void runTask() throws Throwable {
+	public void runTask() throws Throwable {
 		updateState(INACTIVE);
 
 		try {
