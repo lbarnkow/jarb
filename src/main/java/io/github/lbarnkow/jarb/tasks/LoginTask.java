@@ -70,7 +70,7 @@ public class LoginTask extends AbstractBaseTask {
 	private AuthInfo convertReply(ReceiveLoginReply reply) {
 		String userId = reply.getResult().getId();
 		String token = reply.getResult().getToken();
-		long epochExpires = reply.getResult().getTokenExpires().getDate();
+		long epochExpires = reply.getResult().getTokenExpires().get$date();
 		Instant expires = Instant.ofEpochMilli(epochExpires);
 
 		return new AuthInfo(userId, token, expires);
