@@ -2,31 +2,13 @@ package io.github.lbarnkow.jarb.rocketchat.rest.messages;
 
 import java.util.List;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawChannel;
 
 public class ChannelListReply extends BaseReply {
 
-	private List<Channel> channels;
+	private List<RawChannel> channels;
 
-	public List<Channel> getChannels() {
+	public List<RawChannel> getChannels() {
 		return channels;
-	}
-
-	public static class Channel extends Common {
-		private String _id;
-		private String name;
-		private String t;
-
-		public String get_id() {
-			return _id;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getT() {
-			return t;
-		}
 	}
 }

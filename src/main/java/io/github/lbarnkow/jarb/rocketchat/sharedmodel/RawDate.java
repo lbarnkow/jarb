@@ -1,17 +1,17 @@
-package io.github.lbarnkow.jarb.rocketchat.realtime.messages.shared;
+package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
 import java.time.Instant;
 
 import io.github.lbarnkow.jarb.misc.Common;
 
-public class Date extends Common {
+public class RawDate extends Common {
 	private long $date;
 
 	// Contents will be deserialized from JSON.
-	Date() {
+	RawDate() {
 	}
 
-	public Date(Instant date) {
+	public RawDate(Instant date) {
 		this.$date = date.getEpochSecond();
 	}
 
