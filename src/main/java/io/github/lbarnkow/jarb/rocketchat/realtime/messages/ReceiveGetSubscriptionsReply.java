@@ -4,24 +4,23 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawDate;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawUser;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@MyJsonSettings
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class ReceiveGetSubscriptionsReply extends BaseMessage {
-
 	private List<Subscription> result;
 
-	// Contents will be deserialized from JSON.
-	private ReceiveGetSubscriptionsReply() {
-		super(null, null);
-	}
-
-	public List<Subscription> getResult() {
-		return result;
-	}
-
-	public static class Subscription extends Common {
+	@MyJsonSettings
+	@Data
+	public static class Subscription {
+		@JsonAlias("_id")
+		private String id; // "_id": "subscription-id"
 		private String t; // "t": "d"
 		private RawDate ts; // "ts": { "$date": 1480377601 }
 		private RawDate ls; // "ls": { "$date": 1480377601 }
@@ -32,51 +31,5 @@ public class ReceiveGetSubscriptionsReply extends BaseMessage {
 		private boolean alert; // "alert": false
 		private int unread; // "unread": 0
 		private RawDate updatedAt; // "_updatedAt": { "$date": 1480377601 }
-		private String id; // "_id": "subscription-id"
-
-		public String getT() {
-			return t;
-		}
-
-		public RawDate getTs() {
-			return ts;
-		}
-
-		public RawDate getLs() {
-			return ls;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public String getRid() {
-			return rid;
-		}
-
-		public RawUser getU() {
-			return u;
-		}
-
-		public boolean isOpen() {
-			return open;
-		}
-
-		public boolean isAlert() {
-			return alert;
-		}
-
-		public int getUnread() {
-			return unread;
-		}
-
-		public RawDate getUpdatedAt() {
-			return updatedAt;
-		}
-
-		@JsonAlias("_id")
-		public String getId() {
-			return id;
-		}
 	}
 }

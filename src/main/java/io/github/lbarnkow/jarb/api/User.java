@@ -1,21 +1,11 @@
 package io.github.lbarnkow.jarb.api;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.Builder;
+import lombok.Data;
 
-public class User extends Common {
+@Data
+@Builder
+public class User {
 	private final String id;
 	private final String name;
-
-	public User(String id, String name) {
-		this.id = id;
-		this.name = name;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
 }

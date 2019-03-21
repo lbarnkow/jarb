@@ -1,15 +1,9 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import lombok.Data;
 
-public class RawAttachment extends Common {
+@MyJsonSettings
+@Data
+public class RawAttachment {
 	private String text;
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
 }

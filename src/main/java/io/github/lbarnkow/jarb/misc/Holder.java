@@ -1,7 +1,18 @@
 package io.github.lbarnkow.jarb.misc;
 
-public class Holder<T> extends Common {
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
+
+@ToString
+@EqualsAndHashCode
+public class Holder<T> {
 	private final T initialValue;
+	@NonNull
+	@Getter
+	@Setter
 	private T value;
 
 	public Holder(T value) {
@@ -9,18 +20,7 @@ public class Holder<T> extends Common {
 		this.value = value;
 	}
 
-	public T get() {
-		return value;
-	}
-
-	public void set(T value) {
-		if (value == null) {
-			throw new IllegalArgumentException("Holder can't reference null values!");
-		}
-		this.value = value;
-	}
-
 	public void reset() {
-		set(initialValue);
+		setValue(initialValue);
 	}
 }

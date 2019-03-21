@@ -1,26 +1,15 @@
 package io.github.lbarnkow.jarb.taskmanager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import lombok.Setter;
 
-import io.github.lbarnkow.jarb.misc.Common;
-
-public abstract class Task extends Common {
-
-	static Logger logger = LoggerFactory.getLogger(Task.class);
-
+public abstract class Task {
+	@Getter
+	@Setter
 	private String name = getClass().getSimpleName() + "-thread";
 
 	protected void initializeTask() throws Throwable {
 	};
 
 	protected abstract void runTask() throws Throwable;
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 }

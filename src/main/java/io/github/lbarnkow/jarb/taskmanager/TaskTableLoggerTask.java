@@ -9,6 +9,13 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
 public class TaskTableLoggerTask extends Task {
 	private static final Logger logger = LoggerFactory.getLogger(TaskTableLoggerTask.class);
 
@@ -19,11 +26,6 @@ public class TaskTableLoggerTask extends Task {
 
 	public TaskTableLoggerTask(TaskManager manager) {
 		this(manager, TASK_INTERVAL_MSEC);
-	}
-
-	TaskTableLoggerTask(TaskManager manager, long taskInterval) {
-		this.manager = manager;
-		this.taskInterval = taskInterval;
 	}
 
 	@Override

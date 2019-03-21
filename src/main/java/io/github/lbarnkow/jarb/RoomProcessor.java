@@ -27,7 +27,11 @@ import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChatCountersReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChatHistoryReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.SubscriptionsGetOneReply;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawMessage;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
+@ToString
+@EqualsAndHashCode
 public class RoomProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(RoomProcessor.class);
 	private static final ChronologicalMessageComparator COMPARATOR = new ChronologicalMessageComparator();
@@ -68,8 +72,9 @@ public class RoomProcessor {
 		if (!roomCache.containsKey(roomId)) {
 			SubscriptionsGetOneReply subscription = restClient.getOneSubscription(authInfo, roomId);
 
+			String roomName = subscription.getName();
 			RoomType roomType = RoomType.parse(subscription.getT());
-			Room room = new Room(subscription.getRid(), subscription.getName(), roomType);
+			Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
 
 			roomCache.put(roomId, room);
 		}
@@ -86,10 +91,16 @@ public class RoomProcessor {
 		ChatHistoryReply history = restClient.getChatHistory(authInfo, room, latest, oldest, true);
 
 		for (RawMessage rawMsg : history.getMessages()) {
-			MessageType type = MessageType.parse(rawMsg.getT());
-			User user = new User(rawMsg.getU().get_id(), rawMsg.getU().getUsername());
-			Message message = new Message(type, room, user, rawMsg.get_id(), rawMsg.getMsg(),
-					Instant.parse(rawMsg.getTs()));
+			String uId = rawMsg.getU().get_id();
+			String uName = rawMsg.getU().getUsername();
+			User user = User.builder().id(uId).name(uName).build();
+
+			String mId = rawMsg.get_id();
+			String mMsg = rawMsg.getMsg();
+			Instant mTs = Instant.parse(rawMsg.getTs());
+			MessageType mType = MessageType.parse(rawMsg.getT());
+			Message message = Message.builder().id(mId).message(mMsg).room(room).timestamp(mTs).type(mType).user(user)
+					.build();
 			result.add(message);
 		}
 

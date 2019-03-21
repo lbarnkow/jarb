@@ -1,7 +1,6 @@
 package io.github.lbarnkow.jarb.api;
 
 public enum MessageType {
-
 	REGULAR_CHAT_MESSAGE(null), //
 
 	ROOM_NAME_CHANGED("r"), //

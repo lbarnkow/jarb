@@ -1,8 +1,12 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@SuppressWarnings("unused")
+@MyJsonSettings
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class SendLogin extends BaseMessageWithMethod {
 	private static final String METHOD = "login";
 
@@ -13,7 +17,9 @@ public class SendLogin extends BaseMessageWithMethod {
 		this.params = new Params[] { new Params(username, password) };
 	}
 
-	private static class Params extends Common {
+	@MyJsonSettings
+	@Data
+	private static class Params {
 		private final User user;
 		private final Password password;
 
@@ -23,20 +29,16 @@ public class SendLogin extends BaseMessageWithMethod {
 		}
 	}
 
-	private static class User extends Common {
+	@MyJsonSettings
+	@Data
+	private static class User {
 		private final String username;
-
-		public User(String username) {
-			this.username = username;
-		}
 	}
 
-	private static class Password extends Common {
+	@MyJsonSettings
+	@Data
+	private static class Password {
 		private final String digest;
 		private final String algorithm = "sha-256";
-
-		public Password(String passwordHash) {
-			this.digest = passwordHash;
-		}
 	}
 }
