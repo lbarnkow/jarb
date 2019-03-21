@@ -12,6 +12,10 @@ public enum RoomType {
 		this.rawType = rawType;
 	}
 
+	public String getRawType() {
+		return rawType;
+	}
+
 	public static RoomType parse(String rawType) {
 		for (RoomType type : RoomType.values()) {
 			if (type.rawType.equals(rawType)) {

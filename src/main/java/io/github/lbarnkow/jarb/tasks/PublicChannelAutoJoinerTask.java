@@ -1,6 +1,7 @@
 package io.github.lbarnkow.jarb.tasks;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -8,9 +9,11 @@ import org.slf4j.LoggerFactory;
 
 import io.github.lbarnkow.jarb.api.AuthInfo;
 import io.github.lbarnkow.jarb.api.Bot;
+import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.misc.Holder;
 import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.RestClient;
+import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveJoinRoomReply;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendJoinRoom;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListJoinedReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListReply;
@@ -58,27 +61,43 @@ public class PublicChannelAutoJoinerTask extends AbstractBaseTask {
 				ChannelListReply channels = restClient.getChannelList(authInfo.getValue());
 				ChannelListJoinedReply joinedChannels = restClient.getChannelListJoined(authInfo.getValue());
 
-				Map<String, RawChannel> roomIdsNotJoined = new HashMap<>();
-				for (RawChannel channel : channels.getChannels()) {
-					roomIdsNotJoined.put(channel.get_id(), channel);
-				}
-				for (RawChannel channel : joinedChannels.getChannels()) {
-					roomIdsNotJoined.remove(channel.get_id());
-				}
+				Map<String, RawChannel> roomIdsNotJoined = findChannelsNotJoined(channels.getChannels(),
+						joinedChannels.getChannels());
 
-				for (String roomId : roomIdsNotJoined.keySet()) {
-					// TODO: offer room to bot!
-					// TODO: What about rooms with join code?!
-					SendJoinRoom message = new SendJoinRoom(roomId);
-					realtimeClient.sendMessage(message);
+				for (RawChannel channel : roomIdsNotJoined.values()) {
+					Room room = channel.asRoom();
 
-					String roomName = roomIdsNotJoined.get(roomId).getName();
-					logger.info("Bot '{}' joined channel '{}'.", bot.getName(), roomName);
+					boolean shouldJoin = bot.offerRoom(room);
+					// What about join code?! Currently API doesn't enforce the passwords (0.73)
+					if (shouldJoin) {
+						SendJoinRoom message = new SendJoinRoom(room);
+						ReceiveJoinRoomReply reply = realtimeClient.sendMessageAndWait(message,
+								ReceiveJoinRoomReply.class);
+
+						if (reply.isSuccess()) {
+							logger.info("Bot '{}' joined channel '{}'.", bot.getName(), room.getName());
+						} else {
+							logger.error("Bot '{}' failed to join channel '{}'.", bot.getName(), room.getName());
+						}
+					}
 				}
 
 				Thread.sleep(sleepTime);
 			}
 		} catch (InterruptedException e) {
 		}
+	}
+
+	private Map<String, RawChannel> findChannelsNotJoined(List<RawChannel> channels, List<RawChannel> joinedChannels) {
+		Map<String, RawChannel> channelsNotJoined = new HashMap<>();
+
+		for (RawChannel channel : channels) {
+			channelsNotJoined.put(channel.get_id(), channel);
+		}
+		for (RawChannel channel : joinedChannels) {
+			channelsNotJoined.remove(channel.get_id());
+		}
+
+		return channelsNotJoined;
 	}
 }
