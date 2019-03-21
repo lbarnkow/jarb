@@ -2,59 +2,13 @@ package io.github.lbarnkow.jarb.rocketchat.rest.messages;
 
 import java.util.List;
 
-import io.github.lbarnkow.jarb.misc.Common;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawMessage;
 
 public class ChatHistoryReply extends BaseReply {
 
-	private List<Message> messages;
+	private List<RawMessage> messages;
 
-	public List<Message> getMessages() {
+	public List<RawMessage> getMessages() {
 		return messages;
-	}
-
-	public static class Message extends Common {
-		private String _id;
-		private String t;
-		private String rid;
-		private String msg;
-		private String ts;
-		private User u;
-
-		public String get_id() {
-			return _id;
-		}
-
-		public String getT() {
-			return t;
-		}
-
-		public String getRid() {
-			return rid;
-		}
-
-		public String getMsg() {
-			return msg;
-		}
-
-		public String getTs() {
-			return ts;
-		}
-
-		public User getU() {
-			return u;
-		}
-	}
-
-	public static class User extends Common {
-		private String _id;
-		private String username;
-
-		public String get_id() {
-			return _id;
-		}
-
-		public String getUsername() {
-			return username;
-		}
 	}
 }

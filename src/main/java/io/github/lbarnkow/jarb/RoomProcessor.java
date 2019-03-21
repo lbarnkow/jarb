@@ -26,6 +26,7 @@ import io.github.lbarnkow.jarb.rocketchat.rest.RestClientException;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChatCountersReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChatHistoryReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.SubscriptionsGetOneReply;
+import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawMessage;
 
 public class RoomProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(RoomProcessor.class);
@@ -84,7 +85,7 @@ public class RoomProcessor {
 		Instant latest = Instant.parse(after.getUnreadsFrom());
 		ChatHistoryReply history = restClient.getChatHistory(authInfo, room, latest, oldest, true);
 
-		for (ChatHistoryReply.Message rawMsg : history.getMessages()) {
+		for (RawMessage rawMsg : history.getMessages()) {
 			MessageType type = MessageType.parse(rawMsg.getT());
 			User user = new User(rawMsg.getU().get_id(), rawMsg.getU().getUsername());
 			Message message = new Message(type, room, user, rawMsg.get_id(), rawMsg.getMsg(),
