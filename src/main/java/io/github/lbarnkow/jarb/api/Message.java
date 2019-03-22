@@ -1,17 +1,23 @@
 package io.github.lbarnkow.jarb.api;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class Message {
-	private final MessageType type;
-	private final Room room;
-	private final User user;
-	private final String id;
-	private final String message;
-	private final Instant timestamp;
+	String id;
+	Room room;
+	String message;
+	Instant timestamp;
+	User user;
+
+	@Builder.Default
+	List<Attachment> attachments = Collections.emptyList();
+
+	MessageType type;
 }

@@ -1,11 +1,11 @@
 package io.github.lbarnkow.jarb.api;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class User {
-	private final String id;
-	private final String name;
+	String id;
+	String name;
 }
