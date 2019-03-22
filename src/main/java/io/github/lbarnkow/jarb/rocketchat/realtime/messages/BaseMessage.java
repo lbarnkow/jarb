@@ -1,10 +1,10 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 @NoArgsConstructor
 public class BaseMessage {
@@ -23,7 +23,7 @@ public class BaseMessage {
 		this(msg, null);
 	}
 
-	@MyJsonSettings
+	@JarbJsonSettings
 	@Data
 	public static class Error {
 		private boolean isClientSafe;

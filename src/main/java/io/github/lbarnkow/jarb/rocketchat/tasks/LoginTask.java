@@ -1,4 +1,4 @@
-package io.github.lbarnkow.jarb.tasks;
+package io.github.lbarnkow.jarb.rocketchat.tasks;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -12,6 +12,7 @@ import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveLoginReply;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendLogin;
+import io.github.lbarnkow.jarb.taskmanager.AbstractBotSpecificTask;
 
 public class LoginTask extends AbstractBotSpecificTask {
 
@@ -36,8 +37,8 @@ public class LoginTask extends AbstractBotSpecificTask {
 		try {
 			while (true) {
 				String username = bot.getCredentials().getUsername();
-				String passwordHash = bot.getCredentials().getPasswordHash();
-				SendLogin message = new SendLogin(username, passwordHash);
+				String password = bot.getCredentials().getPassword();
+				SendLogin message = new SendLogin(username, password);
 
 				ReceiveLoginReply reply = realtimeClient.sendMessageAndWait(message, ReceiveLoginReply.class);
 				AuthInfo authInfo = convertReply(reply);

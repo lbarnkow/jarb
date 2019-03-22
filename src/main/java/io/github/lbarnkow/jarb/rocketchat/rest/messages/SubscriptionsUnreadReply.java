@@ -1,7 +1,7 @@
 package io.github.lbarnkow.jarb.rocketchat.rest.messages;
 
-import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 
-@MyJsonSettings
+@JarbJsonSettings
 public class SubscriptionsUnreadReply extends BaseReply {
 }

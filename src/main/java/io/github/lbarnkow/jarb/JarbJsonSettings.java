@@ -1,4 +1,4 @@
-package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
+package io.github.lbarnkow.jarb;
 
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.ANY;
 import static com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility.NONE;
@@ -24,5 +24,5 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 		setterVisibility = NONE)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(Include.NON_NULL)
-public @interface MyJsonSettings {
+public @interface JarbJsonSettings {
 }

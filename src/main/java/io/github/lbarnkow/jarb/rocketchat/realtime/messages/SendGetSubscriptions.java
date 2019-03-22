@@ -1,10 +1,10 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendGetSubscriptions extends BaseMessageWithMethod {

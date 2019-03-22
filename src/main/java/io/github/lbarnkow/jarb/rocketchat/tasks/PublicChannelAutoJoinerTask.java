@@ -1,4 +1,4 @@
-package io.github.lbarnkow.jarb.tasks;
+package io.github.lbarnkow.jarb.rocketchat.tasks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +18,7 @@ import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendJoinRoom;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListJoinedReply;
 import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListReply;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawChannel;
+import io.github.lbarnkow.jarb.taskmanager.AbstractBotSpecificTask;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

@@ -1,82 +1,99 @@
 package io.github.lbarnkow.jarb;
 
-import java.util.Optional;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import io.github.lbarnkow.jarb.api.Bot;
-import io.github.lbarnkow.jarb.api.Credentials;
-import io.github.lbarnkow.jarb.api.Message;
-import io.github.lbarnkow.jarb.api.Room;
+import io.github.lbarnkow.jarb.api.BotConfiguration;
 import io.github.lbarnkow.jarb.misc.GuiceModule;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class Main {
-	private static final Logger logger = LoggerFactory.getLogger(Main.class);
-
 	public static void main(String[] args) {
-		logger.info("# # # W E L C O M E # # #");
+		log.info("# # # W E L C O M E # # #");
 
-		Injector guice = Guice.createInjector(new GuiceModule());
+		val config = loadConfig("jarb-config.yaml");
 
-		// TODO: Read configuration and enabled bots from config
-		Runtime runtime = guice.getInstance(Runtime.class);
+		val guice = Guice.createInjector(new GuiceModule());
 
-		BotManager botManager = guice.getInstance(BotManager.class);
-		BotManagerConfiguration config = new BotManagerConfiguration();
+		val bots = createBots(config, guice);
+		val runtime = guice.getInstance(Runtime.class);
+		val botManager = guice.getInstance(BotManager.class);
 
 		runtime.addShutdownHook(new Thread("ShutdownHook") {
 			@Override
 			public void run() {
-				logger.info("JVM is shutting down, stopping all thread/services...");
+				log.info("JVM is shutting down, stopping all thread/services...");
 				botManager.stop();
-				logger.info("All threads/service stopped.");
+				log.info("All threads/service stopped.");
 			}
 		});
 
-		Bot demoBot = new DummyBot("demobot", "demobot");
-//		Bot jiraBot = new DummyBot("jirabot", "jirabot");
-//		Bot wikiBot = new DummyBot("wikibot", "wikibot");
-
-		botManager.start(config, demoBot);
-//		botManager.start(config, demoBot, jiraBot, wikiBot);
+		botManager.start(config, bots);
 	}
 
-	public static class DummyBot extends Bot {
-		private final Credentials credentials;
+	private static BotManagerConfiguration loadConfig(String path) {
+		BotManagerConfiguration result = null;
+		val file = new File(path);
 
-		public DummyBot(String username, String password) {
-			String passwordHash = DigestUtils.sha256Hex(password);
-			this.credentials = Credentials.builder().username(username).passwordHash(passwordHash).build();
+		if (file.exists()) {
+			val mapper = new ObjectMapper(new YAMLFactory());
+			try {
+				result = mapper.readValue(file, BotManagerConfiguration.class);
+			} catch (IOException e) {
+				log.error("Failed to read configuration from file '{}'!", path, e);
+				System.exit(1);
+			}
+		} else {
+			// just go with the defaults for local development
+			result = new BotManagerConfiguration();
 		}
 
-		@Override
-		public void initialize() {
-		}
+		return result;
+	}
 
-		@Override
-		public String getName() {
-			return credentials.getUsername();
-		}
+	private static Bot[] createBots(BotManagerConfiguration config, Injector guice) {
+		val bots = new ArrayList<Bot>();
 
-		@Override
-		public Credentials getCredentials() {
-			return credentials;
-		}
+		config.getBots().forEach(botConfig -> {
+			try {
+				val clazz = loadClass(botConfig);
+				val bot = guice.getInstance(clazz);
+				bot.initialize(botConfig.getName(), botConfig.getCredentials());
+				bots.add(bot);
+			} catch (Exception e) {
+				log.error("Failed to load, instantiate and initialize the bot '{}'!", botConfig.getName(), e);
+				System.exit(1);
+			}
+		});
 
-		@Override
-		public Optional<Message> offerMessage(Message message) {
-			logger.error(message.toString());
-			return Optional.empty();
-		}
+		return bots.toArray(new Bot[0]);
+	}
 
-		@Override
-		public boolean offerRoom(Room room) {
-			return true;
+	@SuppressWarnings("unchecked")
+	private static Class<Bot> loadClass(BotConfiguration botConfig) {
+		try {
+			val clazz = Bot.class.getClassLoader().loadClass(botConfig.getQualifiedClassName());
+			if (Bot.class.isAssignableFrom(clazz)) {
+				return (Class<Bot>) clazz;
+			}
+
+			log.error("Selected bot class '{}' is not a in the type hierachy of '{}'!",
+					botConfig.getQualifiedClassName(), Bot.class.getName());
+		} catch (ClassNotFoundException e) {
+			log.error("Failed to load bot class '{}'!", botConfig.getQualifiedClassName(), e);
 		}
+		System.exit(1);
+
+		// will never be reached...
+		return null;
 	}
 }

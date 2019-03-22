@@ -43,13 +43,13 @@ import io.github.lbarnkow.jarb.rocketchat.RestClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendStreamRoomMessages;
 import io.github.lbarnkow.jarb.rocketchat.rest.RestClientException;
+import io.github.lbarnkow.jarb.rocketchat.tasks.LoginTask;
+import io.github.lbarnkow.jarb.rocketchat.tasks.PublicChannelAutoJoinerTask;
+import io.github.lbarnkow.jarb.rocketchat.tasks.SubscriptionsTrackerTask;
+import io.github.lbarnkow.jarb.rocketchat.tasks.LoginTask.LoginTaskListener;
+import io.github.lbarnkow.jarb.rocketchat.tasks.SubscriptionsTrackerTask.SubscriptionsTrackerTaskListener;
 import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
-import io.github.lbarnkow.jarb.tasks.LoginTask;
-import io.github.lbarnkow.jarb.tasks.LoginTask.LoginTaskListener;
-import io.github.lbarnkow.jarb.tasks.PublicChannelAutoJoinerTask;
-import io.github.lbarnkow.jarb.tasks.SubscriptionsTrackerTask;
-import io.github.lbarnkow.jarb.tasks.SubscriptionsTrackerTask.SubscriptionsTrackerTaskListener;
 import lombok.ToString;
 
 @ToString

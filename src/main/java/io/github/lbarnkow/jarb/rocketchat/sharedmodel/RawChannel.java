@@ -1,10 +1,11 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
 import lombok.Data;
 
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 public class RawChannel {
 	private String _id;

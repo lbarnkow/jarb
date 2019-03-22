@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Attachment;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 
 // see: https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 @Builder
 @NoArgsConstructor // Jackson needs this

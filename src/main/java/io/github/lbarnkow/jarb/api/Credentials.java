@@ -1,11 +1,13 @@
 package io.github.lbarnkow.jarb.api;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Credentials {
-	private final String username;
-	private final String passwordHash;
+	private String username;
+	private String password;
 }
