@@ -1,7 +1,6 @@
-package io.github.lbarnkow.jarb.tasks;
+package io.github.lbarnkow.jarb.taskmanager;
 
 import io.github.lbarnkow.jarb.api.Bot;
-import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

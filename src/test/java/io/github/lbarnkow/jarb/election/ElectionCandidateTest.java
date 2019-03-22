@@ -99,7 +99,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	@EnabledOnOs({ LINUX })
 	void testFailedLeaseFileWrite() {
 		// given
-		config.syncFileName = "/dev/rtc0";
+		config.setSyncFileName("/dev/rtc0");
 		ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
 		ElectionLease lease = new ElectionLease(candidate.getId(), DEFAULT_LEASE_TTL);
 
@@ -170,7 +170,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	ElectionCandidate[] generateCandidates(int n) throws IOException {
 		File tmpFile = Files.createTempFile(getClass().getSimpleName(), null).toFile();
 		tmpFile.deleteOnExit();
-		config.syncFileName = tmpFile.getAbsolutePath();
+		config.setSyncFileName(tmpFile.getAbsolutePath());
 
 		ElectionCandidate[] result = new ElectionCandidate[n];
 

@@ -1,8 +1,9 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 public class RawSubscription {
 	private String t;

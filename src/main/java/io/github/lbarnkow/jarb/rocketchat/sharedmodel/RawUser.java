@@ -1,12 +1,13 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 @Builder
 @NoArgsConstructor // Jackson needs this

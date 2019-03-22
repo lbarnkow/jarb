@@ -1,0 +1,25 @@
+election:
+  leaseRefreshInterval: 300
+  leaseChallengeInterval: 100
+  leaseTimeToLive: 1000
+  syncFileName: /tmp/jarb-election-sync-file.tmp
+connection:
+  host: localhost
+  port: 8080
+  encrypted: false
+bots:
+- name: Demo-bot
+  qualifiedClassName: io.github.lbarnkow.jarb.bots.DummyBot
+  credentials:
+    username: demobot
+    password: 49139b9b9cec7e1ce60e83317b17fc9bc8561408729e148cd0f96f662a4440af
+- name: JIRA-bot
+  qualifiedClassName: io.github.lbarnkow.jarb.bots.DummyBot
+  credentials:
+    username: jirabot
+    password: b947cc134d934805ab953f2099d31112fd0bb841641971c61ce6e53121575742
+- name: wiki-bot
+  qualifiedClassName: io.github.lbarnkow.jarb.bots.DummyBot
+  credentials:
+    username: wikibot
+    password: 6d8bd9c3a8fc80ffa62588ec7a3b98b3afe4226dead6115a291fdcad43d631b4

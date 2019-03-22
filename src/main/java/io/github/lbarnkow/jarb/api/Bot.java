@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 public abstract class Bot {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-	public abstract void initialize();
+	public abstract Bot initialize(String name, Credentials credentials);
 
 	public abstract Credentials getCredentials();
 

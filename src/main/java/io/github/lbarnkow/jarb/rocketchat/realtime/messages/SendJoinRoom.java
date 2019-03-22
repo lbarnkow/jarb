@@ -3,12 +3,12 @@ package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Room;
-import io.github.lbarnkow.jarb.rocketchat.sharedmodel.MyJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendJoinRoom extends BaseMessageWithMethod {

@@ -1,8 +1,11 @@
 package io.github.lbarnkow.jarb.rocketchat;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.github.lbarnkow.jarb.JarbJsonSettings;
+import lombok.Data;
 
-@JsonIgnoreProperties({ "websocketUrl", "restUrl" })
+@Data
+@JarbJsonSettings
+//@JsonIgnoreProperties({ "websocketUrl", "restUrl" })
 public class ConnectionConfiguration {
 	private static final String DEFAULT_HOST = "localhost";
 	private static final int DEFAULT_PORT = 8080;
@@ -11,18 +14,6 @@ public class ConnectionConfiguration {
 	private String host = DEFAULT_HOST;
 	private int port = DEFAULT_PORT;
 	private boolean encrypted = DEFAULT_IS_ENCRYPTED;
-
-	public String getHost() {
-		return host;
-	}
-
-	public int getPort() {
-		return port;
-	}
-
-	public boolean isEncrypted() {
-		return encrypted;
-	}
 
 	public String getWebsocketUrl() {
 		String scheme = encrypted ? "wss" : "ws";

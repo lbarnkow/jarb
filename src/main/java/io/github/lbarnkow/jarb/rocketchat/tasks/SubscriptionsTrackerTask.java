@@ -1,4 +1,4 @@
-package io.github.lbarnkow.jarb.tasks;
+package io.github.lbarnkow.jarb.rocketchat.tasks;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +13,7 @@ import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveGetSubscriptionsReply;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendGetSubscriptions;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawSubscription;
+import io.github.lbarnkow.jarb.taskmanager.AbstractBotSpecificTask;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

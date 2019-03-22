@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.MessageType;
 import io.github.lbarnkow.jarb.api.Room;
@@ -13,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 // see https://rocket.chat/docs/developer-guides/realtime-api/the-message-object/
-@MyJsonSettings
+@JarbJsonSettings
 @Data
 @Builder
 @NoArgsConstructor // Jackson needs this
