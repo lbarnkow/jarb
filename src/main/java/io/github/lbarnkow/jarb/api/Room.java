@@ -1,12 +1,12 @@
 package io.github.lbarnkow.jarb.api;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 @Builder
 public class Room {
-	private final String id;
-	private final String name;
-	private final RoomType type;
+	final String id;
+	final String name;
+	final RoomType type;
 }
