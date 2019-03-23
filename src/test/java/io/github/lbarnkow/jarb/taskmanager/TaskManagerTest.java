@@ -5,6 +5,8 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.ACTIVE;
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
 class TaskManagerTest {
@@ -19,7 +21,7 @@ class TaskManagerTest {
 		// given
 
 		// when
-		manager.start(task1, task2, task3);
+		manager.start(Optional.empty(), task1, task2, task3);
 		Thread.sleep(20L);
 		TaskState state1 = manager.getTaskState(task1);
 		TaskState state2 = manager.getTaskState(task2);
@@ -48,7 +50,7 @@ class TaskManagerTest {
 		// given
 
 		// when
-		manager.start(task1, task2, task3);
+		manager.start(Optional.empty(), task1, task2, task3);
 		manager.stopAll();
 		Thread.sleep(25L);
 
@@ -67,7 +69,7 @@ class TaskManagerTest {
 		// given
 
 		// when
-		manager.start(task1, task2, task3);
+		manager.start(Optional.empty(), task1, task2, task3);
 		manager.stop(task1, task3);
 		Thread.sleep(60L);
 
@@ -84,7 +86,8 @@ class TaskManagerTest {
 	@Test
 	void testPrune() {
 		// given
-		assertThat(manager.getTasks()).hasSize(manager.getNumberOfManagementTasks());
+		manager.start(Optional.empty(), task1);
+		assertThat(manager.getTasks()).hasSize(1 + manager.getNumberOfManagementTasks());
 		Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
 
 		// when
@@ -99,6 +102,7 @@ class TaskManagerTest {
 	@Test
 	void testPruneLiveTask() {
 		// given
+		manager.start(Optional.empty(), task1);
 		Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
 
 		// when

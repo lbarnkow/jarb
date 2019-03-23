@@ -6,30 +6,38 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lombok.Synchronized;
 import lombok.ToString;
 
 @ToString
 public class TaskManager {
 	private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
+	private boolean started = false;
 	private final Map<Task, TaskWrapper> tasks = new HashMap<>();
 
 	private final Task[] managementTasks = new Task[] { new TaskTableLoggerTask(this), new DeadTaskPrunerTask(this) };
 
 	public TaskManager() {
-		start(managementTasks);
 	}
 
-	public synchronized void start(Task... tasks) {
-		start(null, tasks);
+	@Synchronized
+	public void start(Optional<TaskEndedCallback> callback, Task... tasks) {
+		if (!started) {
+			startTasks(callback, managementTasks);
+			started = true;
+		}
+
+		startTasks(callback, tasks);
 	}
 
-	public synchronized void start(TaskEndedCallback callback, Task... tasks) {
+	private void startTasks(Optional<TaskEndedCallback> callback, Task... tasks) {
 		for (Task task : tasks) {
 			TaskWrapper wrapper = new TaskWrapper(task);
 			wrapper.startTask(callback);

@@ -2,17 +2,11 @@ package io.github.lbarnkow.jarb;
 
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.LEADER;
-import static io.github.lbarnkow.jarb.misc.EventTypes.ACQUIRED_LEADERSHIP;
-import static io.github.lbarnkow.jarb.misc.EventTypes.AUTH_TOKEN_REFRESHED;
-import static io.github.lbarnkow.jarb.misc.EventTypes.LOST_LEADERSHIP;
-import static io.github.lbarnkow.jarb.misc.EventTypes.NEW_SUBSCRIPTION;
-import static io.github.lbarnkow.jarb.misc.EventTypes.PROCESS_ROOM;
-import static io.github.lbarnkow.jarb.misc.EventTypes.REALTIME_SESSION_CLOSED;
-import static io.github.lbarnkow.jarb.misc.EventTypes.REALTIME_SESSION_ESTABLISHED;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -21,9 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
 import javax.websocket.DeploymentException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Provider;
@@ -34,7 +25,6 @@ import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.election.ElectionCandidate;
 import io.github.lbarnkow.jarb.election.ElectionCandidateListener;
 import io.github.lbarnkow.jarb.election.ElectionCandidateState;
-import io.github.lbarnkow.jarb.misc.EventTypes;
 import io.github.lbarnkow.jarb.misc.Holder;
 import io.github.lbarnkow.jarb.misc.Tuple;
 import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
@@ -44,19 +34,22 @@ import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendStreamRoomMessages;
 import io.github.lbarnkow.jarb.rocketchat.rest.RestClientException;
 import io.github.lbarnkow.jarb.rocketchat.tasks.LoginTask;
+import io.github.lbarnkow.jarb.rocketchat.tasks.LoginTask.LoginTaskListener;
 import io.github.lbarnkow.jarb.rocketchat.tasks.PublicChannelAutoJoinerTask;
 import io.github.lbarnkow.jarb.rocketchat.tasks.SubscriptionsTrackerTask;
-import io.github.lbarnkow.jarb.rocketchat.tasks.LoginTask.LoginTaskListener;
 import io.github.lbarnkow.jarb.rocketchat.tasks.SubscriptionsTrackerTask.SubscriptionsTrackerTaskListener;
 import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
+import io.github.lbarnkow.jarb.taskmanager.TaskEndedCallback;
+import io.github.lbarnkow.jarb.taskmanager.TaskEndedEvent;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import lombok.ToString;
+import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @ToString
 public class BotManager extends AbstractBaseTask implements ElectionCandidateListener, RealtimeClientListener,
-		LoginTaskListener, SubscriptionsTrackerTaskListener {
-
-	private static final Logger logger = LoggerFactory.getLogger(BotManager.class);
+		LoginTaskListener, SubscriptionsTrackerTaskListener, TaskEndedCallback {
 
 	private TaskManager tasks;
 	private ElectionCandidate election;
@@ -69,7 +62,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 	private AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
 	private Semaphore eventPool = new Semaphore(0);
-	private BlockingDeque<Event> eventQueue = new LinkedBlockingDeque<>();
+	private BlockingDeque<QueuedEvent> eventQueue = new LinkedBlockingDeque<>();
 
 	private RoomProcessor roomProcessor;
 
@@ -93,18 +86,18 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 		}
 		restClient.initialize(config.getConnection());
 
-		tasks.start(this);
+		tasks.start(Optional.of(this), this);
 
 		election.configure(this, this.config.getElection());
-		tasks.start(election);
+		tasks.start(Optional.of(this), election);
 	}
 
 	public void stop() {
 		if (shuttingDown.getAndSet(true) == false) {
-			logger.info("Stopping all background tasks...");
+			log.info("Stopping all background tasks...");
 			tasks.stopAll();
 
-			logger.info("Closing websocket session...");
+			log.info("Closing websocket session...");
 
 			for (Map.Entry<Bot, BotDataStruct> entry : bots.entrySet()) {
 				Bot bot = entry.getKey();
@@ -113,7 +106,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 				try {
 					data.realtimeClient.disconnect();
 				} catch (IOException e) {
-					logger.error("Caught {} while disconnecting realtimeClient for bot '{}'!",
+					log.error("Caught {} while disconnecting realtimeClient for bot '{}'!",
 							e.getClass().getSimpleName(), bot.getName(), e);
 				}
 			}
@@ -127,42 +120,45 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 		try {
 			while (keepGoing) {
 				eventPool.acquire();
-				Event event = eventQueue.pollFirst();
+				QueuedEvent event = eventQueue.pollFirst();
 
 				keepGoing = handleEvent(event);
 			}
 
 		} catch (InterruptedException e) {
 			if (!shuttingDown.get()) {
-				logger.info("Caught InterruptedException shutting down...");
+				log.info("Caught InterruptedException shutting down...");
 			}
 		} catch (Exception e) {
-			logger.error("Unexpected Exception; shutting down!", e);
+			log.error("Unexpected Exception; shutting down!", e);
 		}
 
 		stop();
 	}
 
-	private boolean handleEvent(Event event) throws URISyntaxException, DeploymentException, IOException,
+	private boolean handleEvent(QueuedEvent event) throws URISyntaxException, DeploymentException, IOException,
 			RestClientException, InterruptedException, ReplyErrorException {
 		boolean keepGoing = true;
 
-		if (event.type == ACQUIRED_LEADERSHIP) {
+		if (event.type == EventTypes.TASK_ENDED) {
+			keepGoing = handleTaskEnded(event);
+
+		} else if (event.type == EventTypes.ACQUIRED_LEADERSHIP) {
 			keepGoing = handleAcquiredLeadershipEvent();
 
-		} else if (event.type == LOST_LEADERSHIP) {
+		} else if (event.type == EventTypes.LOST_LEADERSHIP) {
 			keepGoing = handleLostLeadership();
 
-		} else if (event.type == REALTIME_SESSION_ESTABLISHED) {
+		} else if (event.type == EventTypes.REALTIME_SESSION_ESTABLISHED) {
 			keepGoing = handleRealtimeSessionEstablishedEvent(event);
 
-		} else if (event.type == REALTIME_SESSION_CLOSED) {
+		} else if (event.type == EventTypes.REALTIME_SESSION_CLOSED) {
 			keepGoing = handleRealtimeSessionClosed(event);
 
-		} else if (event.type == AUTH_TOKEN_REFRESHED) {
+		} else if (event.type == EventTypes.AUTH_TOKEN_REFRESHED) {
 			keepGoing = handleAuthTokenRefreshed(event);
 
-		} else if (event.type == NEW_SUBSCRIPTION) {
+		} else if (event.type == EventTypes.NEW_SUBSCRIPTION) {
 			keepGoing = handleNewSubscription(event);
 
 		} else if (event.type == EventTypes.PROCESS_ROOM) {
@@ -173,8 +169,20 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 		return keepGoing;
 	}
 
-	private boolean handleLostLeadership() {
-		logger.info("Lost leadership lease; shutting down!");
+	private boolean handleTaskEnded(QueuedEvent event) {
+		val taskEndedEvent = (TaskEndedEvent) event.data;
+		val task = taskEndedEvent.getTask();
+		val state = taskEndedEvent.getState();
+		val throwable = taskEndedEvent.getLastError().orElse(null);
+
+		if (throwable != null) {
+			log.error("A background task '{}' stopped with an error while in state '{}'; shutting down!",
+					task.getName(), state, throwable);
+		} else {
+			log.info("A background task '{}' stopped w/o an error in state '{}'; shutting down!", task.getName(),
+					state);
+		}
+
 		return false;
 	}
 
@@ -185,32 +193,38 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 		return true;
 	}
 
-	private boolean handleRealtimeSessionEstablishedEvent(Event event) {
+	private boolean handleLostLeadership() {
+		log.info("Lost leadership lease; shutting down!");
+		return false;
+	}
+
+	private boolean handleRealtimeSessionEstablishedEvent(QueuedEvent event) {
 		Bot bot = (Bot) event.data;
 		BotDataStruct dataStruct = bots.get(bot);
 		RealtimeClient realtimeClient = dataStruct.realtimeClient;
 
-		logger.info("Real-time session established for bot '{}'; logging in bot...", bot.getName());
+		log.info("Real-time session established for bot '{}'; logging in bot...", bot.getName());
 
 		LoginTask loginTask = new LoginTask(bot, realtimeClient, this);
 		dataStruct.loginTask = loginTask;
-		tasks.start(loginTask);
+
+		tasks.start(Optional.of(this), loginTask);
 
 		return true;
 	}
 
-	private boolean handleRealtimeSessionClosed(Event event) {
+	private boolean handleRealtimeSessionClosed(QueuedEvent event) {
 		@SuppressWarnings("unchecked")
 		Tuple<Bot, Boolean> tuple = (Tuple<Bot, Boolean>) event.data;
 		Bot bot = tuple.getFirst();
 		boolean initiatedByClient = tuple.getSecond();
 		if (!initiatedByClient) {
-			logger.info("Realtime connection for bot '{}' was closed by other side; shutting down!", bot.getName());
+			log.info("Realtime connection for bot '{}' was closed by other side; shutting down!", bot.getName());
 		}
 		return false;
 	}
 
-	private boolean handleAuthTokenRefreshed(Event event) throws JsonProcessingException {
+	private boolean handleAuthTokenRefreshed(QueuedEvent event) throws JsonProcessingException {
 		@SuppressWarnings("unchecked")
 		Tuple<Bot, AuthInfo> tuple = (Tuple<Bot, AuthInfo>) event.data;
 
@@ -231,14 +245,14 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 			dataStruct.subscriptionsTrackerTask = subscriptionsTrackerTask;
 			dataStruct.autoJoinerTask = autoJoinerTask;
 
-			tasks.start(subscriptionsTrackerTask);
-			tasks.start(autoJoinerTask);
+			tasks.start(Optional.of(this), subscriptionsTrackerTask);
+			tasks.start(Optional.of(this), autoJoinerTask);
 		}
 
 		return true;
 	}
 
-	private boolean handleNewSubscription(Event event) throws JsonProcessingException {
+	private boolean handleNewSubscription(QueuedEvent event) throws JsonProcessingException {
 		@SuppressWarnings("unchecked")
 		Tuple<Bot, Room> tuple = (Tuple<Bot, Room>) event.data;
 		Bot bot = tuple.getFirst();
@@ -250,17 +264,17 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 		RealtimeClient realtimeClient = dataStruct.realtimeClient;
 		realtimeClient.sendMessage(message);
 
-		logger.info("Added real-time subscription for bot '{}' to room '{}'.", bot.getName(), room.getName());
+		log.info("Added real-time subscription for bot '{}' to room '{}'.", bot.getName(), room.getName());
 
 		// catch-up on unread messages
 		Tuple<Bot, String> newTuple = new Tuple<>(bot, room.getId());
-		Event newEvent = new Event(PROCESS_ROOM, newTuple);
+		QueuedEvent newEvent = new QueuedEvent(EventTypes.PROCESS_ROOM, newTuple);
 		enqueueEvent(newEvent);
 
 		return true;
 	}
 
-	private boolean handleProcessRoom(Event event)
+	private boolean handleProcessRoom(QueuedEvent event)
 			throws RestClientException, InterruptedException, ReplyErrorException, IOException {
 		@SuppressWarnings("unchecked")
 		Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
@@ -274,13 +288,19 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 	}
 
 	@Override
+	public void onTaskEnded(TaskEndedEvent taskEndedEvent) {
+		val event = new QueuedEvent(EventTypes.TASK_ENDED, taskEndedEvent);
+		enqueueEvent(event);
+	}
+
+	@Override
 	public void onStateChanged(ElectionCandidate candidate, ElectionCandidateState oldState,
 			ElectionCandidateState newState) {
 		if (newState == LEADER) {
-			Event event = new Event(ACQUIRED_LEADERSHIP, null);
+			QueuedEvent event = new QueuedEvent(EventTypes.ACQUIRED_LEADERSHIP, null);
 			enqueueEvent(event);
 		} else if (newState == INACTIVE && oldState != null) {
-			Event event = new Event(LOST_LEADERSHIP, null);
+			QueuedEvent event = new QueuedEvent(EventTypes.LOST_LEADERSHIP, null);
 			enqueueEvent(event);
 		}
 	}
@@ -288,14 +308,14 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 	@Override
 	public void onRealtimeClientSessionEstablished(RealtimeClient source) {
 		Bot bot = lookupBotFor(source);
-		Event event = new Event(REALTIME_SESSION_ESTABLISHED, bot);
+		QueuedEvent event = new QueuedEvent(EventTypes.REALTIME_SESSION_ESTABLISHED, bot);
 		enqueueEvent(event);
 	}
 
 	@Override
 	public void onRealtimeClientSessionClose(RealtimeClient source, boolean initiatedByClient) {
 		Tuple<Bot, Boolean> tuple = new Tuple<>(lookupBotFor(source), initiatedByClient);
-		Event event = new Event(REALTIME_SESSION_CLOSED, tuple);
+		QueuedEvent event = new QueuedEvent(EventTypes.REALTIME_SESSION_CLOSED, tuple);
 		enqueueEvent(event);
 	}
 
@@ -303,14 +323,14 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 	public void onRealtimeClientStreamRoomMessagesUpdate(RealtimeClient source, String roomId) {
 		Bot bot = lookupBotFor(source);
 		Tuple<Bot, String> tuple = new Tuple<>(bot, roomId);
-		Event event = new Event(PROCESS_ROOM, tuple);
+		QueuedEvent event = new QueuedEvent(EventTypes.PROCESS_ROOM, tuple);
 		enqueueEvent(event);
 	}
 
 	@Override
 	public void onLoginAuthTokenRefreshed(LoginTask source, Bot bot, AuthInfo authInfo) {
 		Tuple<Bot, AuthInfo> tuple = new Tuple<>(bot, authInfo);
-		Event event = new Event(AUTH_TOKEN_REFRESHED, tuple);
+		QueuedEvent event = new QueuedEvent(EventTypes.AUTH_TOKEN_REFRESHED, tuple);
 		enqueueEvent(event);
 	}
 
@@ -318,7 +338,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 	public void onNewSubscription(SubscriptionsTrackerTask source, Bot bot, Room room) {
 		roomProcessor.cacheRoom(room);
 		Tuple<Bot, Room> tuple = new Tuple<>(bot, room);
-		Event event = new Event(NEW_SUBSCRIPTION, tuple);
+		QueuedEvent event = new QueuedEvent(EventTypes.NEW_SUBSCRIPTION, tuple);
 		enqueueEvent(event);
 	}
 
@@ -335,19 +355,30 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 		throw new IllegalStateException("No bot associated with RealtimeClient!");
 	}
 
-	private void enqueueEvent(Event event) {
+	private void enqueueEvent(QueuedEvent event) {
 		eventQueue.add(event);
 		eventPool.release();
 	}
 
-	private static class Event {
+	private static class QueuedEvent {
 		private EventTypes type;
 		private Object data;
 
-		Event(EventTypes type, Object data) {
+		QueuedEvent(EventTypes type, Object data) {
 			this.type = type;
 			this.data = data;
 		}
+	}
+
+	private static enum EventTypes {
+		TASK_ENDED, //
+		REALTIME_SESSION_CLOSED, //
+		ACQUIRED_LEADERSHIP, //
+		LOST_LEADERSHIP, //
+		REALTIME_SESSION_ESTABLISHED, //
+		AUTH_TOKEN_REFRESHED, //
+		NEW_SUBSCRIPTION, //
+		PROCESS_ROOM
 	}
 
 	@SuppressWarnings("unused")
