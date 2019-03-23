@@ -1,13 +1,26 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.owasp:dependency-check-gradle:4.0.2'
+    }
+}
+
 plugins {
     id 'java'
     id 'application'
+    id 'org.owasp.dependencycheck' version '4.0.2'
 }
 
 repositories {
     jcenter()
 }
 
-// TODO: integrate OWASP dependency check
+dependencyCheck {
+    suppressionFile = 'owasp-dependency-check-suppressions.xml'
+    cveValidForHours = 24
+}
 
 mainClassName = 'io.github.lbarnkow.jarb.Main'
 
