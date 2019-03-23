@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -21,6 +22,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
 
 	private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
 
+	@ToString.Exclude
 	private final TaskManager manager;
 	private final long taskInterval;
 

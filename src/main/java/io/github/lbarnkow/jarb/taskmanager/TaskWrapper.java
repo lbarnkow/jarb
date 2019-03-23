@@ -6,6 +6,8 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEACTIVATING;
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +22,7 @@ public class TaskWrapper {
 	private TaskState state = UNUSED;
 	private Throwable lastError;
 
-	public void startTask(TaskEndedCallback callback) {
+	public void startTask(Optional<TaskEndedCallback> callback) {
 		if (state != UNUSED) {
 			throw new IllegalStateException("Tasks can only be started once!");
 		}
@@ -30,7 +32,7 @@ public class TaskWrapper {
 		thread.start();
 	}
 
-	private void executeTask(TaskEndedCallback callback) {
+	private void executeTask(Optional<TaskEndedCallback> callback) {
 		try {
 			task.initializeTask();
 		} catch (Throwable t) {
@@ -48,6 +50,10 @@ public class TaskWrapper {
 
 		state = DEAD;
 		logger.info("Task '{}' finished.", task.getName());
+		if (callback.isPresent()) {
+			TaskEndedEvent event = TaskEndedEvent.builder().task(task).state(state).lastError(Optional.empty()).build();
+			callback.get().onTaskEnded(event);
+		}
 	}
 
 	public void stopTask() {
@@ -57,13 +63,13 @@ public class TaskWrapper {
 		}
 	}
 
-	private void handleError(String stage, Throwable t, TaskEndedCallback callback) {
+	private void handleError(String stage, Throwable t, Optional<TaskEndedCallback> callback) {
 		lastError = t;
 		logger.error("{} of task '{}' raised an unexpected exception!", stage, task.getName(), t);
-		TaskEndedEvent event = new TaskEndedEvent(task, state, lastError);
 		state = DEAD;
-		if (callback != null) {
-			callback.onTaskEnded(event);
+		if (callback.isPresent()) {
+			TaskEndedEvent event = TaskEndedEvent.builder().task(task).state(state).lastError(Optional.of(t)).build();
+			callback.get().onTaskEnded(event);
 		}
 	}
 }
