@@ -29,6 +29,7 @@ public class TaskManager {
 
 	@Synchronized
 	public void start(Optional<TaskEndedCallback> callback, Task... tasks) {
+		// TODO: Allow managementTasks to be deactivated?
 		if (!started) {
 			startTasks(callback, managementTasks);
 			started = true;
