@@ -70,6 +70,7 @@ class TaskManagerTest {
 
 		// when
 		manager.start(Optional.empty(), task1, task2, task3);
+		Thread.sleep(25L);
 		manager.stop(task1, task3);
 		Thread.sleep(60L);
 
