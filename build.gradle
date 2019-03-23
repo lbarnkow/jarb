@@ -1,26 +1,22 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'org.owasp:dependency-check-gradle:4.0.2'
-    }
-}
-
 plugins {
     id 'java'
     id 'application'
+
+    // checks for known vulnerabilities in our dependencies
     id 'org.owasp.dependencycheck' version '4.0.2'
+
+    // reports outdated depedencies in our project ...
+    id 'com.github.ben-manes.versions' version '0.21.0'
+    // ... and selects a newer version automatically.
+    id 'se.patrikerdes.use-latest-versions' version '0.2.9'
 }
 
 repositories {
     jcenter()
 }
 
-dependencyCheck {
-    suppressionFile = 'owasp-dependency-check-suppressions.xml'
-    cveValidForHours = 24
-}
+apply from: "build.dependency-check.gradle"
+apply from: "build.dependency-updates.gradle"
 
 mainClassName = 'io.github.lbarnkow.jarb.Main'
 
