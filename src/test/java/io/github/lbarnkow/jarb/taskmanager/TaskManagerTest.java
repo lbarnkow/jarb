@@ -51,8 +51,8 @@ class TaskManagerTest {
 
 		// when
 		manager.start(Optional.empty(), task1, task2, task3);
-		manager.stopAll();
 		Thread.sleep(25L);
+		manager.stopAll();
 
 		// then
 		assertThat(manager.getTaskState(task1)).isEqualTo(DEAD);
