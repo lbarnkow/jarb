@@ -72,7 +72,7 @@ public class RawAttachment {
 		return RawAttachment.builder() //
 				.color(a.getColor()) //
 				.text(a.getText()) //
-				.ts(a.getTimestamp().toString()) //
+				.ts(a.getTimestamp() != null ? a.getTimestamp().toString() : null) //
 				.thumb_url(a.getThumbUrl()) //
 				.message_link(a.getMessageLink()) //
 				.collapsed(a.isCollapsed()) //
