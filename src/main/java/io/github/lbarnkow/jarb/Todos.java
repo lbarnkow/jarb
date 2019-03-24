@@ -1,7 +1,7 @@
 // Kept as .java file to use eclipse IDE's built-in task tracking
 // This file will go through the Java compiler; so keep it compilable!
 
-// TODO: build simple pugme-bot as baseline proof-of-concept
+// TODO: get code coverage up to where it should be!
 // TODO: learn travis
 // TODO: CI: setup travis
 // TODO: CI: execute tests

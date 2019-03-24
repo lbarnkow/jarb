@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.github.lbarnkow.jarb.JarbJsonSettings;
+import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,8 +17,8 @@ public class SendSendMessage extends BaseMessageWithMethod {
 
 	private List<RawMessage> params;
 
-	public SendSendMessage(RawMessage message) {
+	public SendSendMessage(Message message) {
 		super(METHOD);
-		params = Arrays.asList(message);
+		params = Arrays.asList(RawMessage.of(message));
 	}
 }

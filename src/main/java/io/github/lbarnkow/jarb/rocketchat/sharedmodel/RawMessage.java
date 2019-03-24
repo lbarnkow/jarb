@@ -61,8 +61,8 @@ public class RawMessage {
 				._id(m.getId()) //
 				.rid(m.getRoom().getId()) //
 				.msg(m.getMessage()) //
-				.ts(m.getTimestamp().toString()) //
-				.u(RawUser.of(m.getUser())) //
+				.ts(m.getTimestamp() != null ? m.getTimestamp().toString() : null) //
+				.u(m.getUser() != null ? RawUser.of(m.getUser()) : null) //
 				.attachments(RawAttachment.of(m.getAttachments())) //
 				.build();
 	}
