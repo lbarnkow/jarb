@@ -1,5 +1,8 @@
 package io.github.lbarnkow.jarb.api;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.apache.commons.codec.digest.DigestUtils;
 
 import io.github.lbarnkow.jarb.JarbJsonSettings;
@@ -16,4 +19,5 @@ public class BotConfiguration {
 	private String name = DEFAULT_NAME;
 	private String qualifiedClassName = DEFAULT_QUALIFIED_CLASS_NAME;
 	private Credentials credentials = DEFAULT_CREDENTIALS;
+	private Map<String, Object> settings = Collections.emptyMap();
 }
