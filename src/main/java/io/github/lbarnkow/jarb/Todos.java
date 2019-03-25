@@ -3,9 +3,8 @@
 
 // TODO: get code coverage up to where it should be!
 // TODO: CI: get code coverage
-// TODO: CI: upload coverage report to codecov (branch master)
+// TODO: CI: upload coverage report to codecov (branch develop)
 // TODO: setup libraries.io
-// TODO: add badges to README: build-status (travis)
 // TODO: add badges to README: codecoverage
 // TODO: add badges to README: libraries.io (ideally for outdated, as well as, insecure deps)
 // TODO: look into semantic commits?
