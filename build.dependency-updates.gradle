@@ -1,3 +1,5 @@
+final int OUTDATED_DEPENDECY_THRESHOLD = 0
+
 dependencyUpdates {
     revision = 'release'
 
@@ -11,6 +13,17 @@ dependencyUpdates {
                     selection.reject('Release candidate')
                 }
             }
+        }
+    }
+
+    doLast {
+        def jsonFile = file('build/dependencyUpdates/report.json')
+        def json = new groovy.json.JsonSlurper().parseText(jsonFile.text)
+
+        if (json.outdated.count > OUTDATED_DEPENDECY_THRESHOLD) {
+            throw new GradleException(
+                "Number of outdated dependencies (${json.outdated.count}) " +
+                "is higher that the allowed threshold (${OUTDATED_DEPENDECY_THRESHOLD})!")
         }
     }
 }

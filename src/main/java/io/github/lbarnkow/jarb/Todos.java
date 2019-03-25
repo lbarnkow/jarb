@@ -2,13 +2,8 @@
 // This file will go through the Java compiler; so keep it compilable!
 
 // TODO: get code coverage up to where it should be!
-// TODO: learn travis
-// TODO: CI: setup travis
-// TODO: CI: execute tests
 // TODO: CI: get code coverage
 // TODO: CI: upload coverage report to codecov (branch master)
-// TODO: CI: owasp dependency scan
-// TODO: CI: dependency updates
 // TODO: setup libraries.io
 // TODO: add badges to README: build-status (travis)
 // TODO: add badges to README: codecoverage
