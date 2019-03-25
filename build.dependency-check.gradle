@@ -1,4 +1,4 @@
 dependencyCheck {
     suppressionFile = 'owasp-dependency-check-suppressions.xml'
-    cveValidForHours = 24
+    cveValidForHours = 12
 }
