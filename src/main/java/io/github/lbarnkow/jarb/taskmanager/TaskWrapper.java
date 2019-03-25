@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.Data;
+import lombok.val;
 
 @Data
 public class TaskWrapper {
@@ -27,8 +28,10 @@ public class TaskWrapper {
 			throw new IllegalStateException("Tasks can only be started once!");
 		}
 
+		val cb = callback != null ? callback : Optional.<TaskEndedCallback>empty();
+
 		state = ACTIVATING;
-		thread = new Thread(() -> executeTask(callback), task.getName());
+		thread = new Thread(() -> executeTask(cb), task.getName());
 		thread.start();
 	}
 

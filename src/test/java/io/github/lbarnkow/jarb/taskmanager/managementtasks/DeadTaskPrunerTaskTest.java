@@ -1,4 +1,4 @@
-package io.github.lbarnkow.jarb.taskmanager;
+package io.github.lbarnkow.jarb.taskmanager.managementtasks;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.github.lbarnkow.jarb.taskmanager.MockHelper.generateTaskMocks;
@@ -14,6 +14,11 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import io.github.lbarnkow.jarb.taskmanager.Task;
+import io.github.lbarnkow.jarb.taskmanager.TaskManager;
+import io.github.lbarnkow.jarb.taskmanager.TaskWrapper;
+import io.github.lbarnkow.jarb.taskmanager.managementtasks.DeadTaskPrunerTask;
 
 class DeadTaskPrunerTaskTest {
 

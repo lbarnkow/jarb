@@ -1,10 +1,13 @@
-package io.github.lbarnkow.jarb.taskmanager;
+package io.github.lbarnkow.jarb.taskmanager.managementtasks;
 
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
+import io.github.lbarnkow.jarb.taskmanager.Task;
+import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
 

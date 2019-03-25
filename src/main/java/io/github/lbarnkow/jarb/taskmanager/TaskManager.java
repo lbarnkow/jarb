@@ -12,6 +12,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.lbarnkow.jarb.taskmanager.managementtasks.DeadTaskPrunerTask;
+import io.github.lbarnkow.jarb.taskmanager.managementtasks.TaskTableLoggerTask;
 import lombok.Synchronized;
 import lombok.ToString;
 

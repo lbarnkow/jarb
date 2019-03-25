@@ -1,4 +1,4 @@
-package io.github.lbarnkow.jarb.taskmanager;
+package io.github.lbarnkow.jarb.taskmanager.managementtasks;
 
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.ACTIVATING;
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.ACTIVE;
@@ -9,6 +9,10 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
+import io.github.lbarnkow.jarb.taskmanager.Task;
+import io.github.lbarnkow.jarb.taskmanager.TaskManager;
+import io.github.lbarnkow.jarb.taskmanager.TaskState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

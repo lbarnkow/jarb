@@ -2,6 +2,7 @@
 // This file will go through the Java compiler; so keep it compilable!
 
 // TODO: get code coverage up to where it should be!
+// TODO: make lombok, gradle and junit5 work together
 // TODO: CI: get code coverage
 // TODO: CI: upload coverage report to codecov (branch develop)
 // TODO: setup libraries.io

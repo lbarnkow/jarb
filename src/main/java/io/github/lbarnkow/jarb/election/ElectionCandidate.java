@@ -1,6 +1,6 @@
 package io.github.lbarnkow.jarb.election;
 
-import static io.github.lbarnkow.jarb.election.ElectionCandidateState.ACTIVATING;
+import static io.github.lbarnkow.jarb.election.ElectionCandidateState.RUNNING_FOR_ELECTION;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.LEADER;
 
@@ -51,7 +51,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 					handleStolenLeaseFile(leaseFile);
 					handleExpiredLeaseFile(leaseFile);
 
-					if (state == LEADER || state == ACTIVATING) {
+					if (state == LEADER || state == RUNNING_FOR_ELECTION) {
 						leaseFile = refreshLease(leaseFile);
 					} else {
 						challengeLease(leaseFile);
@@ -93,7 +93,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 	}
 
 	private void releaseLease() throws IOException {
-		if (state == LEADER || state == ACTIVATING) {
+		if (state == LEADER || state == RUNNING_FOR_ELECTION) {
 			Files.delete(config.getSyncFile().toPath());
 			logger.info("Released lease (deleted lease file)!");
 		}
@@ -107,7 +107,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 
 			logger.info("Running for election w/ id '{}'", id);
 
-			updateState(ACTIVATING);
+			updateState(RUNNING_FOR_ELECTION);
 		}
 	}
 
@@ -115,7 +115,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 		ElectionLease newLease = new ElectionLease(oldLease, config.getLeaseTimeToLive());
 		writeLeaseFile(newLease);
 
-		if (state == ACTIVATING) {
+		if (state == RUNNING_FOR_ELECTION) {
 			logger.info("Won election w/ id '{}'! Promoted to state '{}'!", id, LEADER);
 		}
 		updateState(LEADER);
@@ -137,7 +137,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 	private void sleep() throws InterruptedException {
 		long sleepTime = SLEEP_VARIANCE_MSEC;
 
-		if (state == LEADER || state == ACTIVATING) {
+		if (state == LEADER || state == RUNNING_FOR_ELECTION) {
 			sleepTime += config.getLeaseRefreshInterval();
 		} else {
 			sleepTime += config.getLeaseChallengeInterval();
@@ -151,7 +151,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 			return;
 		}
 
-		if (state == LEADER || state == ACTIVATING) {
+		if (state == LEADER || state == RUNNING_FOR_ELECTION) {
 			logger.error("Lease file missing even though my state was '{}'! Reverting back to '{}'.", state, INACTIVE);
 		}
 
@@ -163,14 +163,14 @@ public class ElectionCandidate extends AbstractBaseTask {
 			return;
 		}
 
-		if (state != LEADER && state != ACTIVATING)
+		if (state != LEADER && state != RUNNING_FOR_ELECTION)
 			return;
 		if (leaseFile.isOwnedBy(id))
 			return;
 
 		if (state == LEADER) {
 			logger.error("Lease file stolen by '{}'! Reverting back to '{}'.", leaseFile.getLeaderId(), INACTIVE);
-		} else if (state == ACTIVATING) {
+		} else if (state == RUNNING_FOR_ELECTION) {
 			logger.info("Lost election to '{}'! Reverting back to '{}'.", leaseFile.getLeaderId(), INACTIVE);
 		}
 
@@ -186,7 +186,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 			return;
 		}
 
-		if (state == LEADER || state == ACTIVATING) {
+		if (state == LEADER || state == RUNNING_FOR_ELECTION) {
 			logger.error("Lease file expired during my term (state '{}')! Reverting back to '{}'.", state, INACTIVE);
 		}
 
