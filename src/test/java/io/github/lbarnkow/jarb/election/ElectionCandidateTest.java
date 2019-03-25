@@ -1,9 +1,10 @@
 package io.github.lbarnkow.jarb.election;
 
 import static com.google.common.truth.Truth.assertThat;
-import static io.github.lbarnkow.jarb.election.ElectionCandidateState.ACTIVATING;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.LEADER;
+import static io.github.lbarnkow.jarb.election.ElectionCandidateState.RUNNING_FOR_ELECTION;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 	private final ElectionConfiguration config = new ElectionConfiguration();
 
 	private Map<ElectionCandidate, ElectionCandidateState> states = new HashMap<>();
+	private Semaphore waitForElection = new Semaphore(0);
 
 	@Test
 	void testIdUniquness() throws IOException {
@@ -54,14 +57,14 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 		TaskManager tasks = new TaskManager();
 		ElectionCandidate[] candidates = generateCandidates(numCandidates);
 		tasks.start(Optional.empty(), candidates);
-		Thread.sleep(1000L);
+		waitForNewLeader();
 
 		// when
 		Map<ElectionCandidate, ElectionCandidateState> statesAfterFirstElection = new HashMap<>(states);
 		ElectionCandidate firstLeader = findLeader(candidates);
 
 		tasks.stop(firstLeader);
-		Thread.sleep(1000L);
+		waitForNewLeader();
 
 		Map<ElectionCandidate, ElectionCandidateState> statesAfterSecondElection = new HashMap<>(states);
 		ElectionCandidate secondLeader = findLeader(candidates);
@@ -86,13 +89,13 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 		statesAfterSecondElection.remove(secondLeader);
 
 		for (ElectionCandidateState state : statesAfterFirstElection.values()) {
-			assertThat(state).isEqualTo(INACTIVE);
+			assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
 		}
 		for (ElectionCandidateState state : statesAfterSecondElection.values()) {
-			assertThat(state).isEqualTo(INACTIVE);
+			assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
 		}
 		for (ElectionCandidateState state : statesAfterShutdown.values()) {
-			assertThat(state).isEqualTo(INACTIVE);
+			assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
 		}
 	}
 
@@ -137,7 +140,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 		ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
 		ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
 		candidate1.state = LEADER;
-		candidate2.state = ACTIVATING;
+		candidate2.state = RUNNING_FOR_ELECTION;
 		assertThat(candidate1.isLeader()).isTrue();
 		assertThat(candidate2.isLeader()).isFalse();
 
@@ -193,10 +196,19 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 		throw new RuntimeException("No leader found!");
 	}
 
+	private void waitForNewLeader() throws InterruptedException {
+		if (!waitForElection.tryAcquire(5, SECONDS)) {
+			throw new RuntimeException("Election took longer than 5 seconds; aborting!");
+		}
+	}
+
 	@Override
 	public synchronized void onStateChanged(ElectionCandidate candidate, ElectionCandidateState oldState,
 			ElectionCandidateState newState) {
 		states.put(candidate, newState);
+		if (newState == LEADER) {
+			waitForElection.release();
+		}
 	}
 
 }

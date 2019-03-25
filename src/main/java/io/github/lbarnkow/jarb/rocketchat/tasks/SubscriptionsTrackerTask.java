@@ -1,5 +1,7 @@
 package io.github.lbarnkow.jarb.rocketchat.tasks;
 
+import static lombok.AccessLevel.PACKAGE;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +17,7 @@ import io.github.lbarnkow.jarb.rocketchat.realtime.messages.SendGetSubscriptions
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawSubscription;
 import io.github.lbarnkow.jarb.taskmanager.AbstractBotSpecificTask;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 @ToString
@@ -23,10 +26,11 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
 
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
-	private static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
+	public static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
 	private final Bot bot;
 	private final RealtimeClient realtimeClient;
+	@Getter(PACKAGE)
 	private final long sleepTime;
 	private final SubscriptionsTrackerTaskListener listener;
 

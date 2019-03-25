@@ -8,19 +8,25 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 
-class TaskTest {
+class TaskWrapperTest implements TaskEndedCallback {
+
+	private List<TaskEndedEvent> eventLog = new ArrayList<>();
 
 	@Test
-	void testSuccessfulTaskLifecycle() throws InterruptedException {
+	void testSuccessfulTaskWrapperLifecycle() throws InterruptedException {
 		// given
 		DummyTaskForUnitTesting task = new DummyTaskForUnitTesting(20L, false, false);
 		TaskWrapper wrapper = new TaskWrapper(task);
 		task.captureStateBeforeInitialization(wrapper);
 
 		// when
-		wrapper.startTask(null);
+		wrapper.startTask(Optional.of(this));
 		Thread.sleep(5L);
 		wrapper.stopTask();
 		Thread.sleep(40L);
@@ -35,16 +41,16 @@ class TaskTest {
 	}
 
 	@Test
-	void testTryStartingTaskTwice() {
+	void testTryStartingTaskWrapperTwice() {
 		// given
 		DummyTaskForUnitTesting task = new DummyTaskForUnitTesting(0L, false, false);
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		wrapper.startTask(null);
+		wrapper.startTask(Optional.of(this));
 
 		// then
-		assertThrows(IllegalStateException.class, () -> wrapper.startTask(null));
+		assertThrows(IllegalStateException.class, () -> wrapper.startTask(Optional.of(this)));
 	}
 
 	@Test
@@ -54,7 +60,7 @@ class TaskTest {
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		wrapper.startTask(null);
+		wrapper.startTask(Optional.of(this));
 		Thread.sleep(15L);
 
 		// then
@@ -68,11 +74,15 @@ class TaskTest {
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
-		wrapper.startTask(null);
+		wrapper.startTask(Optional.of(this));
 		Thread.sleep(25L);
 
 		// then
 		assertThat(wrapper.getLastError()).isInstanceOf(DummyTaskForUnitTesting.RunException.class);
 	}
 
+	@Override
+	public void onTaskEnded(TaskEndedEvent event) {
+		eventLog.add(event);
+	}
 }
