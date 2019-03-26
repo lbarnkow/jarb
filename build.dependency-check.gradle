@@ -1,4 +1,35 @@
+final int VULNERABLE_DEPENDENCIES_THRESHOLD = 25
+
 dependencyCheck {
     suppressionFile = 'owasp-dependency-check-suppressions.xml'
     cveValidForHours = 12
+    format = 'ALL'
+}
+
+dependencyCheckAnalyze.doLast {
+    def jsonFile = file('build/reports/dependency-check-report.json')
+    def json = new groovy.json.JsonSlurper().parseText(jsonFile.text)
+
+    def count = 0
+    for (dependency in json.dependencies) {
+        if (dependency.vulnerabilities != null) {
+            count += dependency.vulnerabilities.size()
+        }
+    }
+
+    def schemaVersion = 1
+    def label = "dependencies"
+    def message = (count == 0 ? "no known vulnerablities" : "${count} potentially vulnerable")
+    def color = (count == 0 ? "success" : "critical")
+
+    json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
+    new File('stats-vuln.json').withWriter('utf-8') {
+        writer -> writer.writeLine json
+    }
+
+    if (count > VULNERABLE_DEPENDENCIES_THRESHOLD) {
+        throw new GradleException(
+            "Number of (potentially) vulnerable dependencies (${count}) " +
+            "is higher that the allowed threshold (${VULNERABLE_DEPENDENCIES_THRESHOLD})!")
+    }
 }
