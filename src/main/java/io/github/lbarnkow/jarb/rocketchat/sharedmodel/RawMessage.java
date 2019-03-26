@@ -44,7 +44,7 @@ public class RawMessage {
 
 	private String t;
 
-	public Message convertWithRoom(Room room) {
+	public Message convertWith(Room room) {
 		return Message.builder() //
 				.id(_id) //
 				.room(room) //

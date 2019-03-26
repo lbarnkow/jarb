@@ -1,5 +1,7 @@
 package io.github.lbarnkow.jarb.rocketchat.tasks;
 
+import static lombok.AccessLevel.PACKAGE;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import io.github.lbarnkow.jarb.rocketchat.rest.messages.ChannelListReply;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawChannel;
 import io.github.lbarnkow.jarb.taskmanager.AbstractBotSpecificTask;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 
 @ToString
@@ -27,11 +30,12 @@ import lombok.ToString;
 public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
-	private static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
+	public static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
 	private final RestClient restClient;
 	private final RealtimeClient realtimeClient;
 	private final Holder<AuthInfo> authInfo;
+	@Getter(PACKAGE)
 	private final long sleepTime;
 
 	PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
