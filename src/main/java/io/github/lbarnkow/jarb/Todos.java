@@ -5,9 +5,9 @@
 // TODO: make lombok, gradle and junit5 work together
 // TODO: CI: get code coverage
 // TODO: CI: upload coverage report to codecov (branch develop)
-// TODO: setup libraries.io
 // TODO: add badges to README: codecoverage
-// TODO: add badges to README: libraries.io (ideally for outdated, as well as, insecure deps)
+// TODO: lock dependencies (including transitive)
+// -----   --> https://docs.gradle.org/current/userguide/dependency_locking.html
 // TODO: look into semantic commits?
 // TODO: look into automatically manage versioning?
 // TODO: create a docker hub account to publish pre-built images?
