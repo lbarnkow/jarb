@@ -6,6 +6,6 @@ import lombok.Value;
 @Value
 @Builder
 public class User {
-	String id;
-	String name;
+  String id;
+  String name;
 }

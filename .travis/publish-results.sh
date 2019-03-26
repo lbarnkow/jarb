@@ -16,6 +16,7 @@ if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
 
     mv ${START_DIR}/stats-deps.json .
     mv ${START_DIR}/stats-vuln.json .
+    mv ${START_DIR}/stats-checkstyle.json .
     date > last-update
 
     git add .

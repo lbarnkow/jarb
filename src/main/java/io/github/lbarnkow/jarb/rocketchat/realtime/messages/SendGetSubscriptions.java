@@ -8,9 +8,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendGetSubscriptions extends BaseMessageWithMethod {
-	private static final String METHOD = "subscriptions/get";
+  private static final String METHOD = "subscriptions/get";
 
-	public SendGetSubscriptions() {
-		super(METHOD);
-	}
+  public SendGetSubscriptions() {
+    super(METHOD);
+  }
 }

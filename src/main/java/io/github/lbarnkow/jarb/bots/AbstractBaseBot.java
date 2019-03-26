@@ -7,15 +7,16 @@ import lombok.ToString;
 
 @ToString
 public abstract class AbstractBaseBot implements Bot {
-	@Getter
-	private String name;
-	@Getter
-	private Credentials credentials;
+  @Getter
+  private String name;
+  @Getter
+  private Credentials credentials;
 
-	public AbstractBaseBot initialize(String name, Credentials credentials) {
-		this.name = name;
-		this.credentials = credentials;
+  @Override
+  public AbstractBaseBot initialize(String name, Credentials credentials) {
+    this.name = name;
+    this.credentials = credentials;
 
-		return this;
-	}
+    return this;
+  }
 }

@@ -8,9 +8,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ReceiveJoinRoomReply extends BaseMessage {
-	private boolean result;
+  private boolean result;
 
-	public boolean isSuccess() {
-		return result;
-	}
+  public boolean isSuccess() {
+    return result;
+  }
 }

@@ -9,11 +9,11 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractBotSpecificTask extends AbstractBaseTask {
 
-	@Getter
-	private final Bot bot;
+  @Getter
+  private final Bot bot;
 
-	public AbstractBotSpecificTask(Bot bot) {
-		this.bot = bot;
-		this.setName(getClass().getSimpleName() + "-" + bot.getName() + "-thread");
-	}
+  public AbstractBotSpecificTask(Bot bot) {
+    this.bot = bot;
+    this.setName(getClass().getSimpleName() + "-" + bot.getName() + "-thread");
+  }
 }

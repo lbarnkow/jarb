@@ -4,116 +4,121 @@ import static io.github.lbarnkow.jarb.api.MessageType.REGULAR_CHAT_MESSAGE;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
+import io.github.lbarnkow.jarb.api.Attachment;
+import io.github.lbarnkow.jarb.api.Bot;
+import io.github.lbarnkow.jarb.api.Credentials;
+import io.github.lbarnkow.jarb.api.Message;
+import io.github.lbarnkow.jarb.api.Room;
+import io.github.lbarnkow.jarb.bots.AbstractBaseBot;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Pattern;
-
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.MediaType;
-
-import io.github.lbarnkow.jarb.api.Attachment;
-import io.github.lbarnkow.jarb.api.Bot;
-import io.github.lbarnkow.jarb.api.Message;
-import io.github.lbarnkow.jarb.api.Room;
-import io.github.lbarnkow.jarb.bots.AbstractBaseBot;
 import lombok.Synchronized;
 import lombok.ToString;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @ToString
 public class PugMeBot extends AbstractBaseBot implements Bot {
 
-	private Pattern REGEX = Pattern.compile("^\\@pugme(\\s\\w+)?\\s*$");
+  private Pattern regex;
 
-	private Instant lastUpdate;
-	private List<String> pugsCache = new ArrayList<>(100);
-	private Random random = new Random();
+  private Instant lastUpdate;
+  private List<String> pugsCache = new ArrayList<>(100);
+  private Random random = new Random();
 
-	@Inject
-	private Client httpClient;
+  @Inject
+  private Client httpClient;
 
-	@Override
-	public boolean offerRoom(Room room) {
-		// Don't auto-join anywhere, let others invite me
-		return false;
-	}
+  @Override
+  public AbstractBaseBot initialize(String name, Credentials credentials) {
+    regex = Pattern.compile("^\\@" + credentials.getUsername() + "(\\s\\w+)?\\s*$");
+    return super.initialize(name, credentials);
+  }
 
-	@Override
-	public Optional<Message> offerMessage(Message message) {
-		Message reply = null;
+  @Override
+  public boolean offerRoom(Room room) {
+    // Don't auto-join anywhere, let others invite me
+    return false;
+  }
 
-		try {
-			if (message.getType() == REGULAR_CHAT_MESSAGE) {
-				val matcher = REGEX.matcher(message.getMessage());
-				if (matcher.matches()) {
-					val room = message.getRoom();
-					val param = matcher.group(1);
+  @Override
+  public Optional<Message> offerMessage(Message message) {
+    Message reply = null;
 
-					if (param == null) {
-						reply = createPugReply(room, 1);
-					} else if (param.trim().equals("bomb")) {
-						reply = createPugReply(room, 5);
-					}
-				}
-			}
-		} catch (Exception e) {
-			log.error("Failed to handle message '{}'!", message, e);
-			reply = Message.builder().room(message.getRoom())
-					.message("*PugMeBot made a doody!* :poop: _(i.e. an internal error occured.)_").build();
-		}
+    try {
+      if (message.getType() == REGULAR_CHAT_MESSAGE) {
+        val matcher = regex.matcher(message.getMessage());
+        if (matcher.matches()) {
+          val room = message.getRoom();
+          val param = matcher.group(1);
 
-		return Optional.ofNullable(reply);
-	}
+          if (param == null) {
+            reply = createPugReply(room, 1);
+          } else if (param.trim().equals("bomb")) {
+            reply = createPugReply(room, 5);
+          }
+        }
+      }
+    } catch (Exception e) {
+      log.error("Failed to handle message '{}'!", message, e);
+      reply = Message.builder().room(message.getRoom())
+          .message("*PugMeBot made a doody!* :poop: _(i.e. an internal error occured.)_").build();
+    }
 
-	private Message createPugReply(Room room, int number) {
-		List<Attachment> attachments = new ArrayList<>();
+    return Optional.ofNullable(reply);
+  }
 
-		for (int i = 0; i < number; i++) {
-			attachments.add(Attachment.builder().imageUrl(selectImageUrl()).build());
-		}
+  private Message createPugReply(Room room, int number) {
+    List<Attachment> attachments = new ArrayList<>();
 
-		return Message.builder().room(room).attachments(attachments).build();
-	}
+    for (int i = 0; i < number; i++) {
+      attachments.add(Attachment.builder().imageUrl(selectImageUrl()).build());
+    }
 
-	@Synchronized
-	private String selectImageUrl() {
-		val twentyFourHoursAgo = Instant.now().minus(24, HOURS);
+    return Message.builder().room(room).attachments(attachments).build();
+  }
 
-		if (lastUpdate == null || lastUpdate.isBefore(twentyFourHoursAgo)) {
-			pugsCache.clear();
-			loadPugs();
-			lastUpdate = Instant.now();
-		}
+  @Synchronized
+  private String selectImageUrl() {
+    val twentyFourHoursAgo = Instant.now().minus(24, HOURS);
 
-		val index = random.nextInt(pugsCache.size());
-		return pugsCache.get(index);
-	}
+    if (lastUpdate == null || lastUpdate.isBefore(twentyFourHoursAgo)) {
+      pugsCache.clear();
+      loadPugs();
+      lastUpdate = Instant.now();
+    }
 
-	private void loadPugs() {
-		// https://www.reddit.com/r/pugs.json?sort=top&t=week&limit=100
-		val response = httpClient.target("https://www.reddit.com/r") //
-				.queryParam("sort", "top") //
-				.queryParam("t", "week") //
-				.queryParam("limit", "100") //
-				.path("pugs.json") //
-				.request(MediaType.APPLICATION_JSON) //
-				.get();
+    val index = random.nextInt(pugsCache.size());
+    return pugsCache.get(index);
+  }
 
-		if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
-			throw new RuntimeException(response.readEntity(String.class));
-		}
+  private void loadPugs() {
+    // https://www.reddit.com/r/pugs.json?sort=top&t=week&limit=100
+    val response = httpClient.target("https://www.reddit.com/r") //
+        .queryParam("sort", "top") //
+        .queryParam("t", "week") //
+        .queryParam("limit", "100") //
+        .path("pugs.json") //
+        .request(MediaType.APPLICATION_JSON) //
+        .get();
 
-		val posts = response.readEntity(RedditResponse.class);
+    if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
+      throw new RuntimeException(response.readEntity(String.class));
+    }
 
-		posts.getData().getChildren().stream() //
-				.filter(child -> child.getData().is_video() == false) //
-				.filter(child -> child.getData().getUrl().endsWith(".jpg"))
-				.forEach(child -> pugsCache.add(child.getData().getUrl()));
-	}
+    val posts = response.readEntity(RedditResponse.class);
+
+    posts.getData().getChildren().stream() //
+        .filter(child -> child.getData().is_video() == false) //
+        .filter(child -> child.getData().getUrl().endsWith(".jpg"))
+        .forEach(child -> pugsCache.add(child.getData().getUrl()));
+  }
 }

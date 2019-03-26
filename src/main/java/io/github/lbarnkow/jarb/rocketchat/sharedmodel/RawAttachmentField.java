@@ -8,8 +8,8 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RawAttachmentField {
-	@JsonAlias("short")
-	private boolean bshort;
-	private String title;
-	private String value;
+  @JsonAlias("short")
+  private boolean bshort;
+  private String title;
+  private String value;
 }

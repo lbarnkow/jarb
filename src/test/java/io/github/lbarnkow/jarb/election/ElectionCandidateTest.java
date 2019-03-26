@@ -8,6 +8,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
+import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,195 +21,195 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
-import io.github.lbarnkow.jarb.taskmanager.TaskManager;
-
 class ElectionCandidateTest implements ElectionCandidateListener {
 
-	private static final long DEFAULT_LEASE_TTL = 1000L;
+  private static final long DEFAULT_LEASE_TTL = 1000L;
 
-	private final ElectionConfiguration config = new ElectionConfiguration();
+  private final ElectionConfiguration config = new ElectionConfiguration();
 
-	private Map<ElectionCandidate, ElectionCandidateState> states = new HashMap<>();
-	private Semaphore waitForElection = new Semaphore(0);
+  private Map<ElectionCandidate, ElectionCandidateState> states = new HashMap<>();
+  private Semaphore waitForElection = new Semaphore(0);
 
-	@Test
-	void testIdUniquness() throws IOException {
-		// given
-		int numCandidates = 50;
-		ElectionCandidate[] candidates = generateCandidates(numCandidates);
+  @Test
+  void testIdUniquness() throws IOException {
+    // given
+    int numCandidates = 50;
+    ElectionCandidate[] candidates = generateCandidates(numCandidates);
 
-		// when
+    // when
 
-		// then
-		List<String> ids = Arrays.asList(candidates).stream().map((e) -> e.getId()).collect(Collectors.toList());
-		Set<String> uniqueIds = new HashSet<>(ids);
-		assertThat(ids).hasSize(numCandidates);
-		assertThat(uniqueIds).hasSize(numCandidates);
-	}
+    // then
+    List<String> ids =
+        Arrays.asList(candidates).stream().map((e) -> e.getId()).collect(Collectors.toList());
+    Set<String> uniqueIds = new HashSet<>(ids);
+    assertThat(ids).hasSize(numCandidates);
+    assertThat(uniqueIds).hasSize(numCandidates);
+  }
 
-	@Test
-	void testTwoElectionTerms() throws IOException, InterruptedException {
-		// given
-		int numCandidates = 25;
-		TaskManager tasks = new TaskManager();
-		ElectionCandidate[] candidates = generateCandidates(numCandidates);
-		tasks.start(Optional.empty(), candidates);
-		waitForNewLeader();
+  @Test
+  void testTwoElectionTerms() throws IOException, InterruptedException {
+    // given
+    int numCandidates = 25;
+    TaskManager tasks = new TaskManager();
+    ElectionCandidate[] candidates = generateCandidates(numCandidates);
+    tasks.start(Optional.empty(), candidates);
+    waitForNewLeader();
 
-		// when
-		Map<ElectionCandidate, ElectionCandidateState> statesAfterFirstElection = new HashMap<>(states);
-		ElectionCandidate firstLeader = findLeader(candidates);
+    // when
+    final Map<ElectionCandidate, ElectionCandidateState> statesAfterFirstElection =
+        new HashMap<>(states);
+    final ElectionCandidate firstLeader = findLeader(candidates);
 
-		tasks.stop(firstLeader);
-		waitForNewLeader();
+    tasks.stop(firstLeader);
+    waitForNewLeader();
 
-		Map<ElectionCandidate, ElectionCandidateState> statesAfterSecondElection = new HashMap<>(states);
-		ElectionCandidate secondLeader = findLeader(candidates);
+    final Map<ElectionCandidate, ElectionCandidateState> statesAfterSecondElection =
+        new HashMap<>(states);
+    final ElectionCandidate secondLeader = findLeader(candidates);
 
-		tasks.stopAll();
-		Thread.sleep(50L);
-		Map<ElectionCandidate, ElectionCandidateState> statesAfterShutdown = new HashMap<>(states);
+    tasks.stopAll();
+    Thread.sleep(50L);
+    Map<ElectionCandidate, ElectionCandidateState> statesAfterShutdown = new HashMap<>(states);
 
-		// then
-		assertThat(statesAfterFirstElection).hasSize(numCandidates);
-		assertThat(statesAfterSecondElection).hasSize(numCandidates);
-		assertThat(statesAfterShutdown).hasSize(numCandidates);
+    // then
+    assertThat(statesAfterFirstElection).hasSize(numCandidates);
+    assertThat(statesAfterSecondElection).hasSize(numCandidates);
+    assertThat(statesAfterShutdown).hasSize(numCandidates);
 
-		assertThat(firstLeader).isNotNull();
-		assertThat(secondLeader).isNotNull();
-		assertThat(firstLeader).isNotSameAs(secondLeader);
+    assertThat(firstLeader).isNotNull();
+    assertThat(secondLeader).isNotNull();
+    assertThat(firstLeader).isNotSameAs(secondLeader);
 
-		assertThat(statesAfterFirstElection.get(firstLeader)).isEqualTo(LEADER);
-		statesAfterFirstElection.remove(firstLeader);
+    assertThat(statesAfterFirstElection.get(firstLeader)).isEqualTo(LEADER);
+    statesAfterFirstElection.remove(firstLeader);
 
-		assertThat(statesAfterSecondElection.get(secondLeader)).isEqualTo(LEADER);
-		statesAfterSecondElection.remove(secondLeader);
+    assertThat(statesAfterSecondElection.get(secondLeader)).isEqualTo(LEADER);
+    statesAfterSecondElection.remove(secondLeader);
 
-		for (ElectionCandidateState state : statesAfterFirstElection.values()) {
-			assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
-		}
-		for (ElectionCandidateState state : statesAfterSecondElection.values()) {
-			assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
-		}
-		for (ElectionCandidateState state : statesAfterShutdown.values()) {
-			assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
-		}
-	}
+    for (ElectionCandidateState state : statesAfterFirstElection.values()) {
+      assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
+    }
+    for (ElectionCandidateState state : statesAfterSecondElection.values()) {
+      assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
+    }
+    for (ElectionCandidateState state : statesAfterShutdown.values()) {
+      assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
+    }
+  }
 
-	@Test
-	@EnabledOnOs({ LINUX })
-	void testFailedLeaseFileWrite() {
-		// given
-		config.setSyncFileName("/dev/rtc0");
-		ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
-		ElectionLease lease = new ElectionLease(candidate.getId(), DEFAULT_LEASE_TTL);
+  @Test
+  @EnabledOnOs({ LINUX })
+  void testFailedLeaseFileWrite() {
+    // given
+    config.setSyncFileName("/dev/rtc0");
+    ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
+    ElectionLease lease = new ElectionLease(candidate.getId(), DEFAULT_LEASE_TTL);
 
-		candidate.state = LEADER;
-		assertThat(candidate.isLeader()).isTrue();
+    candidate.state = LEADER;
+    assertThat(candidate.isLeader()).isTrue();
 
-		// when
-		assertThrows(IOException.class, () -> candidate.writeLeaseFile(lease));
+    // when
+    assertThrows(IOException.class, () -> candidate.writeLeaseFile(lease));
 
-		// then
-		assertThat(candidate.isLeader()).isFalse();
-		assertThat(states.get(candidate)).isEqualTo(INACTIVE);
-	}
+    // then
+    assertThat(candidate.isLeader()).isFalse();
+    assertThat(states.get(candidate)).isEqualTo(INACTIVE);
+  }
 
-	@Test
-	void testMissingLease() {
-		// given
-		ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
-		candidate.state = LEADER;
-		assertThat(candidate.isLeader()).isTrue();
+  @Test
+  void testMissingLease() {
+    // given
+    ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
+    candidate.state = LEADER;
+    assertThat(candidate.isLeader()).isTrue();
 
-		// when
-		candidate.handleMissingLeaseFile(null);
+    // when
+    candidate.handleMissingLeaseFile(null);
 
-		// then
-		assertThat(candidate.isLeader()).isFalse();
-		assertThat(states.get(candidate)).isEqualTo(INACTIVE);
-	}
+    // then
+    assertThat(candidate.isLeader()).isFalse();
+    assertThat(states.get(candidate)).isEqualTo(INACTIVE);
+  }
 
-	@Test
-	void testStolenLeaseFile() {
-		// given
-		ElectionLease lease = new ElectionLease("testing", DEFAULT_LEASE_TTL);
-		ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
-		ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
-		candidate1.state = LEADER;
-		candidate2.state = RUNNING_FOR_ELECTION;
-		assertThat(candidate1.isLeader()).isTrue();
-		assertThat(candidate2.isLeader()).isFalse();
+  @Test
+  void testStolenLeaseFile() {
+    // given
+    final ElectionLease lease = new ElectionLease("testing", DEFAULT_LEASE_TTL);
+    ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
+    ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
+    candidate1.state = LEADER;
+    candidate2.state = RUNNING_FOR_ELECTION;
+    assertThat(candidate1.isLeader()).isTrue();
+    assertThat(candidate2.isLeader()).isFalse();
 
-		// when
-		candidate1.handleStolenLeaseFile(lease);
-		candidate2.handleStolenLeaseFile(lease);
+    // when
+    candidate1.handleStolenLeaseFile(lease);
+    candidate2.handleStolenLeaseFile(lease);
 
-		// then
-		assertThat(candidate1.isLeader()).isFalse();
-		assertThat(candidate2.isLeader()).isFalse();
-		assertThat(states.get(candidate1)).isEqualTo(INACTIVE);
-		assertThat(states.get(candidate2)).isEqualTo(INACTIVE);
-	}
+    // then
+    assertThat(candidate1.isLeader()).isFalse();
+    assertThat(candidate2.isLeader()).isFalse();
+    assertThat(states.get(candidate1)).isEqualTo(INACTIVE);
+    assertThat(states.get(candidate2)).isEqualTo(INACTIVE);
+  }
 
-	@Test
-	void testExpiredLease() {
-		// given
-		ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
-		candidate.state = LEADER;
-		assertThat(candidate.isLeader()).isTrue();
-		ElectionLease lease = new ElectionLease(candidate.getId(), 50L, 100L);
+  @Test
+  void testExpiredLease() {
+    // given
+    ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
+    candidate.state = LEADER;
+    assertThat(candidate.isLeader()).isTrue();
+    ElectionLease lease = new ElectionLease(candidate.getId(), 50L, 100L);
 
-		// when
-		candidate.handleExpiredLeaseFile(lease);
+    // when
+    candidate.handleExpiredLeaseFile(lease);
 
-		// then
-		assertThat(candidate.isLeader()).isFalse();
-		assertThat(states.get(candidate)).isEqualTo(INACTIVE);
-	}
+    // then
+    assertThat(candidate.isLeader()).isFalse();
+    assertThat(states.get(candidate)).isEqualTo(INACTIVE);
+  }
 
-	ElectionCandidate[] generateCandidates(int n) throws IOException {
-		File tmpFile = Files.createTempFile(getClass().getSimpleName(), null).toFile();
-		tmpFile.deleteOnExit();
-		config.setSyncFileName(tmpFile.getAbsolutePath());
+  ElectionCandidate[] generateCandidates(int n) throws IOException {
+    File tmpFile = Files.createTempFile(getClass().getSimpleName(), null).toFile();
+    tmpFile.deleteOnExit();
+    config.setSyncFileName(tmpFile.getAbsolutePath());
 
-		ElectionCandidate[] result = new ElectionCandidate[n];
+    ElectionCandidate[] result = new ElectionCandidate[n];
 
-		for (int i = 0; i < n; i++) {
-			result[i] = new ElectionCandidate().configure(this, config);
-			result[i].setName(result[i].getName() + "-" + (i + 1));
-		}
+    for (int i = 0; i < n; i++) {
+      result[i] = new ElectionCandidate().configure(this, config);
+      result[i].setName(result[i].getName() + "-" + (i + 1));
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	ElectionCandidate findLeader(ElectionCandidate[] candidates) {
-		for (ElectionCandidate candidate : candidates) {
-			if (candidate.isLeader()) {
-				return candidate;
-			}
-		}
+  ElectionCandidate findLeader(ElectionCandidate[] candidates) {
+    for (ElectionCandidate candidate : candidates) {
+      if (candidate.isLeader()) {
+        return candidate;
+      }
+    }
 
-		throw new RuntimeException("No leader found!");
-	}
+    throw new RuntimeException("No leader found!");
+  }
 
-	private void waitForNewLeader() throws InterruptedException {
-		if (!waitForElection.tryAcquire(5, SECONDS)) {
-			throw new RuntimeException("Election took longer than 5 seconds; aborting!");
-		}
-	}
+  private void waitForNewLeader() throws InterruptedException {
+    if (!waitForElection.tryAcquire(5, SECONDS)) {
+      throw new RuntimeException("Election took longer than 5 seconds; aborting!");
+    }
+  }
 
-	@Override
-	public synchronized void onStateChanged(ElectionCandidate candidate, ElectionCandidateState oldState,
-			ElectionCandidateState newState) {
-		states.put(candidate, newState);
-		if (newState == LEADER) {
-			waitForElection.release();
-		}
-	}
+  @Override
+  public synchronized void onStateChanged(ElectionCandidate candidate,
+      ElectionCandidateState oldState, ElectionCandidateState newState) {
+    states.put(candidate, newState);
+    if (newState == LEADER) {
+      waitForElection.release();
+    }
+  }
 
 }

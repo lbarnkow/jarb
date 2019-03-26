@@ -14,6 +14,7 @@ install:
 
 script:
 - "./gradlew test"
+- "./gradlew checkstyleMain"
 - "./gradlew dependencyCheckAnalyze"
 - "./gradlew dependencyUpdates"
 - ".travis/publish-results.sh"

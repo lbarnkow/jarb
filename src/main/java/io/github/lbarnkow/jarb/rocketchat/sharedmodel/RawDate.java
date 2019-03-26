@@ -8,6 +8,6 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RawDate {
-	@JsonAlias("$date")
-	private long date;
+  @JsonAlias("$date")
+  private long date;
 }

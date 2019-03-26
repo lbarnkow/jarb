@@ -1,11 +1,10 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import java.util.Arrays;
-import java.util.List;
-
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawMessage;
+import java.util.Arrays;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,12 +12,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendSendMessage extends BaseMessageWithMethod {
-	private static final String METHOD = "sendMessage";
+  private static final String METHOD = "sendMessage";
 
-	private List<RawMessage> params;
+  private List<RawMessage> params;
 
-	public SendSendMessage(Message message) {
-		super(METHOD);
-		params = Arrays.asList(RawMessage.of(message));
-	}
+  public SendSendMessage(Message message) {
+    super(METHOD);
+    params = Arrays.asList(RawMessage.of(message));
+  }
 }
