@@ -4,7 +4,7 @@ export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRAN
 
 STATS_BRANCH="ci/stats-${BRANCH}"
 
-if [[ "${BRANCH}" == "develop" && "${BRANCH}" == "master" ]]; then
+if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     START_DIR=$(pwd)
 
     mkdir publish-stats
@@ -19,7 +19,7 @@ if [[ "${BRANCH}" == "develop" && "${BRANCH}" == "master" ]]; then
     date > last-update
 
     git add .
-    git commit --amend --message "cu update"
+    git commit --amend --message "ci update"
     git push --force https://lbarnkow:${PUSH_TOKEN_FOR_GITHUB}@github.com/lbarnkow/jarb.git
 
     cd ${START_DIR}
