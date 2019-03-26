@@ -22,7 +22,7 @@ class TaskManagerTest {
 
 		// when
 		manager.start(Optional.empty(), task1, task2, task3);
-		Thread.sleep(20L);
+		Thread.sleep(25L);
 		TaskState state1 = manager.getTaskState(task1);
 		TaskState state2 = manager.getTaskState(task2);
 		TaskState state3 = manager.getTaskState(task3);

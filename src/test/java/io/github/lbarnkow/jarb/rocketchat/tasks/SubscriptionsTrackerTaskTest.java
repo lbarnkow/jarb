@@ -30,7 +30,10 @@ import io.github.lbarnkow.jarb.taskmanager.TaskWrapper;
 
 class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
 
-	private static final String BOTNAME = "TestBot";
+	private static final String TEST_ROOM_ID_PREFIX = "TEST_RID_ID_";
+	private static final String TEST_ROOM_NAME_PREFIX = "TEST_ROOM_NAME_";
+
+	private static final String TEST_BOTNAME = "TestBot";
 
 	private List<ListenerData> events = new ArrayList<>();
 
@@ -43,27 +46,33 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
 		when(rtClient.sendMessageAndWait(any(), any())).thenReturn(reply);
 
 		Bot bot = mock(Bot.class);
-		when(bot.getName()).thenReturn(BOTNAME);
+		when(bot.getName()).thenReturn(TEST_BOTNAME);
 
 		SubscriptionsTrackerTask task = new SubscriptionsTrackerTask(bot, rtClient, 10L, this);
 		TaskWrapper wrapper = new TaskWrapper(task);
 
 		// when
 		wrapper.startTask(Optional.empty());
-		Thread.sleep(50L);
+		Thread.sleep(30L);
 		wrapper.stopTask();
 
 		// then
 		verify(rtClient, atLeast(1)).sendMessageAndWait(any(SendGetSubscriptions.class),
 				eq(ReceiveGetSubscriptionsReply.class));
 		assertThat(events.size()).isEqualTo(5);
+		events.forEach(event -> {
+			assertThat(event.source).isSameAs(task);
+			assertThat(event.bot.getName()).isEqualTo(TEST_BOTNAME);
+			assertThat(event.room.getId()).startsWith(TEST_ROOM_ID_PREFIX);
+			assertThat(event.room.getName()).startsWith(TEST_ROOM_NAME_PREFIX);
+		});
 	}
 
 	@Test
 	void testDefaultSleepTime() {
 		// given
 		Bot bot = mock(Bot.class);
-		when(bot.getName()).thenReturn(BOTNAME);
+		when(bot.getName()).thenReturn(TEST_BOTNAME);
 
 		// when
 		SubscriptionsTrackerTask task = new SubscriptionsTrackerTask(bot, null, null);
@@ -77,9 +86,9 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
 		List<RawSubscription> subs = new ArrayList<>();
 		for (int i = 0; i < num; i++) {
 			RawSubscription sub = new RawSubscription();
-			sub.set_id(randomUUID().toString());
-			sub.setRid(randomUUID().toString());
-			sub.setName(randomUUID().toString());
+			sub.set_id("TEST_SUB_ID_" + randomUUID().toString());
+			sub.setRid(TEST_ROOM_ID_PREFIX + randomUUID().toString());
+			sub.setName(TEST_ROOM_NAME_PREFIX + randomUUID().toString());
 			sub.setT(RoomType.PUBLIC_CHANNEL.getRawType());
 			subs.add(sub);
 		}

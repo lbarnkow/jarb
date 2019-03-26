@@ -1,5 +1,7 @@
 package io.github.lbarnkow.jarb.api;
 
+import lombok.Getter;
+
 public enum MessageType {
 	REGULAR_CHAT_MESSAGE(null), //
 
@@ -38,6 +40,7 @@ public enum MessageType {
 
 	UNKNOWN(null);
 
+	@Getter
 	private final String rawType;
 
 	private MessageType(String rawType) {

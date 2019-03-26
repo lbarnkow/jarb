@@ -3,10 +3,16 @@ package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @JarbJsonSettings
 @Data
+@Builder
+@NoArgsConstructor // Jackson needs this
+@AllArgsConstructor // @Builder needs this
 public class RawChannel {
 	private String _id;
 	private String name;
