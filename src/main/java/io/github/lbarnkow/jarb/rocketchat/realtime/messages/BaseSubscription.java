@@ -8,12 +8,12 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class BaseSubscription extends BaseMessage {
-	private static final String MSG = "sub";
+  private static final String MSG = "sub";
 
-	private final String name;
+  private final String name;
 
-	BaseSubscription(String name) {
-		super(MSG, UUID.randomUUID().toString());
-		this.name = name;
-	}
+  BaseSubscription(String name) {
+    super(MSG, UUID.randomUUID().toString());
+    this.name = name;
+  }
 }

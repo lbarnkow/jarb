@@ -8,8 +8,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ChatCountersReply extends BaseReply {
-	private boolean joined;
-	private int unreads;
-	private String unreadsFrom;
-	private String latest;
+  private boolean joined;
+  private int unreads;
+  private String unreadsFrom;
+  private String latest;
 }

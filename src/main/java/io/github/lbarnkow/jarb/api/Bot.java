@@ -3,13 +3,13 @@ package io.github.lbarnkow.jarb.api;
 import java.util.Optional;
 
 public interface Bot {
-	Bot initialize(String name, Credentials credentials);
+  Bot initialize(String name, Credentials credentials);
 
-	String getName();
+  String getName();
 
-	Credentials getCredentials();
+  Credentials getCredentials();
 
-	boolean offerRoom(Room room);
+  boolean offerRoom(Room room);
 
-	Optional<Message> offerMessage(Message message);
+  Optional<Message> offerMessage(Message message);
 }

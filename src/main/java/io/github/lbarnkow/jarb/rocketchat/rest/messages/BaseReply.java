@@ -6,5 +6,5 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class BaseReply {
-	private boolean success;
+  private boolean success;
 }

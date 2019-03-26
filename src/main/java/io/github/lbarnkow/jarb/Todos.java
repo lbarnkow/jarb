@@ -2,6 +2,8 @@
 // This file will go through the Java compiler; so keep it compilable!
 
 // TODO: get code coverage up to where it should be!
+// TODO: get checkstyle violations to 0
+// TODO: set checkstyle violations threshold to 0
 // TODO: make lombok, gradle and junit5 work together
 // TODO: CI: get code coverage
 // TODO: CI: upload coverage report to codecov (branch develop)

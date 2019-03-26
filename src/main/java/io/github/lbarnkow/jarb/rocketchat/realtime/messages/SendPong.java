@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendPong extends BaseMessage {
-	public SendPong() {
-		super("pong");
-	}
+  public SendPong() {
+    super("pong");
+  }
 }

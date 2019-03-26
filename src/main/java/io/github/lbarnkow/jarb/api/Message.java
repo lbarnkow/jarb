@@ -10,14 +10,14 @@ import lombok.Value;
 @Value
 @Builder
 public class Message {
-	String id;
-	Room room;
-	String message;
-	Instant timestamp;
-	User user;
+  String id;
+  Room room;
+  String message;
+  Instant timestamp;
+  User user;
 
-	@Builder.Default
-	List<Attachment> attachments = Collections.emptyList();
+  @Builder.Default
+  List<Attachment> attachments = Collections.emptyList();
 
-	MessageType type;
+  MessageType type;
 }

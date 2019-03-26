@@ -13,20 +13,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawUser {
-	private String _id;
-	private String username;
+  private String _id;
+  private String username;
 
-	public User convert() {
-		return User.builder() //
-				.id(_id) //
-				.name(username) //
-				.build();
-	}
+  public User convert() {
+    return User.builder() //
+        .id(_id) //
+        .name(username) //
+        .build();
+  }
 
-	public static RawUser of(User u) {
-		return RawUser.builder() //
-				._id(u.getId()) //
-				.username(u.getName()) //
-				.build();
-	}
+  public static RawUser of(User u) {
+    return RawUser.builder() //
+        ._id(u.getId()) //
+        .username(u.getName()) //
+        .build();
+  }
 }

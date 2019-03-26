@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SubscriptionsGetOneReply extends BaseReply {
-	private String rid;
-	private String name;
-	private String t;
+  private String rid;
+  private String name;
+  private String t;
 }

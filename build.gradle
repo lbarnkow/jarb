@@ -9,6 +9,9 @@ plugins {
     id 'com.github.ben-manes.versions' version '0.21.0'
     // ... and selects a newer version automatically.
     id 'se.patrikerdes.use-latest-versions' version '0.2.9'
+
+    // static code quality analysis
+    id 'checkstyle'
 }
 
 repositories {
@@ -17,6 +20,7 @@ repositories {
 
 apply from: "build.dependency-check.gradle"
 apply from: "build.dependency-updates.gradle"
+apply from: "build.checkstyle.gradle"
 
 mainClassName = 'io.github.lbarnkow.jarb.Main'
 

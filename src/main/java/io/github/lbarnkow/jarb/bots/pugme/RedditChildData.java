@@ -6,6 +6,6 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RedditChildData {
-	private String url;
-	private boolean is_video;
+  private String url;
+  private boolean is_video;
 }

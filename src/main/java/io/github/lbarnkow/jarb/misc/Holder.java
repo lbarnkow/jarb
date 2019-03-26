@@ -9,18 +9,18 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class Holder<T> {
-	private final T initialValue;
-	@NonNull
-	@Getter
-	@Setter
-	private T value;
+  private final T initialValue;
+  @NonNull
+  @Getter
+  @Setter
+  private T value;
 
-	public Holder(T value) {
-		this.initialValue = value;
-		this.value = value;
-	}
+  public Holder(T value) {
+    this.initialValue = value;
+    this.value = value;
+  }
 
-	public void reset() {
-		setValue(initialValue);
-	}
+  public void reset() {
+    setValue(initialValue);
+  }
 }

@@ -6,5 +6,5 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class ReceiveConnected {
-	private String session;
+  private String session;
 }

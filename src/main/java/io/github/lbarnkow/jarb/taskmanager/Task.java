@@ -1,9 +1,9 @@
 package io.github.lbarnkow.jarb.taskmanager;
 
 public interface Task {
-	String getName();
+  String getName();
 
-	void initializeTask() throws Throwable;
+  void initializeTask() throws Throwable;
 
-	void runTask() throws Throwable;
+  void runTask() throws Throwable;
 }

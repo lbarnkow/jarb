@@ -9,13 +9,13 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendStreamRoomMessages extends BaseSubscription {
-	private static final String NAME = "stream-room-messages";
-	public static final String COLLECTION = NAME;
+  private static final String NAME = "stream-room-messages";
+  public static final String COLLECTION = NAME;
 
-	private final Object[] params;
+  private final Object[] params;
 
-	public SendStreamRoomMessages(Room room) {
-		super(NAME);
-		params = new Object[] { room.getId(), false };
-	}
+  public SendStreamRoomMessages(Room room) {
+    super(NAME);
+    params = new Object[] { room.getId(), false };
+  }
 }

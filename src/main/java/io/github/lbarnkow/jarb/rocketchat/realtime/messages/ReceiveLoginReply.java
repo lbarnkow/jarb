@@ -9,14 +9,14 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ReceiveLoginReply extends BaseMessage {
-	private LoginResult result;
+  private LoginResult result;
 
-	@JarbJsonSettings
-	@Data
-	public static class LoginResult {
-		private String id;
-		private String token;
-		private RawDate tokenExpires;
-		private String type;
-	}
+  @JarbJsonSettings
+  @Data
+  public static class LoginResult {
+    private String id;
+    private String token;
+    private RawDate tokenExpires;
+    private String type;
+  }
 }

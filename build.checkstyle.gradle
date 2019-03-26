@@ -1,0 +1,27 @@
+final int CHECKSTYLE_VIOLATIONS_THRESHOLD = 100
+
+checkstyleMain.doLast {
+    def xmlFile = file('build/reports/checkstyle/main.xml')
+    def xml = new groovy.util.XmlSlurper().parseText(xmlFile.text)
+
+    def count = 0;
+    for (file in xml.file) {
+        count += file.error.size()
+    }
+
+    def schemaVersion = 1
+    def label = "checkstyle"
+    def message = (count == 0 ? "all good" : "${count} violations")
+    def color = (count == 0 ? "success" : "yellow")
+
+    def json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
+    new File('stats-checkstyle.json').withWriter('utf-8') {
+        writer -> writer.writeLine json
+    }
+
+    if (count > CHECKSTYLE_VIOLATIONS_THRESHOLD) {
+        throw new GradleException(
+            "Number of checkstyle violations (${count}) " +
+            "is higher that the allowed threshold (${CHECKSTYLE_VIOLATIONS_THRESHOLD})!")
+    }
+}

@@ -6,5 +6,5 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RedditChild {
-	private RedditChildData data;
+  private RedditChildData data;
 }

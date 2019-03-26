@@ -1,8 +1,7 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
-import java.util.UUID;
-
 import io.github.lbarnkow.jarb.JarbJsonSettings;
+import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,16 +9,16 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class BaseMessageWithMethod extends BaseMessage {
-	private static final String MSG = "method";
+  private static final String MSG = "method";
 
-	private String method;
+  private String method;
 
-	BaseMessageWithMethod(String id, String method) {
-		super(MSG, id);
-		this.method = method;
-	}
+  BaseMessageWithMethod(String id, String method) {
+    super(MSG, id);
+    this.method = method;
+  }
 
-	public BaseMessageWithMethod(String method) {
-		this(UUID.randomUUID().toString(), method);
-	}
+  public BaseMessageWithMethod(String method) {
+    this(UUID.randomUUID().toString(), method);
+  }
 }
