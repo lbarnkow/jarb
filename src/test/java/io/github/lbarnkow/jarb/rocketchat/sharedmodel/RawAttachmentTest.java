@@ -78,18 +78,18 @@ class RawAttachmentTest {
         .color("color") //
         .text("text") //
         .ts(Instant.now().toString()) //
-        .thumb_url("thumb_url") //
-        .message_link("message_link") //
+        .thumbUrl("thumb_url") //
+        .messageLink("message_link") //
         .collapsed(true) //
-        .author_name("author_name") //
-        .author_link("author_link") //
-        .author_icon("author_icon") //
+        .authorName("author_name") //
+        .authorLink("author_link") //
+        .authorIcon("author_icon") //
         .title("title") //
-        .title_link("title_link") //
-        .title_link_download(true) //
-        .image_url("image_url") //
-        .audio_url("audio_url") //
-        .video_url("video_url") //
+        .titleLink("title_link") //
+        .titleLinkDownload(true) //
+        .imageUrl("image_url") //
+        .audioUrl("audio_url") //
+        .videoUrl("video_url") //
         .build();
   }
 
@@ -117,18 +117,18 @@ class RawAttachmentTest {
     assertThat(attachment.getColor()).isEqualTo(rawAttachment.getColor());
     assertThat(attachment.getText()).isEqualTo(rawAttachment.getText());
     assertThat(attachment.getTimestamp().toString()).isEqualTo(rawAttachment.getTs());
-    assertThat(attachment.getThumbUrl()).isEqualTo(rawAttachment.getThumb_url());
-    assertThat(attachment.getMessageLink()).isEqualTo(rawAttachment.getMessage_link());
+    assertThat(attachment.getThumbUrl()).isEqualTo(rawAttachment.getThumbUrl());
+    assertThat(attachment.getMessageLink()).isEqualTo(rawAttachment.getMessageLink());
     assertThat(attachment.isCollapsed()).isEqualTo(rawAttachment.isCollapsed());
-    assertThat(attachment.getAuthorName()).isEqualTo(rawAttachment.getAuthor_name());
-    assertThat(attachment.getAuthorLink()).isEqualTo(rawAttachment.getAuthor_link());
-    assertThat(attachment.getAuthorIcon()).isEqualTo(rawAttachment.getAuthor_icon());
+    assertThat(attachment.getAuthorName()).isEqualTo(rawAttachment.getAuthorName());
+    assertThat(attachment.getAuthorLink()).isEqualTo(rawAttachment.getAuthorLink());
+    assertThat(attachment.getAuthorIcon()).isEqualTo(rawAttachment.getAuthorIcon());
     assertThat(attachment.getTitle()).isEqualTo(rawAttachment.getTitle());
-    assertThat(attachment.getTitleLink()).isEqualTo(rawAttachment.getTitle_link());
-    assertThat(attachment.isTitleLinkDownload()).isEqualTo(rawAttachment.isTitle_link_download());
-    assertThat(attachment.getImageUrl()).isEqualTo(rawAttachment.getImage_url());
-    assertThat(attachment.getAudioUrl()).isEqualTo(rawAttachment.getAudio_url());
-    assertThat(attachment.getVideoUrl()).isEqualTo(rawAttachment.getVideo_url());
+    assertThat(attachment.getTitleLink()).isEqualTo(rawAttachment.getTitleLink());
+    assertThat(attachment.isTitleLinkDownload()).isEqualTo(rawAttachment.isTitleLinkDownload());
+    assertThat(attachment.getImageUrl()).isEqualTo(rawAttachment.getImageUrl());
+    assertThat(attachment.getAudioUrl()).isEqualTo(rawAttachment.getAudioUrl());
+    assertThat(attachment.getVideoUrl()).isEqualTo(rawAttachment.getVideoUrl());
   }
 
 }

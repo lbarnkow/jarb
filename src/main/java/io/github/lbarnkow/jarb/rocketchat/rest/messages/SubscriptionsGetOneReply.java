@@ -1,5 +1,6 @@
 package io.github.lbarnkow.jarb.rocketchat.rest.messages;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,5 +11,6 @@ import lombok.EqualsAndHashCode;
 public class SubscriptionsGetOneReply extends BaseReply {
   private String rid;
   private String name;
-  private String t;
+  @JsonAlias("t")
+  private String type;
 }

@@ -117,7 +117,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
     val posts = response.readEntity(RedditResponse.class);
 
     posts.getData().getChildren().stream() //
-        .filter(child -> child.getData().is_video() == false) //
+        .filter(child -> child.getData().isVideo() == false) //
         .filter(child -> child.getData().getUrl().endsWith(".jpg"))
         .forEach(child -> pugsCache.add(child.getData().getUrl()));
   }

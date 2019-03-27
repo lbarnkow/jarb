@@ -16,33 +16,33 @@ class RawMessageTest {
   @Test
   void testConvertWith() {
     // given
-    RawUser rawUser = RawUser.builder()._id("id").username("username").build();
+    RawUser rawUser = RawUser.builder().id("id").username("username").build();
     Room room = Room.builder().id("id").name("name").type(PUBLIC_CHANNEL).build();
 
     RawMessage rawMessage = RawMessage.builder() //
-        ._id("id") //
+        .id("id") //
         .rid(room.getId()) //
         .msg("message") //
         .ts(Instant.now().toString()) //
-        .u(rawUser) //
+        .user(rawUser) //
         .attachments(Collections.emptyList()) //
-        .t(USER_JOINED_ROOM.getRawType()) //
+        .type(USER_JOINED_ROOM.getRawType()) //
         .build();
 
     // when
     Message message = rawMessage.convertWith(room);
 
     // then
-    assertThat(message.getId()).isEqualTo(rawMessage.get_id());
+    assertThat(message.getId()).isEqualTo(rawMessage.getId());
     assertThat(message.getRoom()).isSameAs(room);
     assertThat(message.getRoom().getId()).isEqualTo(rawMessage.getRid());
     assertThat(message.getMessage()).isEqualTo(rawMessage.getMsg());
     assertThat(message.getTimestamp().toString()).isEqualTo(rawMessage.getTs());
-    assertThat(message.getUser().getId()).isEqualTo(rawMessage.getU().get_id());
-    assertThat(message.getUser().getName()).isEqualTo(rawMessage.getU().getUsername());
+    assertThat(message.getUser().getId()).isEqualTo(rawMessage.getUser().getId());
+    assertThat(message.getUser().getName()).isEqualTo(rawMessage.getUser().getUsername());
     assertThat(message.getAttachments()).isEmpty();
     assertThat(rawMessage.getAttachments()).isEmpty();
-    assertThat(message.getType().getRawType()).isEqualTo(rawMessage.getT());
+    assertThat(message.getType().getRawType()).isEqualTo(rawMessage.getType());
   }
 
   @Test
@@ -64,13 +64,13 @@ class RawMessageTest {
     RawMessage rawMessage = RawMessage.of(message);
 
     // then
-    assertThat(message.getId()).isEqualTo(rawMessage.get_id());
+    assertThat(message.getId()).isEqualTo(rawMessage.getId());
     assertThat(message.getRoom()).isSameAs(room);
     assertThat(message.getRoom().getId()).isEqualTo(rawMessage.getRid());
     assertThat(message.getMessage()).isEqualTo(rawMessage.getMsg());
     assertThat(message.getTimestamp().toString()).isEqualTo(rawMessage.getTs());
-    assertThat(message.getUser().getId()).isEqualTo(rawMessage.getU().get_id());
-    assertThat(message.getUser().getName()).isEqualTo(rawMessage.getU().getUsername());
+    assertThat(message.getUser().getId()).isEqualTo(rawMessage.getUser().getId());
+    assertThat(message.getUser().getName()).isEqualTo(rawMessage.getUser().getUsername());
     assertThat(message.getAttachments()).isEmpty();
     assertThat(rawMessage.getAttachments()).isEmpty();
   }

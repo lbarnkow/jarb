@@ -12,18 +12,18 @@ class RawChannelTest {
   void testAsRoom() {
     // given
     RawChannel rawChannel = RawChannel.builder() //
-        ._id("id") //
+        .id("id") //
         .name("name") //
-        .t(PUBLIC_CHANNEL.getRawType()) //
+        .type(PUBLIC_CHANNEL.getRawType()) //
         .build();
 
     // when
     Room room = rawChannel.asRoom();
 
     // then
-    assertThat(room.getId()).isEqualTo(rawChannel.get_id());
+    assertThat(room.getId()).isEqualTo(rawChannel.getId());
     assertThat(room.getName()).isEqualTo(rawChannel.getName());
-    assertThat(room.getType().getRawType()).isEqualTo(rawChannel.getT());
+    assertThat(room.getType().getRawType()).isEqualTo(rawChannel.getType());
   }
 
   @Test
@@ -35,8 +35,8 @@ class RawChannelTest {
     RawChannel rawChannel = RawChannel.of(room);
 
     // then
-    assertThat(room.getId()).isEqualTo(rawChannel.get_id());
+    assertThat(room.getId()).isEqualTo(rawChannel.getId());
     assertThat(room.getName()).isEqualTo(rawChannel.getName());
-    assertThat(room.getType().getRawType()).isEqualTo(rawChannel.getT());
+    assertThat(room.getType().getRawType()).isEqualTo(rawChannel.getType());
   }
 }

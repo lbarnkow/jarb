@@ -1,5 +1,6 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.User;
 import lombok.AllArgsConstructor;
@@ -13,19 +14,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawUser {
-  private String _id;
+  @JsonAlias("_id")
+  private String id;
   private String username;
 
   public User convert() {
     return User.builder() //
-        .id(_id) //
+        .id(id) //
         .name(username) //
         .build();
   }
 
   public static RawUser of(User u) {
     return RawUser.builder() //
-        ._id(u.getId()) //
+        .id(u.getId()) //
         .username(u.getName()) //
         .build();
   }

@@ -1,5 +1,6 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.MessageType;
@@ -19,12 +20,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawMessage {
-  private String _id;
+  @JsonAlias("_id")
+  private String id;
   private String rid;
   private String msg;
   private String ts;
-  private RawUser u;
-  private String _updatedAt;
+  @JsonAlias("u")
+  private RawUser user;
+  @JsonAlias("_updatedAt")
+  private String updatedAt;
   private String editedAt;
   private String editedBy;
 
@@ -41,27 +45,28 @@ public class RawMessage {
   private boolean groupable;
   private boolean parseUrls;
 
-  private String t;
+  @JsonAlias("t")
+  private String type;
 
   public Message convertWith(Room room) {
     return Message.builder() //
-        .id(_id) //
+        .id(id) //
         .room(room) //
         .message(msg) //
         .timestamp(ts != null ? Instant.parse(ts) : null) //
-        .user(u.convert()) //
+        .user(user.convert()) //
         .attachments(RawAttachment.convertList(attachments)) //
-        .type(MessageType.parse(t)) //
+        .type(MessageType.parse(type)) //
         .build();
   }
 
   public static RawMessage of(Message m) {
     return RawMessage.builder() //
-        ._id(m.getId()) //
+        .id(m.getId()) //
         .rid(m.getRoom().getId()) //
         .msg(m.getMessage()) //
         .ts(m.getTimestamp() != null ? m.getTimestamp().toString() : null) //
-        .u(m.getUser() != null ? RawUser.of(m.getUser()) : null) //
+        .user(m.getUser() != null ? RawUser.of(m.getUser()) : null) //
         .attachments(RawAttachment.of(m.getAttachments())) //
         .build();
   }

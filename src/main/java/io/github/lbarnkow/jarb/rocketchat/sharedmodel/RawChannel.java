@@ -1,5 +1,6 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
@@ -14,20 +15,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawChannel {
-  private String _id;
+  @JsonAlias("_id")
+  private String id;
   private String name;
-  private String t;
+  @JsonAlias("t")
+  private String type;
 
   public Room asRoom() {
-    RoomType type = RoomType.parse(t);
-    return Room.builder().id(_id).name(name).type(type).build();
+    RoomType type = RoomType.parse(this.type);
+    return Room.builder().id(id).name(name).type(type).build();
   }
 
   public static RawChannel of(Room room) {
     RawChannel channel = new RawChannel();
-    channel._id = room.getId();
+    channel.id = room.getId();
     channel.name = room.getName();
-    channel.t = room.getType().getRawType();
+    channel.type = room.getType().getRawType();
     return channel;
   }
 }
