@@ -21,10 +21,13 @@ if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     cp ${START_DIR}/build/stats/stats-deps.json .
     cp ${START_DIR}/build/stats/stats-vuln.json .
     cp ${START_DIR}/build/stats/stats-checkstyle.json .
+    cp ${START_DIR}/build/stats/stats-pmd-categories.json .
+    cp ${START_DIR}/build/stats/stats-pmd-violations.json .
 
     cp ${START_DIR}/build/dependencyUpdates/report.txt report-deps.md
     cp ${START_DIR}/build/reports/dependency-check-vulnerability.md report-vuln.md
     cp ${START_DIR}/build/reports/checkstyle/report.md report-checkstyle.md
+    cp ${START_DIR}/build/reports/pmd/report.md report-pmd.md
 
     date > last-update
 

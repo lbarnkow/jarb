@@ -1,0 +1,103 @@
+final int PMD_VIOLATIONS_THRESHOLD = 50
+final String STATS_DIR = 'build/stats'
+
+pmd {
+    ignoreFailures = true
+    ruleSets = [
+        "category/java/bestpractices.xml",
+        // "category/java/codestyle.xml",
+        // "category/java/design.xml",
+        // "category/java/documentation.xml",
+        // "category/java/errorprone.xml",
+        // "category/java/multithreading.xml",
+        // "category/java/performance.xml",
+        // "category/java/security.xml",
+    ]
+}
+
+tasks.register("pmdAll") {
+    group = 'Verification'
+    description = 'PMD for main and test SourceSets'
+
+    dependsOn 'pmdMain'
+    dependsOn 'pmdTest'
+
+    doLast {
+        pmdExportStats(PMD_VIOLATIONS_THRESHOLD, STATS_DIR)
+        pmdExportReport()
+    }
+}
+
+def pmdExportStats(threshold, statsDir) {
+    def violations = 0
+    violations += pmdCountViolations('main')
+    violations += pmdCountViolations('test')
+
+    def categories = pmd.ruleSets.size()
+
+    def schemaVersion = 1
+    def label = "pmd categories"
+    def message = "${categories} out of 8"
+    def color = "informational"
+
+    def json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
+    new File(statsDir).mkdirs()
+    new File(statsDir, 'stats-pmd-categories.json').withWriter('utf-8') {
+        writer -> writer.writeLine json
+    }
+
+    schemaVersion = 1
+    label = "pmd"
+    message = (violations == 0 ? "all good" : "${violations} violations")
+    color = (violations == 0 ? "success" : "yellow")
+
+    json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
+    new File(statsDir).mkdirs()
+    new File(statsDir, 'stats-pmd-violations.json').withWriter('utf-8') {
+        writer -> writer.writeLine json
+    }
+
+    if (violations > threshold) {
+        throw new GradleException(
+            "Number of pmd violations (${violations}) " +
+            "is higher that the allowed threshold (${threshold})!")
+    }
+}
+
+def pmdCountViolations(sourceset) {
+    def xmlFile = file("build/reports/pmd/${sourceset}.xml")
+    def xml = new groovy.util.XmlSlurper().parseText(xmlFile.text)
+
+    def count = 0
+    for (file in xml.file) {
+        count += file.violation.size()
+    }
+    return count
+}
+
+def pmdExportReport() {
+    def htmlMain = file('build/reports/pmd/main.html').text
+    def htmlTest = file('build/reports/pmd/test.html').text
+
+    def pattern = java.util.regex.Pattern.compile(".+<body>(.+)</body>.+", java.util.regex.Pattern.DOTALL)
+    def matcherMain = pattern.matcher(htmlMain)
+    def matcherTest = pattern.matcher(htmlTest)
+
+    if (matcherMain.matches() && matcherTest.matches()) {
+        new File('build/reports/pmd/report.md').withWriter('utf-8') {
+            writer -> 
+                writer.writeLine '# PMD Analysis Report (Main + Test)'
+                writer.writeLine ''
+                writer.writeLine '## Enabled Categories'
+                writer.writeLine ''
+                for (cat in pmd.ruleSets) {
+                    writer.writeLine "* ${cat}"
+                }
+                writer.writeLine ''
+                writer.writeLine '---'
+                writer.writeLine ''
+                writer.writeLine matcherMain.group(1)
+                writer.writeLine matcherTest.group(1)
+        }
+    }
+}
