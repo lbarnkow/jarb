@@ -15,6 +15,9 @@ if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     cd ci-output
     git checkout -b ${STATS_BRANCH}
 
+    git config user.name "lbarnkow-ci"
+    git config user.email "48982208+lbarnkow-ci@users.noreply.github.com"
+
     cp ${START_DIR}/build/stats/stats-deps.json .
     cp ${START_DIR}/build/stats/stats-vuln.json .
     cp ${START_DIR}/build/stats/stats-checkstyle.json .
