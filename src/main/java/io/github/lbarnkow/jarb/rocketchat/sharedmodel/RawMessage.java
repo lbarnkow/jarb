@@ -48,6 +48,14 @@ public class RawMessage {
   @JsonAlias("t")
   private String type;
 
+  /**
+   * Converts this instance to a <code>Message</code> instance.
+   *
+   * @param room a <code>Room</code> to attach to the <code>Message</code>
+   *             instance; needed because <code>RawMessage</code> only knows the
+   *             Room-ID
+   * @return the resulting <code>Message</code>
+   */
   public Message convertWith(Room room) {
     return Message.builder() //
         .id(id) //
@@ -60,6 +68,13 @@ public class RawMessage {
         .build();
   }
 
+  /**
+   * Converts a <code>Message</code> instance to a <code>RawMessage</code>
+   * instance.
+   *
+   * @param m the <code>Message</code> instance to convert
+   * @return the resulting <code>RawMessage</code>
+   */
   public static RawMessage of(Message m) {
     return RawMessage.builder() //
         .id(m.getId()) //

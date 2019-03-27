@@ -12,6 +12,19 @@ public final class DummyTaskForUnitTesting extends AbstractBaseTask {
   private boolean failInitialize;
   private boolean failRun;
 
+  /**
+   * A dummy task used for unit testing. This task will not do any meaningful
+   * work, but instead used <code>Thread.sleep()</code> to simulate computational
+   * work using up time. Additionally, it can be configured to throw exceptions
+   * during intialization or work phases.
+   *
+   * @param sleepMillis    the amount of milliseconds to sleep durch the work
+   *                       phase
+   * @param failInitialize <code>true</code> if this instance should throw an
+   *                       exception during task initialization
+   * @param failRun        <code>true</code> if this instance should throw an
+   *                       exception during work phase
+   */
   public DummyTaskForUnitTesting(long sleepMillis, boolean failInitialize, boolean failRun) {
     this.sleepMillis = sleepMillis;
     this.failInitialize = failInitialize;

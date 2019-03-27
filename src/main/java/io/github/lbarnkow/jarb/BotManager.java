@@ -74,6 +74,15 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     this.roomProcessor = roomProcessor;
   }
 
+  /**
+   * Starts the main bot managements process. <br>
+   * <br>
+   * This will spawn a couple of threads for managements tasks and initiate
+   * connections to the chat servers.
+   *
+   * @param config the parsed configuration
+   * @param bots   the bots being managed by this instance
+   */
   public void start(BotManagerConfiguration config, Bot... bots) {
     this.config = config;
 
@@ -90,6 +99,11 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     tasks.start(Optional.of(this), election);
   }
 
+  /**
+   * Stops the main bot management process.<br>
+   * <br>
+   * This will stop all threads spawned by this instance.
+   */
   public void stop() {
     if (shuttingDown.getAndSet(true) == false) {
       log.info("Stopping all background tasks...");
@@ -237,8 +251,8 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     if (newAuthInfo.isValid() && !previousAuthInfo.isValid()) {
       dataStruct.authInfo.setValue(newAuthInfo);
 
-      SubscriptionsTrackerTask subscriptionsTrackerTask = new SubscriptionsTrackerTask(bot,
-          dataStruct.realtimeClient, this);
+      SubscriptionsTrackerTask subscriptionsTrackerTask =
+          new SubscriptionsTrackerTask(bot, dataStruct.realtimeClient, this);
       PublicChannelAutoJoinerTask autoJoinerTask = new PublicChannelAutoJoinerTask(restClient,
           dataStruct.realtimeClient, bot, dataStruct.authInfo);
 
