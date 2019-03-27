@@ -57,12 +57,12 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
         Set<String> newIds = new HashSet<>();
 
         for (RawSubscription sub : reply.getResult()) {
-          newIds.add(sub.get_id());
+          newIds.add(sub.getId());
 
-          if (!knownIds.contains(sub.get_id())) {
+          if (!knownIds.contains(sub.getId())) {
             String roomId = sub.getRid();
             String roomName = sub.getName();
-            RoomType roomType = RoomType.parse(sub.getT());
+            RoomType roomType = RoomType.parse(sub.getType());
             Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
             log.debug("Bot '{}' has a subscription to room '{}'.", bot.getName(), room.getName());
             listener.onNewSubscription(this, bot, room);

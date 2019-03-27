@@ -1,5 +1,6 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Attachment;
 import java.time.Instant;
@@ -22,18 +23,28 @@ public class RawAttachment {
   private String color;
   private String text;
   private String ts;
-  private String thumb_url;
-  private String message_link;
+  @JsonAlias("thumb_url")
+  private String thumbUrl;
+  @JsonAlias("message_link")
+  private String messageLink;
   private boolean collapsed;
-  private String author_name;
-  private String author_link;
-  private String author_icon;
+  @JsonAlias("author_name")
+  private String authorName;
+  @JsonAlias("author_link")
+  private String authorLink;
+  @JsonAlias("author_icon")
+  private String authorIcon;
   private String title;
-  private String title_link;
-  private boolean title_link_download;
-  private String image_url;
-  private String audio_url;
-  private String video_url;
+  @JsonAlias("title_link")
+  private String titleLink;
+  @JsonAlias("title_link_download")
+  private boolean titleLinkDownload;
+  @JsonAlias("image_url")
+  private String imageUrl;
+  @JsonAlias("audio_url")
+  private String audioUrl;
+  @JsonAlias("video_url")
+  private String videoUrl;
   @Builder.Default
   private List<RawAttachmentField> fields = Collections.emptyList();
 
@@ -42,18 +53,18 @@ public class RawAttachment {
         .color(color) //
         .text(text) //
         .timestamp(ts != null ? Instant.parse(ts) : null) //
-        .thumbUrl(thumb_url) //
-        .messageLink(message_link) //
+        .thumbUrl(thumbUrl) //
+        .messageLink(messageLink) //
         .collapsed(collapsed) //
-        .authorName(author_name) //
-        .authorLink(author_link) //
-        .authorIcon(author_icon) //
+        .authorName(authorName) //
+        .authorLink(authorLink) //
+        .authorIcon(authorIcon) //
         .title(title) //
-        .titleLink(title_link) //
-        .titleLinkDownload(title_link_download) //
-        .imageUrl(image_url) //
-        .audioUrl(audio_url) //
-        .videoUrl(video_url) //
+        .titleLink(titleLink) //
+        .titleLinkDownload(titleLinkDownload) //
+        .imageUrl(imageUrl) //
+        .audioUrl(audioUrl) //
+        .videoUrl(videoUrl) //
         .build();
   }
 
@@ -72,18 +83,18 @@ public class RawAttachment {
         .color(a.getColor()) //
         .text(a.getText()) //
         .ts(a.getTimestamp() != null ? a.getTimestamp().toString() : null) //
-        .thumb_url(a.getThumbUrl()) //
-        .message_link(a.getMessageLink()) //
+        .thumbUrl(a.getThumbUrl()) //
+        .messageLink(a.getMessageLink()) //
         .collapsed(a.isCollapsed()) //
-        .author_name(a.getAuthorName()) //
-        .author_link(a.getAuthorLink()) //
-        .author_icon(a.getAuthorIcon()) //
+        .authorName(a.getAuthorName()) //
+        .authorLink(a.getAuthorLink()) //
+        .authorIcon(a.getAuthorIcon()) //
         .title(a.getTitle()) //
-        .title_link(a.getTitleLink()) //
-        .title_link_download(a.isTitleLinkDownload()) //
-        .image_url(a.getImageUrl()) //
-        .audio_url(a.getAudioUrl()) //
-        .video_url(a.getVideoUrl()) //
+        .titleLink(a.getTitleLink()) //
+        .titleLinkDownload(a.isTitleLinkDownload()) //
+        .imageUrl(a.getImageUrl()) //
+        .audioUrl(a.getAudioUrl()) //
+        .videoUrl(a.getVideoUrl()) //
         .build();
   }
 

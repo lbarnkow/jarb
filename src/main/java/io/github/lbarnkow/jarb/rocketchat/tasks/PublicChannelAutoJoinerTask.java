@@ -94,10 +94,10 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
     Map<String, RawChannel> channelsNotJoined = new HashMap<>();
 
     for (RawChannel channel : channels) {
-      channelsNotJoined.put(channel.get_id(), channel);
+      channelsNotJoined.put(channel.getId(), channel);
     }
     for (RawChannel channel : joinedChannels) {
-      channelsNotJoined.remove(channel.get_id());
+      channelsNotJoined.remove(channel.getId());
     }
 
     return channelsNotJoined;

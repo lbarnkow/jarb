@@ -50,7 +50,7 @@ public class RoomProcessor {
 
     ChatCountersReply countersBefore =
         restClient.getChatCounters(authInfo, room.getType(), room.getId());
-    if (countersBefore.isJoined()) {
+    if (countersBefore.isJoined() || room.getType() == RoomType.INSTANT_MESSAGE) {
       log.debug("Bot '{}' needs to process (at least) '{}' unread messages in room '{}'.",
           bot.getName(), countersBefore.getUnreads(), room.getName());
 
@@ -86,7 +86,7 @@ public class RoomProcessor {
       SubscriptionsGetOneReply subscription = restClient.getOneSubscription(authInfo, roomId);
 
       String roomName = subscription.getName();
-      RoomType roomType = RoomType.parse(subscription.getT());
+      RoomType roomType = RoomType.parse(subscription.getType());
       Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
 
       roomCache.put(roomId, room);
@@ -104,14 +104,14 @@ public class RoomProcessor {
     ChatHistoryReply history = restClient.getChatHistory(authInfo, room, latest, oldest, true);
 
     for (RawMessage rawMsg : history.getMessages()) {
-      String userId = rawMsg.getU().get_id();
-      String userName = rawMsg.getU().getUsername();
+      String userId = rawMsg.getUser().getId();
+      String userName = rawMsg.getUser().getUsername();
       User user = User.builder().id(userId).name(userName).build();
 
-      String rmId = rawMsg.get_id();
+      String rmId = rawMsg.getId();
       String rmMsg = rawMsg.getMsg();
       Instant rmTs = Instant.parse(rawMsg.getTs());
-      MessageType rmType = MessageType.parse(rawMsg.getT());
+      MessageType rmType = MessageType.parse(rawMsg.getType());
       Message message = Message.builder().id(rmId).message(rmMsg).room(room).timestamp(rmTs)
           .type(rmType).user(user).build();
       result.add(message);

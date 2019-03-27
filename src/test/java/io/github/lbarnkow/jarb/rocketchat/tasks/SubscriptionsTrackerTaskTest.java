@@ -84,10 +84,10 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
     List<RawSubscription> subs = new ArrayList<>();
     for (int i = 0; i < num; i++) {
       RawSubscription sub = new RawSubscription();
-      sub.set_id("TEST_SUB_ID_" + randomUUID().toString());
+      sub.setId("TEST_SUB_ID_" + randomUUID().toString());
       sub.setRid(TEST_ROOM_ID_PREFIX + randomUUID().toString());
       sub.setName(TEST_ROOM_NAME_PREFIX + randomUUID().toString());
-      sub.setT(RoomType.PUBLIC_CHANNEL.getRawType());
+      sub.setType(RoomType.PUBLIC_CHANNEL.getRawType());
       subs.add(sub);
     }
 

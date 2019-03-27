@@ -1,5 +1,6 @@
 package io.github.lbarnkow.jarb.bots.pugme;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
@@ -7,5 +8,6 @@ import lombok.Data;
 @Data
 public class RedditChildData {
   private String url;
-  private boolean is_video;
+  @JsonAlias("is_video")
+  private boolean isVideo;
 }

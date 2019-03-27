@@ -100,9 +100,9 @@ class PublicChannelAutoJoinerTaskTest {
 
     for (int i = 0; i < numChannels; i++) {
       RawChannel channel = new RawChannel();
-      channel.set_id(TEST_ROOM_ID_PREFIX + randomUUID().toString());
+      channel.setId(TEST_ROOM_ID_PREFIX + randomUUID().toString());
       channel.setName(TEST_ROOM_NAME_PREFIX + randomUUID().toString());
-      channel.setT(PUBLIC_CHANNEL.getRawType());
+      channel.setType(PUBLIC_CHANNEL.getRawType());
       channels.add(channel);
     }
 
