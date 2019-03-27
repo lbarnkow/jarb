@@ -7,14 +7,14 @@ env:
   - GRADLE_OPTS="-Dorg.gradle.console=plain"
   global:
   # PUSH_TOKEN_FOR_GITHUB
-  - secure: S2D9AdEvdkp07/vjtwM1I0oOjKZ5/a0sJb7YijlYcvQx/Y0pY34ixBUGrp20l05y7+dcDf5jtMAcvarxILUANupQXer3bYm+IGLUm1Lq1JY7Hu4QYiZZDRDQ9YTQ+nBcr5iRzmo6Dr+cG5XiHPg3OK6IWGX0CLbtYKqfB7zF3rkNdg14TE38mRzYiyhU9bE8ltxlqJB8CHuY0uZ+KRoh5Efk2NPtbcjdrlA3ECvJuGWZNxsJ5qvA++RHUtbntAy8LXsa67iDb8cq99zhjcmh+H2S64qJmfgnODYCr+Cg9MpXElJxGBb2hBmDvTl2f9ePZtFVe4erDiPvYVtiKXMj27+t9ccv43972oAlPcUvuhzqIf6XTOIrukvIOS4Rb1SPDENMEMatFeJO/PiEtUOXYwuFLicfs2fnusYUxGdhndwmBV4Xh0ZU1Y+Dlxb2DX/0z9P1ipo7zETW/wT/th/XzIPXMI5GET1F6a03PYMZlxh7x4Sk+OTVJbdT3lAj1W7W5Vz0xGN2KZL7rfpqI0Hl4gtRXofg5afHpFRL7icfZw8z+WQ+hno7vGpOOysW59IVQh4N+/9L4fMA8vFW1T83YmzzTa5bXu2QezLKAGPOkQz6P5mLjFASc14RLVU+MYSGE7WZpsoBjzBGam/ccysjCwCtmwoWW5BGOTyU7YMfFl0=
+  - secure: "kpDos941yTvfqtNyzCkSYRIBrxQJY2aRdTgmqHVoEfg736wv/J2v4Mt0vR4iBhxzubPw8xAR1+AGxhPik2rBv6t7G7nOrNWEh7goE4aaPCX3c3+Zf2+/vVlyDSEHRhhXd72ZnBvBAb2+0Gxa/DgNqvPq01S/iel4CMgUzcA14haGhs6vjsmKMQiomxLSEmB2d3JuxfzPbVRUMKK0vGzYDXJ20PpSkuA0UOOL7k5ahgZhdiBlBc0XARwMV2U8vmnRe5x2Bgf/JCwTFbXwfr03G8RjKs8KfGt9E6ertAdrXuyM8Ez/Ho+zL3xw1blk6mGNyKQvSdKChi0reD7p6+qKCWJ75RrKH95wdSZ1WHZPlHhuiMlmdebgx6jZomuyZ+AYGsQMU4TzJOE4hAED4cIpjdPnjavcoFQgSLu2TIXIiUNEw4gqNB02XxjHPEeZuGImKaGAPFV2wnXxohEBtjVTY8U/+mJeoQq6599aRQb2nowQGLFi5kemkLQhCwYqLUSUPRweDnYM+d9FU9v4HH3ZA+O25F78/GWt2DTy3v3wK+1RlifmVFmbl9vYed5eiKItT/0AFmnnSQeEXN+4JtWcWUzE0Ea66CoVgbHr1kgsaXJ4ijMO7gSwU1EJiR8yTwVbDP42YQA9WhO/PqFALVjkcb77rWL1/cFbXH8NTfiVsSE="
 
 install:
 - "./gradlew compileJava compileTestJava"
 
 script:
 - "./gradlew test"
-- "./gradlew checkstyleMain"
+- "./gradlew checkstyleAll"
 - "./gradlew dependencyCheckAnalyze"
 - "./gradlew dependencyUpdates"
 - ".travis/publish-results.sh"

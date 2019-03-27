@@ -1,4 +1,5 @@
 final int OUTDATED_DEPENDENCIES_THRESHOLD = 25
+final String STATS_DIR = 'build/stats'
 
 dependencyUpdates {
     revision = 'release'
@@ -19,6 +20,10 @@ dependencyUpdates {
 }
 
 dependencyUpdates.doLast {
+    dependencyUpdatesExportStats(OUTDATED_DEPENDENCIES_THRESHOLD, STATS_DIR)
+}
+
+def dependencyUpdatesExportStats(threshold, statsDir) {
     def jsonFile = file('build/dependencyUpdates/report.json')
     def json = new groovy.json.JsonSlurper().parseText(jsonFile.text)
 
@@ -29,13 +34,14 @@ dependencyUpdates.doLast {
     def color = (count == 0 ? "success" : "important")
 
     json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
-    new File('stats-deps.json').withWriter('utf-8') {
+    new File(statsDir).mkdirs()
+    new File(statsDir, 'stats-deps.json').withWriter('utf-8') {
         writer -> writer.writeLine json
     }
 
-    if (count > OUTDATED_DEPENDENCIES_THRESHOLD) {
+    if (count > threshold) {
         throw new GradleException(
             "Number of outdated dependencies (${count}) " +
-            "is higher that the allowed threshold (${OUTDATED_DEPENDENCIES_THRESHOLD})!")
+            "is higher that the allowed threshold (${threshold})!")
     }
 }

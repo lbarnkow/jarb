@@ -1,13 +1,24 @@
 final int CHECKSTYLE_VIOLATIONS_THRESHOLD = 100
+final String STATS_DIR = 'build/stats'
 
-checkstyleMain.doLast {
-    def xmlFile = file('build/reports/checkstyle/main.xml')
-    def xml = new groovy.util.XmlSlurper().parseText(xmlFile.text)
+tasks.register("checkstyleAll") {
+    group = 'Verification'
+    description = 'Checkstyle for main and test SourceSets'
 
-    def count = 0;
-    for (file in xml.file) {
-        count += file.error.size()
+    dependsOn 'checkstyleMain'
+    dependsOn 'checkstyleTest'
+
+    doLast {
+        checkstyleExportStats(CHECKSTYLE_VIOLATIONS_THRESHOLD, STATS_DIR)
+        checkstyleExportReport()
+        println "lulz"
     }
+}
+
+def checkstyleExportStats(threshold, statsDir) {
+    def count = 0
+    count += checkstyleCountViolations('main')
+    count += checkstyleCountViolations('test')
 
     def schemaVersion = 1
     def label = "checkstyle"
@@ -15,13 +26,42 @@ checkstyleMain.doLast {
     def color = (count == 0 ? "success" : "yellow")
 
     def json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
-    new File('stats-checkstyle.json').withWriter('utf-8') {
+    new File(statsDir).mkdirs()
+    new File(statsDir, 'stats-checkstyle.json').withWriter('utf-8') {
         writer -> writer.writeLine json
     }
 
-    if (count > CHECKSTYLE_VIOLATIONS_THRESHOLD) {
+    if (count > threshold) {
         throw new GradleException(
             "Number of checkstyle violations (${count}) " +
-            "is higher that the allowed threshold (${CHECKSTYLE_VIOLATIONS_THRESHOLD})!")
+            "is higher that the allowed threshold (${threshold})!")
+    }
+}
+
+def checkstyleCountViolations(sourceset) {
+    def xmlFile = file("build/reports/checkstyle/${sourceset}.xml")
+    def xml = new groovy.util.XmlSlurper().parseText(xmlFile.text)
+
+    def count = 0
+    for (file in xml.file) {
+        count += file.error.size()
+    }
+    return count
+}
+
+def checkstyleExportReport() {
+    def htmlMain = file('build/reports/checkstyle/main.html').text
+    def htmlTest = file('build/reports/checkstyle/test.html').text
+
+    def pattern = java.util.regex.Pattern.compile(".+<body>(.+)</body>.+", java.util.regex.Pattern.DOTALL)
+    def matcherMain = pattern.matcher(htmlMain)
+    def matcherTest = pattern.matcher(htmlTest)
+
+    if (matcherMain.matches() && matcherTest.matches()) {
+        new File('build/reports/checkstyle/report.md').withWriter('utf-8') {
+            writer -> 
+                writer.writeLine matcherMain.group(1)
+                writer.writeLine matcherTest.group(1)
+        }
     }
 }
