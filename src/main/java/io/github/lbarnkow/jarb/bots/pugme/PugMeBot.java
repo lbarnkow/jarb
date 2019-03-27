@@ -57,7 +57,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
       if (message.getType() == REGULAR_CHAT_MESSAGE) {
         val matcher = regex.matcher(message.getMessage());
         if (matcher.matches()) {
-          val room = message.getRoom();
+          Room room = message.getRoom();
           val param = matcher.group(1);
 
           if (param == null) {
