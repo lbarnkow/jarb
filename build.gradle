@@ -18,6 +18,10 @@ repositories {
     jcenter()
 }
 
+// TODO: temporary fix to mitigate CVE-2019-9658, should be re-evaluated in the future
+// see: https://github.com/gradle/gradle/blob/master/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality/CheckstylePlugin.java#L39
+checkstyle.toolVersion = "8.18"
+
 apply from: "build.dependency-check.gradle"
 apply from: "build.dependency-updates.gradle"
 apply from: "build.checkstyle.gradle"

@@ -11,7 +11,6 @@ tasks.register("checkstyleAll") {
     doLast {
         checkstyleExportStats(CHECKSTYLE_VIOLATIONS_THRESHOLD, STATS_DIR)
         checkstyleExportReport()
-        println "lulz"
     }
 }
 
@@ -60,6 +59,8 @@ def checkstyleExportReport() {
     if (matcherMain.matches() && matcherTest.matches()) {
         new File('build/reports/checkstyle/report.md').withWriter('utf-8') {
             writer -> 
+                writer.writeLine '# Dependency Check Report (Main + Test)'
+                writer.writeLine ""
                 writer.writeLine matcherMain.group(1)
                 writer.writeLine matcherTest.group(1)
         }
