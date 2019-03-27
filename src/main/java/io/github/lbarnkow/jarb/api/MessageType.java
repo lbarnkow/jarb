@@ -47,6 +47,13 @@ public enum MessageType {
     this.rawType = rawType;
   }
 
+  /**
+   * Parses a raw message type from Rocket.Chat and converts it into the
+   * appropriate enum value.
+   *
+   * @param rawType the raw message type
+   * @return a enum value
+   */
   public static MessageType parse(String rawType) {
     if (rawType == null) {
       return REGULAR_CHAT_MESSAGE;

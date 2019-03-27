@@ -15,6 +15,11 @@ import lombok.val;
 
 @Slf4j
 public class Main {
+  /**
+   * Main code entry point for jarb.
+   *
+   * @param args CLI args (currently not used)
+   */
   public static void main(String[] args) {
     log.info("# # # W E L C O M E # # #");
 

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 import javax.websocket.DeploymentException;
 import org.slf4j.Logger;
@@ -43,6 +44,17 @@ public class RealtimeClient implements WebsocketClientListener {
     this.client = client;
   }
 
+  /**
+   * Establishes a web socket connection to the Rocket.Chat-Server and initiates a
+   * realtime session by sending the <i>"connect"</i> message.
+   *
+   * @param listener a listener to be informed about session state changes and
+   *                 incoming messages
+   * @param config   the parsed connection configuration
+   * @throws URISyntaxException  caused by bad configuration
+   * @throws DeploymentException caused by connection issues
+   * @throws IOException         on io errors
+   */
   public void connect(RealtimeClientListener listener, ConnectionConfiguration config)
       throws URISyntaxException, DeploymentException, IOException {
     this.listener = listener;
@@ -60,8 +72,23 @@ public class RealtimeClient implements WebsocketClientListener {
     client.sendMessage(json);
   }
 
+  /**
+   * Sends a realtime message and blocks until either a reply with the same
+   * <i>id</i> is received or a timeout is reached.
+   *
+   * @param message   the message to send
+   * @param timeout   the timeout in milliseconds
+   * @param replyType the expected type of reply
+   * @return the reply
+   * @throws InterruptedException on thread interruption while waiting for the
+   *                              reply
+   * @throws ReplyErrorException  on errors received in the JSON reply from the
+   *                              server
+   * @throws IOException          on io errors
+   * @throws TimeoutException     on exceeding the wait timeout
+   */
   public <X> X sendMessageAndWait(BaseMessage message, long timeout, Class<X> replyType)
-      throws InterruptedException, ReplyErrorException, IOException {
+      throws InterruptedException, ReplyErrorException, IOException, TimeoutException {
     if (message.getId() == null) {
       throw new IllegalArgumentException(
           "Messages must have a unique id to be used with 'sendMessageAndWait()'!");
@@ -73,9 +100,13 @@ public class RealtimeClient implements WebsocketClientListener {
     sendMessage(message);
     sem.tryAcquire(timeout, MILLISECONDS);
 
+    Object value = unansweredRequests.remove(message.getId());
+    if (value == null || value == sem) {
+      throw new TimeoutException(message.toString());
+    }
+
     @SuppressWarnings("unchecked")
-    Tuple<BaseMessage, String> reply = (Tuple<BaseMessage, String>) unansweredRequests
-        .remove(message.getId());
+    Tuple<BaseMessage, String> reply = (Tuple<BaseMessage, String>) value;
     if (reply.getFirst().getError() != null) {
       throw new ReplyErrorException(reply.getFirst().getError());
     }
@@ -84,7 +115,7 @@ public class RealtimeClient implements WebsocketClientListener {
   }
 
   public <X> X sendMessageAndWait(BaseMessage message, Class<X> replyType)
-      throws InterruptedException, ReplyErrorException, IOException {
+      throws InterruptedException, ReplyErrorException, IOException, TimeoutException {
     return sendMessageAndWait(message, 1000L * 60L, replyType);
   }
 
@@ -144,8 +175,8 @@ public class RealtimeClient implements WebsocketClientListener {
   private void handleSubscriptionUpdate(BaseMessage message, String rawJson)
       throws JsonParseException, JsonMappingException, IOException {
     if (SendStreamRoomMessages.COLLECTION.equals(message.getCollection())) {
-      ReceiveStreamRoomMessagesSubscriptionUpdate subscriptionUpdate = MAPPER.readValue(rawJson,
-          ReceiveStreamRoomMessagesSubscriptionUpdate.class);
+      ReceiveStreamRoomMessagesSubscriptionUpdate subscriptionUpdate =
+          MAPPER.readValue(rawJson, ReceiveStreamRoomMessagesSubscriptionUpdate.class);
       List<Arg> args = subscriptionUpdate.getFields().getArgs();
       for (Arg arg : args) {
         listener.onRealtimeClientStreamRoomMessagesUpdate(this, arg.getRid());

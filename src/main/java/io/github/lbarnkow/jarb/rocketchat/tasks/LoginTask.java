@@ -19,6 +19,16 @@ public class LoginTask extends AbstractBotSpecificTask {
   private final RealtimeClient realtimeClient;
   private final LoginTaskListener listener;
 
+  /**
+   * <code>LoginTask</code> constructor.
+   *
+   * @param bot            the <code>Bot</code> associated with this
+   *                       <code>LoginTask</code>
+   * @param realtimeClient an initialized and connected
+   *                       <code>RealtimeClient</code> to send message with
+   * @param listener       a listener to inform about successful logins and
+   *                       updated tokens
+   */
   public LoginTask(Bot bot, RealtimeClient realtimeClient, LoginTaskListener listener) {
     super(bot);
 

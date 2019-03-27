@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 
 class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
@@ -36,7 +37,7 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
   private List<ListenerData> events = new ArrayList<>();
 
   @Test
-  void testTask() throws InterruptedException, ReplyErrorException, IOException {
+  void testTask() throws InterruptedException, ReplyErrorException, IOException, TimeoutException {
     // given
     ReceiveGetSubscriptionsReply reply = createTestData(5);
 
