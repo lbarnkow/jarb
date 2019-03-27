@@ -18,11 +18,11 @@ public class Main {
   public static void main(String[] args) {
     log.info("# # # W E L C O M E # # #");
 
-    val config = loadConfig("jarb-config.yaml");
+    BotManagerConfiguration config = loadConfig("jarb-config.yaml");
 
-    val guice = Guice.createInjector(new GuiceModule());
+    Injector guice = Guice.createInjector(new GuiceModule());
 
-    val bots = createBots(config, guice);
+    Bot[] bots = Main.createBots(config, guice);
     val runtime = guice.getInstance(Runtime.class);
     val botManager = guice.getInstance(BotManager.class);
 

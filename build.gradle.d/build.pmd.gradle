@@ -20,7 +20,7 @@ tasks.register("pmdAll") {
     description = 'PMD for main and test SourceSets'
 
     dependsOn 'pmdMain'
-    dependsOn 'pmdTest'
+    // dependsOn 'pmdTest'
 
     doLast {
         pmdExportStats(PMD_VIOLATIONS_THRESHOLD, STATS_DIR)
@@ -31,7 +31,7 @@ tasks.register("pmdAll") {
 def pmdExportStats(threshold, statsDir) {
     def violations = 0
     violations += pmdCountViolations('main')
-    violations += pmdCountViolations('test')
+    // violations += pmdCountViolations('test')
 
     def categories = pmd.ruleSets.size()
 
@@ -77,16 +77,17 @@ def pmdCountViolations(sourceset) {
 
 def pmdExportReport() {
     def htmlMain = file('build/reports/pmd/main.html').text
-    def htmlTest = file('build/reports/pmd/test.html').text
+    // def htmlTest = file('build/reports/pmd/test.html').text
 
     def pattern = java.util.regex.Pattern.compile(".+<body>(.+)</body>.+", java.util.regex.Pattern.DOTALL)
     def matcherMain = pattern.matcher(htmlMain)
-    def matcherTest = pattern.matcher(htmlTest)
+    // def matcherTest = pattern.matcher(htmlTest)
 
     if (matcherMain.matches() && matcherTest.matches()) {
         new File('build/reports/pmd/report.md').withWriter('utf-8') {
             writer -> 
-                writer.writeLine '# PMD Analysis Report (Main + Test)'
+                // writer.writeLine '# PMD Analysis Report (Main + Test)'
+                writer.writeLine '# PMD Analysis Report (Main only)'
                 writer.writeLine ''
                 writer.writeLine '## Enabled Categories'
                 writer.writeLine ''
@@ -97,7 +98,7 @@ def pmdExportReport() {
                 writer.writeLine '---'
                 writer.writeLine ''
                 writer.writeLine matcherMain.group(1)
-                writer.writeLine matcherTest.group(1)
+                // writer.writeLine matcherTest.group(1)
         }
     }
 }

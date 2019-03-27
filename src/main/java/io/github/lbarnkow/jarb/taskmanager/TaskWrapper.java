@@ -9,7 +9,6 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 import java.util.Optional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 @Data
 @Slf4j
@@ -24,7 +23,7 @@ public class TaskWrapper {
       throw new IllegalStateException("Tasks can only be started once!");
     }
 
-    val cb = callback != null ? callback : Optional.<TaskEndedCallback>empty();
+    Optional<TaskEndedCallback> cb = callback != null ? callback : Optional.empty();
 
     state = ACTIVATING;
     thread = new Thread(() -> executeTask(cb), task.getName());

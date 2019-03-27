@@ -153,7 +153,7 @@ public class RestClient {
 
     public QueryParam(String key, Object... values) {
       this.key = key;
-      this.values = values;
+      this.values = Arrays.copyOf(values, values.length);
     }
 
     public String getKey() {
