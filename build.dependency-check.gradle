@@ -1,4 +1,5 @@
 final int VULNERABLE_DEPENDENCIES_THRESHOLD = 25
+final String STATS_DIR = 'build/stats'
 
 dependencyCheck {
     suppressionFile = 'owasp-dependency-check-suppressions.xml'
@@ -7,6 +8,11 @@ dependencyCheck {
 }
 
 dependencyCheckAnalyze.doLast {
+    dependencyCheckExportStats(VULNERABLE_DEPENDENCIES_THRESHOLD, STATS_DIR)
+    dependencyCheckExportReport()
+}
+
+def dependencyCheckExportStats(threshold, statsDir) {
     def jsonFile = file('build/reports/dependency-check-report.json')
     def json = new groovy.json.JsonSlurper().parseText(jsonFile.text)
 
@@ -23,13 +29,31 @@ dependencyCheckAnalyze.doLast {
     def color = (count == 0 ? "success" : "critical")
 
     json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
-    new File('stats-vuln.json').withWriter('utf-8') {
+    new File(statsDir).mkdirs()
+    new File(statsDir, 'stats-vuln.json').withWriter('utf-8') {
         writer -> writer.writeLine json
     }
 
-    if (count > VULNERABLE_DEPENDENCIES_THRESHOLD) {
+    if (count > threshold) {
         throw new GradleException(
             "Number of (potentially) vulnerable dependencies (${count}) " +
-            "is higher that the allowed threshold (${VULNERABLE_DEPENDENCIES_THRESHOLD})!")
+            "is higher that the allowed threshold (${threshold})!")
+    }
+}
+
+def dependencyCheckExportReport() {
+    def htmlFile = file('build/reports/dependency-check-vulnerability.html')
+    def rawText = htmlFile.text
+
+    def pattern = java.util.regex.Pattern.compile(".+</svg>(.+)</body>.+", java.util.regex.Pattern.DOTALL)
+    def matcher = pattern.matcher(rawText)
+
+    if (matcher.matches()) {
+        new File('build/reports/dependency-check-vulnerability.md').withWriter('utf-8') {
+            writer -> 
+                writer.writeLine '# Dependency Check Report'
+                writer.writeLine ""
+                writer.writeLine matcher.group(1)
+        }
     }
 }

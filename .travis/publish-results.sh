@@ -2,7 +2,8 @@
 
 export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 
-STATS_BRANCH="ci/stats-${BRANCH}"
+export REPO_NAME=$(basename -s .git $(git config --get remote.origin.url))
+export STATS_BRANCH="${REPO_NAME}/stats-${BRANCH}"
 
 if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     START_DIR=$(pwd)
@@ -10,18 +11,23 @@ if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     mkdir publish-stats
     cd publish-stats
 
-    git clone https://github.com/lbarnkow/jarb.git
-    cd jarb
-    git checkout ${STATS_BRANCH}
+    git clone https://github.com/lbarnkow/ci-output.git
+    cd ci-output
+    git checkout -b ${STATS_BRANCH}
 
-    mv ${START_DIR}/stats-deps.json .
-    mv ${START_DIR}/stats-vuln.json .
-    mv ${START_DIR}/stats-checkstyle.json .
+    cp ${START_DIR}/build/stats/stats-deps.json .
+    cp ${START_DIR}/build/stats/stats-vuln.json .
+    cp ${START_DIR}/build/stats/stats-checkstyle.json .
+
+    cp ${START_DIR}/build/dependencyUpdates/report.txt report-deps.md
+    cp ${START_DIR}/build/reports/dependency-check-vulnerability.md report-vuln.md
+    cp ${START_DIR}/build/reports/checkstyle/report.md report-checkstyle.md
+
     date > last-update
 
     git add .
-    git commit --amend --message "ci update"
-    git push --force https://lbarnkow:${PUSH_TOKEN_FOR_GITHUB}@github.com/lbarnkow/jarb.git
+    git commit --amend --message "ci update - $(date)"
+    git push --force https://lbarnkow-ci:${PUSH_TOKEN_FOR_GITHUB}@github.com/lbarnkow/ci-output.git
 
     cd ${START_DIR}
     rm -rf publish-stats
