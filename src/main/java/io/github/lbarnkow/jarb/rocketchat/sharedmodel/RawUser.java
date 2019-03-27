@@ -18,6 +18,11 @@ public class RawUser {
   private String id;
   private String username;
 
+  /**
+   * Converts this instance to an <code>User</code> instance.
+   *
+   * @return the resulting <code>User</code>
+   */
   public User convert() {
     return User.builder() //
         .id(id) //
@@ -25,6 +30,12 @@ public class RawUser {
         .build();
   }
 
+  /**
+   * Converts an <code>User</code> instance to a <code>RawUser</code> instance.
+   *
+   * @param u the <code>User</code> instance to convert
+   * @return the resulting <code>RawUser</code>
+   */
   public static RawUser of(User u) {
     return RawUser.builder() //
         .id(u.getId()) //

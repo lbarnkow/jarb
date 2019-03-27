@@ -48,6 +48,11 @@ public class RawAttachment {
   @Builder.Default
   private List<RawAttachmentField> fields = Collections.emptyList();
 
+  /**
+   * Converts this instance to an <code>Attachment</code> instance.
+   *
+   * @return the resulting <code>Attachment</code>
+   */
   public Attachment convert() {
     return Attachment.builder() //
         .color(color) //
@@ -68,6 +73,14 @@ public class RawAttachment {
         .build();
   }
 
+  /**
+   * Converts a <code>List</code> of <code>RawAttachment</code> instances to
+   * <code>Attachment</code> instances.
+   *
+   * @param rawList the <code>List</code> of <code>RawAttachment</code> instances
+   *                to convert
+   * @return the resulting <code>Attachment</code> instances
+   */
   public static List<Attachment> convertList(List<RawAttachment> rawList) {
     if (rawList == null || rawList.isEmpty()) {
       return Collections.emptyList();
@@ -78,6 +91,13 @@ public class RawAttachment {
     return result;
   }
 
+  /**
+   * Converts an <code>Attachment</code> instance to a <code>RawAttachment</code>
+   * instance.
+   *
+   * @param a the <code>Attachment</code> instance to convert
+   * @return the resulting <code>RawAttachment</code>
+   */
   public static RawAttachment of(Attachment a) {
     return RawAttachment.builder() //
         .color(a.getColor()) //
@@ -98,6 +118,14 @@ public class RawAttachment {
         .build();
   }
 
+  /**
+   * Converts a <code>List</code> of <code>Attachment</code> instances to
+   * <code>RawAttachment</code> instances.
+   *
+   * @param list the <code>List</code> of <code>Attachment</code> instances to
+   *             convert
+   * @return the resulting <code>RawAttachment</code> instances
+   */
   public static List<RawAttachment> of(List<Attachment> list) {
     if (list == null || list.isEmpty()) {
       return Collections.emptyList();

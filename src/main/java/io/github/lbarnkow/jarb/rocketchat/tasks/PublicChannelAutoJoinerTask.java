@@ -65,7 +65,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
             findChannelsNotJoined(channels.getChannels(), joinedChannels.getChannels());
 
         for (RawChannel channel : roomIdsNotJoined.values()) {
-          Room room = channel.asRoom();
+          Room room = channel.convert();
 
           boolean shouldJoin = bot.offerRoom(room);
           // What about join code?! Currently API doesn't enforce the passwords (0.73)

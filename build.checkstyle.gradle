@@ -1,4 +1,4 @@
-final int CHECKSTYLE_VIOLATIONS_THRESHOLD = 100
+final int CHECKSTYLE_VIOLATIONS_THRESHOLD = 30
 final String STATS_DIR = 'build/stats'
 
 tasks.register("checkstyleAll") {

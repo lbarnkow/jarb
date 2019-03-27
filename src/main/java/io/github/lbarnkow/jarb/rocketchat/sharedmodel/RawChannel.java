@@ -21,11 +21,17 @@ public class RawChannel {
   @JsonAlias("t")
   private String type;
 
-  public Room asRoom() {
+  public Room convert() {
     RoomType type = RoomType.parse(this.type);
     return Room.builder().id(id).name(name).type(type).build();
   }
 
+  /**
+   * Converts an <code>Room</code> instance to a <code>RawChannel</code> instance.
+   *
+   * @param room the <code>Room</code> instance to convert
+   * @return the resulting <code>RawChannel</code>
+   */
   public static RawChannel of(Room room) {
     RawChannel channel = new RawChannel();
     channel.id = room.getId();

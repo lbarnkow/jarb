@@ -18,7 +18,7 @@ class RawChannelTest {
         .build();
 
     // when
-    Room room = rawChannel.asRoom();
+    Room room = rawChannel.convert();
 
     // then
     assertThat(room.getId()).isEqualTo(rawChannel.getId());

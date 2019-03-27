@@ -60,6 +60,13 @@ public class ElectionLease {
     return Objects.equals(leaderId, candidateId);
   }
 
+  /**
+   * Deserializes and loads <code>ElectionLease</code> data from the file system.
+   *
+   * @param file the file to load from
+   * @return the deserialized <code>ElectionLease</code> instance
+   * @throws IOException on io errors
+   */
   public static ElectionLease load(File file) throws IOException {
     if (!file.exists()) {
       return null;
@@ -89,6 +96,13 @@ public class ElectionLease {
     return lease;
   }
 
+  /**
+   * Serializes and stores <code>ElectionLease</code> data to the file system.
+   *
+   * @param lease the <code>ElectionLease</code> instance to serialize
+   * @param file  the file to save to
+   * @throws IOException on io errors
+   */
   public static void save(ElectionLease lease, File file) throws IOException {
     boolean success = false;
     IOException lastException = null;

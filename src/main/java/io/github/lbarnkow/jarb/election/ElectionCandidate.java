@@ -21,6 +21,15 @@ public class ElectionCandidate extends AbstractBaseTask {
   private ElectionCandidateListener listener;
   private ElectionConfiguration config;
 
+  /**
+   * Post-construction initialization by the user of this instance. Since this
+   * instance will most likely be created by the dependency injection framework,
+   * this method is used to parameterize it further.
+   *
+   * @param listener the listener to inform about state changes
+   * @param config   the parsed configuration
+   * @return
+   */
   public ElectionCandidate configure(ElectionCandidateListener listener,
       ElectionConfiguration config) {
     this.listener = listener;
