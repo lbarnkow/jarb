@@ -19,6 +19,8 @@ script:
 - "./gradlew test"
 - "./gradlew dependencyCheckAnalyze"
 - "./gradlew dependencyUpdates"
+- "./gradlew jacocoTestReport"
+- "./gradlew jacocoTestCoverageVerification"
 - ".travis/publish-results.sh"
 
 # don't cache gradle dependencies (see: https://docs.travis-ci.com/user/languages/java/#caching)

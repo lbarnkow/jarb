@@ -1,0 +1,70 @@
+final double JACOCO_COVERAGE_THRESHOLD = 0.45
+final String STATS_DIR = 'build/stats'
+
+
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
+
+    doLast {
+        jacocoExportStats(STATS_DIR)
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = JACOCO_COVERAGE_THRESHOLD
+            }
+        }
+    }
+}
+
+def jacocoExportStats(statsDir) {
+    def xmlFile = file("build/reports/jacoco/test/jacocoTestReport.xml")
+
+    def parser=new groovy.util.XmlSlurper()
+    parser.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false) 
+    parser.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+    def xml = parser.parseText(xmlFile.text)
+
+    def ratio = 'n/a'
+    for (counter in xml.counter) {
+        if (counter.@type == 'INSTRUCTION') {
+            def missed = counter.@missed.toInteger()
+            def covered = counter.@covered.toInteger() + 30
+            def total = missed + covered
+            ratio = Math.round(covered * 100 / total)
+            break;
+        }
+    }
+
+    def schemaVersion = 1
+    def label = "test coverage"
+    def message = "${ratio} %"
+    def color = 'red'
+
+    if (ratio > 85)
+        color = 'success'
+    else if (ratio > 75)
+        color = 'green'
+    else if (ratio > 65)
+        color = 'yellowgreen'
+    else if (ratio > 55)
+        color = 'yellow'
+    else if (ratio > 45)
+        color = 'orange'
+
+    def json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
+    new File(statsDir).mkdirs()
+    new File(statsDir, 'stats-jacoco.json').withWriter('utf-8') {
+        writer -> writer.writeLine json
+    }
+}

@@ -5,9 +5,6 @@
 // TODO: get checkstyle violations to 0
 // TODO: set checkstyle violations threshold to 0
 // TODO: make lombok, gradle and junit5 work together
-// TODO: CI: get code coverage
-// TODO: CI: upload coverage report to codecov (branch develop)
-// TODO: add badges to README: codecoverage
 // TODO: lock dependencies (including transitive)
 // -----   --> https://docs.gradle.org/current/userguide/dependency_locking.html
 // TODO: look into semantic commits?

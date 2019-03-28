@@ -2,35 +2,26 @@ plugins {
     id 'java'
     id 'application'
 
-    // checks for known vulnerabilities in our dependencies
     id 'org.owasp.dependencycheck' version '4.0.2'
 
-    // reports outdated depedencies in our project ...
     id 'com.github.ben-manes.versions' version '0.21.0'
-    // ... and selects a newer version automatically.
     id 'se.patrikerdes.use-latest-versions' version '0.2.9'
 
-    // static code quality analysis
     id 'checkstyle'
     id 'pmd'
+
+    id 'jacoco'
 }
 
 repositories {
     jcenter()
 }
 
-// TODO: temporary fix to mitigate CVE-2019-9658, should be re-evaluated in the future
-// see: https://github.com/gradle/gradle/blob/master/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality/CheckstylePlugin.java#L39
-checkstyle.toolVersion = '8.18'
-
-// TODO: temporary fix until the pmd plugin defaults to the latest pmd version
-// see: https://github.com/gradle/gradle/blob/master/subprojects/code-quality/src/main/groovy/org/gradle/api/plugins/quality/PmdPlugin.java#L51
-pmd.toolVersion = '6.12.0'
-
-apply from: "build.gradle.d/build.dependency-check.gradle"
-apply from: "build.gradle.d/build.dependency-updates.gradle"
-apply from: "build.gradle.d/build.checkstyle.gradle"
-apply from: "build.gradle.d/build.pmd.gradle"
+apply from: "build.gradle.d/dependency-check.gradle"
+apply from: "build.gradle.d/dependency-updates.gradle"
+apply from: "build.gradle.d/checkstyle.gradle"
+apply from: "build.gradle.d/pmd.gradle"
+apply from: 'build.gradle.d/jacoco.gradle'
 
 mainClassName = 'io.github.lbarnkow.jarb.Main'
 
