@@ -14,9 +14,9 @@ install:
 
 script:
 - "set -e"
+- "./gradlew checkstyleMain"
+- "./gradlew pmdMain"
 - "./gradlew test"
-- "./gradlew checkstyleAll"
-- "./gradlew pmdAll"
 - "./gradlew dependencyCheckAnalyze"
 - "./gradlew dependencyUpdates"
 - ".travis/publish-results.sh"
