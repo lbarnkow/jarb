@@ -1,6 +1,6 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.MessageType;
@@ -20,14 +20,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawMessage {
-  @JsonAlias("_id")
+  @JsonProperty("_id")
   private String id;
   private String rid;
   private String msg;
   private String ts;
-  @JsonAlias("u")
+  @JsonProperty("u")
   private RawUser user;
-  @JsonAlias("_updatedAt")
+  @JsonProperty("_updatedAt")
   private String updatedAt;
   private String editedAt;
   private String editedBy;
@@ -45,7 +45,7 @@ public class RawMessage {
   private boolean groupable;
   private boolean parseUrls;
 
-  @JsonAlias("t")
+  @JsonProperty("t")
   private String type;
 
   /**

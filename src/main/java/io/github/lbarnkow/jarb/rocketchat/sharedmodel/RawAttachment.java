@@ -1,6 +1,6 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import io.github.lbarnkow.jarb.api.Attachment;
 import java.time.Instant;
@@ -23,27 +23,27 @@ public class RawAttachment {
   private String color;
   private String text;
   private String ts;
-  @JsonAlias("thumb_url")
+  @JsonProperty("thumb_url")
   private String thumbUrl;
-  @JsonAlias("message_link")
+  @JsonProperty("message_link")
   private String messageLink;
   private boolean collapsed;
-  @JsonAlias("author_name")
+  @JsonProperty("author_name")
   private String authorName;
-  @JsonAlias("author_link")
+  @JsonProperty("author_link")
   private String authorLink;
-  @JsonAlias("author_icon")
+  @JsonProperty("author_icon")
   private String authorIcon;
   private String title;
-  @JsonAlias("title_link")
+  @JsonProperty("title_link")
   private String titleLink;
-  @JsonAlias("title_link_download")
+  @JsonProperty("title_link_download")
   private boolean titleLinkDownload;
-  @JsonAlias("image_url")
+  @JsonProperty("image_url")
   private String imageUrl;
-  @JsonAlias("audio_url")
+  @JsonProperty("audio_url")
   private String audioUrl;
-  @JsonAlias("video_url")
+  @JsonProperty("video_url")
   private String videoUrl;
   @Builder.Default
   private List<RawAttachmentField> fields = Collections.emptyList();

@@ -1,26 +1,26 @@
 package io.github.lbarnkow.jarb.rocketchat.sharedmodel;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
 @JarbJsonSettings
 @Data
 public class RawSubscription {
-  @JsonAlias("t")
+  @JsonProperty("t")
   private String type;
   private RawDate ts;
   private RawDate ls;
   private String name;
   private String rid;
-  @JsonAlias("u")
+  @JsonProperty("u")
   private RawUser user;
   private boolean open;
   private boolean alert;
   // roles?
   private int unread;
-  @JsonAlias("_updatedAt")
+  @JsonProperty("_updatedAt")
   private RawDate updatedAt;
-  @JsonAlias("_id")
+  @JsonProperty("_id")
   private String id;
 }
