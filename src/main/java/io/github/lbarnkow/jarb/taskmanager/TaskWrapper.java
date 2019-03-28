@@ -18,6 +18,11 @@ public class TaskWrapper {
   private TaskState state = UNUSED;
   private Throwable lastError;
 
+  /**
+   * Starts the thread on which the tasks work is being processed.
+   *
+   * @param callback a function to call upon the tasks termination
+   */
   public void startTask(Optional<TaskEndedCallback> callback) {
     if (state != UNUSED) {
       throw new IllegalStateException("Tasks can only be started once!");
@@ -55,6 +60,10 @@ public class TaskWrapper {
     }
   }
 
+  /**
+   * Signals a running task to stop its work immediately
+   * (<code>Thread.interrupt()</code>).
+   */
   public void stopTask() {
     if (state == TaskState.ACTIVATING || state == TaskState.ACTIVE) {
       state = DEACTIVATING;

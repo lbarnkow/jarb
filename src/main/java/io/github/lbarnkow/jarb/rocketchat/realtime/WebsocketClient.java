@@ -35,6 +35,15 @@ public class WebsocketClient {
     this.container = container;
   }
 
+  /**
+   * Initializes this instance with configuration data and an event listener.
+   *
+   * @param config   the parsed configuration
+   * @param listener a listener to inform about incoming websocket events
+   * @throws URISyntaxException  on malformed remote server URLs
+   * @throws DeploymentException on connections issues
+   * @throws IOException         on io errors
+   */
   public void initialize(ConnectionConfiguration config, WebsocketClientListener listener)
       throws URISyntaxException, DeploymentException, IOException {
     this.listener = listener;
@@ -55,6 +64,12 @@ public class WebsocketClient {
     logger.debug("Opened Websocket, session id '{}'.", session.getId());
   }
 
+  /**
+   * Called by the web socket container upon closing of the session.
+   *
+   * @param userSession the session being closed
+   * @param reason      the reason
+   */
   @OnClose
   public void onClose(Session userSession, CloseReason reason) {
     logger.debug("Closed Websocket session: code '{}', message '{}'.",
@@ -62,6 +77,12 @@ public class WebsocketClient {
     listener.onWebsocketClose(closedByClient);
   }
 
+  /**
+   * Called by the web socket container upon receiving a message to offload
+   * interpretation of its contents.
+   *
+   * @param message the received message
+   */
   @OnMessage
   public void onMessage(String message) {
     logger.trace("Received Websocket message: '{}'.", message);
@@ -85,6 +106,11 @@ public class WebsocketClient {
     listener.onWebsocketMessage(message);
   }
 
+  /**
+   * Closes the active web socket session.
+   *
+   * @throws IOException on io errors
+   */
   public void close() throws IOException {
     if (!session.isOpen()) {
       return;

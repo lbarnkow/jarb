@@ -2,8 +2,6 @@
 // This file will go through the Java compiler; so keep it compilable!
 
 // TODO: get code coverage up to where it should be!
-// TODO: get checkstyle violations to 0
-// TODO: set checkstyle violations threshold to 0
 // TODO: make lombok, gradle and junit5 work together
 // TODO: lock dependencies (including transitive)
 // -----   --> https://docs.gradle.org/current/userguide/dependency_locking.html

@@ -41,6 +41,16 @@ public class RestClient {
     baseTarget = client.target(config.getRestUrl());
   }
 
+  /**
+   * Fetches all public channels on the server.<br>
+   * <br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/channels/list/">https://rocket.chat/docs/developer-guides/rest-api/channels/list/</a>
+   *
+   * @param authInfo valid auth token
+   * @return public channels on the server
+   * @throws RestClientException on bad HTTP status codes
+   */
   public ChannelListReply getChannelList(AuthInfo authInfo) throws RestClientException {
     List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
 
@@ -50,6 +60,17 @@ public class RestClient {
     return response.readEntity(ChannelListReply.class);
   }
 
+  /**
+   * Fetches all public channels a given user (see authInfo) has joined on the
+   * server.<br>
+   * <br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/channels/list-joined/">https://rocket.chat/docs/developer-guides/rest-api/channels/list-joined/</a>
+   *
+   * @param authInfo valid auth token
+   * @return public channels the user has joined on the server
+   * @throws RestClientException on bad HTTP status codes
+   */
   public ChannelListJoinedReply getChannelListJoined(AuthInfo authInfo) throws RestClientException {
     List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
 
@@ -59,6 +80,17 @@ public class RestClient {
     return response.readEntity(ChannelListJoinedReply.class);
   }
 
+  /**
+   * Gets the subscription object for a given room id.<br>
+   * <br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/subscriptions/getone/">https://rocket.chat/docs/developer-guides/rest-api/subscriptions/getone/</a>
+   *
+   * @param authInfo valid auth token
+   * @param roomId   the room's id
+   * @return the subscription
+   * @throws RestClientException on bad HTTP status codes
+   */
   public SubscriptionsGetOneReply getOneSubscription(AuthInfo authInfo, String roomId)
       throws RestClientException {
     List<QueryParam> params = Arrays.asList(new QueryParam("roomId", roomId));
@@ -69,6 +101,24 @@ public class RestClient {
     return response.readEntity(SubscriptionsGetOneReply.class);
   }
 
+  /**
+   * Gets the statistics / counters for a given room id and a given room type.
+   * Depending on the room type three different REST calls can result, as public
+   * channels, private groups and direct messages use different end points.<br>
+   * <br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/channels/counters/">https://rocket.chat/docs/developer-guides/rest-api/channels/counters/</a><br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/groups/counters/">https://rocket.chat/docs/developer-guides/rest-api/groups/counters/</a><br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/im/counters/">https://rocket.chat/docs/developer-guides/rest-api/im/counters/</a>
+   *
+   * @param authInfo valid auth token
+   * @param roomType the room's type
+   * @param roomId   the room's id
+   * @return the counters
+   * @throws RestClientException on bad HTTP status codes
+   */
   public ChatCountersReply getChatCounters(AuthInfo authInfo, RoomType roomType, String roomId)
       throws RestClientException {
     List<QueryParam> params = Arrays.asList(new QueryParam("roomId", roomId));
@@ -81,6 +131,27 @@ public class RestClient {
     return response.readEntity(ChatCountersReply.class);
   }
 
+  /**
+   * Gets messages in a given time span for a given room. Depending on the room
+   * type three different REST calls can result, as public channels, private
+   * groups and direct messages use different end points.<br>
+   * <br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/channels/history/">https://rocket.chat/docs/developer-guides/rest-api/channels/history/</a>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/groups/history/">https://rocket.chat/docs/developer-guides/rest-api/groups/history/</a>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/im/history/">https://rocket.chat/docs/developer-guides/rest-api/im/history/</a>
+   *
+   * @param authInfo  valid auth token
+   * @param room      the room
+   * @param latest    start of the time window to fetch
+   * @param oldest    end of the time window to fetch
+   * @param inclusive <code>true</code> to include messages exactly matching start
+   *                  or end of the time window to fetch
+   * @return the messages with the given time frame
+   * @throws RestClientException on bad HTTP status codes
+   */
   public ChatHistoryReply getChatHistory(AuthInfo authInfo, Room room, Instant latest,
       Instant oldest, boolean inclusive) throws RestClientException {
     List<QueryParam> params = Arrays.asList(//
@@ -98,6 +169,18 @@ public class RestClient {
     return response.readEntity(ChatHistoryReply.class);
   }
 
+  /**
+   * Marks a given room as read by for a given auth token (user), i.e. all
+   * messages in that room up to this point in time are marked as read.<br>
+   * <br>
+   * See: <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/subscriptions/read/">https://rocket.chat/docs/developer-guides/rest-api/subscriptions/read/</a>
+   *
+   * @param authInfo valid auth token
+   * @param roomId   the room's id
+   * @return the server's reply
+   * @throws RestClientException on bad HTTP status codes
+   */
   public SubscriptionsReadReply markSubscriptionRead(AuthInfo authInfo, String roomId)
       throws RestClientException {
     Map<String, String> payload = Collections.singletonMap("rid", roomId);

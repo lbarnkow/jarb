@@ -28,6 +28,13 @@ public class TaskManager {
   public TaskManager() {
   }
 
+  /**
+   * Spawns threads for a set of given tasks and monitors their progress in the
+   * task lifecycle.
+   *
+   * @param callback a function to call upon each tasks termination
+   * @param tasks    the tasks to run and track
+   */
   @Synchronized
   public void start(Optional<TaskEndedCallback> callback, Task... tasks) {
     // TODO: Allow managementTasks to be deactivated?
@@ -52,12 +59,28 @@ public class TaskManager {
     waitForAllTasksToFinish();
   }
 
+  /**
+   * Signals a set of given tasks (which have to be started and managed by this
+   * instance) to stop. Note that this method does not wait for the tasks to
+   * actually terminate.
+   *
+   * @param tasks the tasks to stop
+   */
+  @Synchronized
   public void stop(Task... tasks) {
     for (Task task : tasks) {
       this.tasks.get(task).stopTask();
     }
   }
 
+  /**
+   * Stops tracking a set of given tasks (which have to be started and managed by
+   * this instance), thereby removing them from the internal list of managed
+   * tasks. Note that these tasks must already have terminated!
+   *
+   * @param tasks the terminated tasks to prune
+   */
+  @Synchronized
   public void prune(Task... tasks) {
     for (Task task : tasks) {
       TaskWrapper wrapper = this.tasks.get(task);
