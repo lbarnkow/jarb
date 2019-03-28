@@ -16,6 +16,7 @@ script:
 - "set -e"
 - "./gradlew test"
 - "./gradlew checkstyleAll"
+- "./gradlew pmdAll"
 - "./gradlew dependencyCheckAnalyze"
 - "./gradlew dependencyUpdates"
 - ".travis/publish-results.sh"
