@@ -23,6 +23,7 @@ if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     cp ${START_DIR}/build/stats/stats-checkstyle.json .
     cp ${START_DIR}/build/stats/stats-pmd-categories.json .
     cp ${START_DIR}/build/stats/stats-pmd-violations.json .
+    cp ${START_DIR}/build/stats/stats-jacoco.json .
 
     cp ${START_DIR}/build/dependencyUpdates/report.txt report-deps.md
     cp ${START_DIR}/build/reports/dependency-check-vulnerability.md report-vuln.md
