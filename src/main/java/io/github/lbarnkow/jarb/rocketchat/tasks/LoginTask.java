@@ -38,12 +38,12 @@ public class LoginTask extends AbstractBotSpecificTask {
 
   @Override
   public void runTask() throws Throwable {
-    Bot bot = getBot();
+    final Bot bot = getBot();
+    final String username = bot.getCredentials().getUsername();
+    final String password = bot.getCredentials().getPassword();
 
     try {
       while (true) {
-        String username = bot.getCredentials().getUsername();
-        String password = bot.getCredentials().getPassword();
         SendLogin message = new SendLogin(username, password);
 
         ReceiveLoginReply reply =

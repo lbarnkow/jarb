@@ -18,12 +18,7 @@ if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     git config user.name "lbarnkow-ci"
     git config user.email "48982208+lbarnkow-ci@users.noreply.github.com"
 
-    cp ${START_DIR}/build/stats/stats-deps.json .
-    cp ${START_DIR}/build/stats/stats-vuln.json .
-    cp ${START_DIR}/build/stats/stats-checkstyle.json .
-    cp ${START_DIR}/build/stats/stats-pmd-categories.json .
-    cp ${START_DIR}/build/stats/stats-pmd-violations.json .
-    cp ${START_DIR}/build/stats/stats-jacoco.json .
+    cp ${START_DIR}/build/stats/* .
 
     cp ${START_DIR}/build/dependencyUpdates/report.txt report-deps.md
     cp ${START_DIR}/build/reports/dependency-check-vulnerability.md report-vuln.md
@@ -33,7 +28,7 @@ if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     date > last-update
 
     git add .
-    git commit --amend --message "ci update - $(date)"
+    git commit --amend --reset-author --message "ci update - $(date)"
     git push --force https://lbarnkow-ci:${PUSH_TOKEN_FOR_GITHUB}@github.com/lbarnkow/ci-output.git
 
     cd ${START_DIR}

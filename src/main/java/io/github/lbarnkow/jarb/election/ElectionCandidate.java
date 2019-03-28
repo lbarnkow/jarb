@@ -182,7 +182,7 @@ public class ElectionCandidate extends AbstractBaseTask {
     if (state == LEADER) {
       log.error("Lease file stolen by '{}'! Reverting back to '{}'.", leaseFile.getLeaderId(),
           INACTIVE);
-    } else if (state == RUNNING_FOR_ELECTION) {
+    } else {
       log.info("Lost election to '{}'! Reverting back to '{}'.", leaseFile.getLeaderId(), INACTIVE);
     }
 

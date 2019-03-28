@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RoomProcessor {
   private static final ChronologicalMessageComparator COMPARATOR =
-      new ChronologicalMessageComparator();
+      ChronologicalMessageComparator.CHRONOLOGICAL_MESSAGE_COMPARATOR;
 
   private Map<String, Room> roomCache = new ConcurrentHashMap<>();
 
