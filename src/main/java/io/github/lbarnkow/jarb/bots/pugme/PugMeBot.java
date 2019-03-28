@@ -2,6 +2,7 @@ package io.github.lbarnkow.jarb.bots.pugme;
 
 import static io.github.lbarnkow.jarb.api.MessageType.REGULAR_CHAT_MESSAGE;
 import static java.time.temporal.ChronoUnit.HOURS;
+import static java.util.regex.Pattern.DOTALL;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 import io.github.lbarnkow.jarb.api.Attachment;
@@ -28,6 +29,7 @@ import lombok.val;
 @ToString
 public class PugMeBot extends AbstractBaseBot implements Bot {
 
+  private static final String REGEX_BASE = "^\\s*@%BOTNAME%(\\s+(?:help|bomb))?(\\s+\\d+)?\\s*$";
   private Pattern regex;
 
   private Instant lastUpdate;
@@ -39,7 +41,8 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
 
   @Override
   public AbstractBaseBot initialize(String name, Credentials credentials) {
-    regex = Pattern.compile("^\\@" + credentials.getUsername() + "(\\s\\w+)?\\s*$");
+    val expression = REGEX_BASE.replace("%BOTNAME%", credentials.getUsername());
+    regex = Pattern.compile(expression, DOTALL);
     return super.initialize(name, credentials);
   }
 
@@ -55,15 +58,18 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
 
     try {
       if (message.getType() == REGULAR_CHAT_MESSAGE) {
+        Room room = message.getRoom();
         val matcher = regex.matcher(message.getMessage());
         if (matcher.matches()) {
-          Room room = message.getRoom();
-          val param = matcher.group(1);
+          val action = parseAction(matcher.group(1));
 
-          if (param == null) {
+          if (action.isEmpty()) {
             reply = createPugReply(room, 1);
-          } else if (param.trim().equals("bomb")) {
-            reply = createPugReply(room, 5);
+          } else if ("bomb".equals(action)) {
+            val count = parseInt(matcher.group(2), 5);
+            reply = createPugReply(room, count);
+          } else {
+            // TODO: print help text
           }
         }
       }
@@ -79,7 +85,14 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
   private Message createPugReply(Room room, int number) {
     List<Attachment> attachments = new ArrayList<>();
 
-    for (int i = 0; i < number; i++) {
+    int num = number;
+    if (num < 0) {
+      num = 1;
+    } else if (num > 25) {
+      num = 25;
+    }
+
+    for (int i = 0; i < num; i++) {
       attachments.add(Attachment.builder().imageUrl(selectImageUrl()).build());
     }
 
@@ -120,5 +133,21 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
         .filter(child -> child.getData().isVideo() == false) //
         .filter(child -> child.getData().getUrl().endsWith(".jpg"))
         .forEach(child -> pugsCache.add(child.getData().getUrl()));
+  }
+
+  private String parseAction(String s) {
+    if (s != null) {
+      return s.trim();
+    }
+    return "";
+  }
+
+  private int parseInt(String s, int or) {
+    String data = (s != null) ? s.trim() : null;
+    try {
+      return Integer.parseInt(data);
+    } catch (NumberFormatException e) {
+      return or;
+    }
   }
 }
