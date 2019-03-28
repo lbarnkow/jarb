@@ -1,4 +1,4 @@
-final int CHECKSTYLE_VIOLATIONS_THRESHOLD = 30
+final int CHECKSTYLE_VIOLATIONS_THRESHOLD = 0
 final String STATS_DIR = 'build/stats'
 
 

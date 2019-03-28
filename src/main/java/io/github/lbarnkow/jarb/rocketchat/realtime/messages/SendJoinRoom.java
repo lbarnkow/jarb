@@ -15,6 +15,12 @@ public class SendJoinRoom extends BaseMessageWithMethod {
 
   private final List<String> params = new ArrayList<>();
 
+  /**
+   * The "joinRoom" message for the real-time API.
+   *
+   * @param roomId   id of the room to join
+   * @param joinCode an optional join code for protected rooms
+   */
   public SendJoinRoom(String roomId, String joinCode) {
     super(METHOD);
 
