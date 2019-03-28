@@ -43,6 +43,22 @@ public class RoomProcessor {
     roomCache.put(room.getId(), room);
   }
 
+  /**
+   * Checks for and processes unread messages in a given <code>Room</code> for a
+   * given <code>Bot</code>.
+   *
+   * @param realtimeClient an initialized and connected
+   *                       <code>RealtimeClient</code>
+   * @param restClient     a <code>RestClient</code>
+   * @param authInfo       the auth token to use for REST calls
+   * @param bot            the bot handling unread messages
+   * @param roomId         the room id to check for unread messages
+   * @throws RestClientException  on REST errors
+   * @throws InterruptedException on thread interruption while waiting for
+   *                              real-time replies
+   * @throws ReplyErrorException  on bad real-time replies
+   * @throws IOException          on io errors
+   */
   public void processRoom(RealtimeClient realtimeClient, RestClient restClient, AuthInfo authInfo,
       Bot bot, String roomId)
       throws RestClientException, InterruptedException, ReplyErrorException, IOException {

@@ -16,6 +16,13 @@ public enum RoomType {
     return rawType;
   }
 
+  /**
+   * Parses a raw room type from Rocket.Chat and converts it into the appropriate
+   * enum value.
+   *
+   * @param rawType the raw room type
+   * @return a enum value
+   */
   public static RoomType parse(String rawType) {
     for (RoomType type : RoomType.values()) {
       if (type.rawType.equals(rawType)) {

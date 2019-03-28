@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -38,8 +39,8 @@ class PublicChannelAutoJoinerTaskTest {
   private static final String TEST_ROOM_NAME_PREFIX = "TEST_ROOM_NAME_";
 
   @Test
-  void testTask()
-      throws InterruptedException, RestClientException, ReplyErrorException, IOException {
+  void testTask() throws InterruptedException, RestClientException, ReplyErrorException,
+      IOException, TimeoutException {
     // given
     AuthInfo authInfo = AuthInfo.builder().userId(null).authToken(null).expires(null).build();
     Holder<AuthInfo> authInfoHolder = new Holder<>(authInfo);
