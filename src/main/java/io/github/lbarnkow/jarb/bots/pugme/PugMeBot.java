@@ -3,6 +3,7 @@ package io.github.lbarnkow.jarb.bots.pugme;
 import static io.github.lbarnkow.jarb.api.MessageType.REGULAR_CHAT_MESSAGE;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.util.regex.Pattern.DOTALL;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 import io.github.lbarnkow.jarb.api.Attachment;
@@ -19,7 +20,6 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.core.MediaType;
 import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
@@ -29,19 +29,33 @@ import lombok.val;
 @ToString
 public class PugMeBot extends AbstractBaseBot implements Bot {
 
+  public static final int MAX_PUGS_PER_POST = 25;
   private static final String REGEX_BASE = "^\\s*@%BOTNAME%(\\s+(?:help|bomb))?(\\s+\\d+)?\\s*$";
   private Pattern regex;
 
+  private String myUsername;
   private Instant lastUpdate;
   private List<String> pugsCache = new ArrayList<>(100);
   private Random random = new Random();
 
+  private Client jersey;
+
+  /**
+   * PugMeBot constructor.
+   *
+   * @param jerseyClient a jerseyClient instance to do the REST calls
+   */
   @Inject
-  private Client httpClient;
+  public PugMeBot(Client jerseyClient) {
+    super();
+
+    this.jersey = jerseyClient;
+  }
 
   @Override
-  public AbstractBaseBot initialize(String name, Credentials credentials) {
-    val expression = REGEX_BASE.replace("%BOTNAME%", credentials.getUsername());
+  public Bot initialize(String name, Credentials credentials) {
+    myUsername = credentials.getUsername();
+    val expression = REGEX_BASE.replace("%BOTNAME%", myUsername);
     regex = Pattern.compile(expression, DOTALL);
     return super.initialize(name, credentials);
   }
@@ -56,21 +70,26 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
   public Optional<Message> offerMessage(Message message) {
     Message reply = null;
 
-    try {
-      if (message.getType() == REGULAR_CHAT_MESSAGE) {
-        Room room = message.getRoom();
-        val matcher = regex.matcher(message.getMessage());
-        if (matcher.matches()) {
-          val action = parseAction(matcher.group(1));
+    if (message.getType() != REGULAR_CHAT_MESSAGE) {
+      return Optional.empty(); // Only care about regular chat posts
+    }
+    if (message.getUser().getName().equals(myUsername)) {
+      return Optional.empty(); // Don't process our own posts
+    }
 
-          if (action.isEmpty()) {
-            reply = createPugReply(room, 1);
-          } else if ("bomb".equals(action)) {
-            val count = parseInt(matcher.group(2), 5);
-            reply = createPugReply(room, count);
-          } else {
-            // TODO: print help text
-          }
+    try {
+      Room room = message.getRoom();
+      val matcher = regex.matcher(message.getMessage());
+      if (matcher.matches()) {
+        val action = parseAction(matcher.group(1));
+
+        if (action.isEmpty()) {
+          reply = createPugReply(room, 1);
+        } else if ("bomb".equals(action)) {
+          val count = parseInt(matcher.group(2), 5);
+          reply = createPugReply(room, count);
+        } else {
+          reply = Message.builder().room(room).attachments(getHelpText()).build();
         }
       }
     } catch (Exception e) {
@@ -86,10 +105,10 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
     List<Attachment> attachments = new ArrayList<>();
 
     int num = number;
-    if (num < 0) {
+    if (num == 0) {
       num = 1;
-    } else if (num > 25) {
-      num = 25;
+    } else if (num > MAX_PUGS_PER_POST) {
+      num = MAX_PUGS_PER_POST;
     }
 
     for (int i = 0; i < num; i++) {
@@ -115,12 +134,12 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
 
   private void loadPugs() {
     // https://www.reddit.com/r/pugs.json?sort=top&t=week&limit=100
-    val response = httpClient.target("https://www.reddit.com/r") //
+    val response = jersey.target("https://www.reddit.com/r") //
         .queryParam("sort", "top") //
         .queryParam("t", "week") //
         .queryParam("limit", "100") //
         .path("pugs.json") //
-        .request(MediaType.APPLICATION_JSON) //
+        .request(APPLICATION_JSON) //
         .get();
 
     if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
