@@ -8,12 +8,18 @@ env:
   global:
   # PUSH_TOKEN_FOR_GITHUB
   - secure: "kpDos941yTvfqtNyzCkSYRIBrxQJY2aRdTgmqHVoEfg736wv/J2v4Mt0vR4iBhxzubPw8xAR1+AGxhPik2rBv6t7G7nOrNWEh7goE4aaPCX3c3+Zf2+/vVlyDSEHRhhXd72ZnBvBAb2+0Gxa/DgNqvPq01S/iel4CMgUzcA14haGhs6vjsmKMQiomxLSEmB2d3JuxfzPbVRUMKK0vGzYDXJ20PpSkuA0UOOL7k5ahgZhdiBlBc0XARwMV2U8vmnRe5x2Bgf/JCwTFbXwfr03G8RjKs8KfGt9E6ertAdrXuyM8Ez/Ho+zL3xw1blk6mGNyKQvSdKChi0reD7p6+qKCWJ75RrKH95wdSZ1WHZPlHhuiMlmdebgx6jZomuyZ+AYGsQMU4TzJOE4hAED4cIpjdPnjavcoFQgSLu2TIXIiUNEw4gqNB02XxjHPEeZuGImKaGAPFV2wnXxohEBtjVTY8U/+mJeoQq6599aRQb2nowQGLFi5kemkLQhCwYqLUSUPRweDnYM+d9FU9v4HH3ZA+O25F78/GWt2DTy3v3wK+1RlifmVFmbl9vYed5eiKItT/0AFmnnSQeEXN+4JtWcWUzE0Ea66CoVgbHr1kgsaXJ4ijMO7gSwU1EJiR8yTwVbDP42YQA9WhO/PqFALVjkcb77rWL1/cFbXH8NTfiVsSE="
+  - DECISIONS_FILE: "config/license_finder/dependency_decisions.yml"
 
 install:
-- "./gradlew compileJava compileTestJava"
+- "set -e"
+- "gem install license_finder"
 
 script:
 - "set -e"
+- "./gradlew compileJava compileTestJava"
+- "./gradlew license"
+- "license_finder action_items --decisions_file ${DECISIONS_FILE}"
+- "license_finder report --decisions_file ${DECISIONS_FILE} --format=html > build/reports/license/license_finder.html"
 - "./gradlew checkstyleMain"
 - "./gradlew pmdMain"
 - "./gradlew test"
@@ -23,7 +29,7 @@ script:
 - "./gradlew jacocoTestCoverageVerification"
 - ".travis/publish-results.sh"
 
-# don't cache gradle dependencies (see: https://docs.travis-ci.com/user/languages/java/#caching)
+# careful with caching gradle dependencies (see: https://docs.travis-ci.com/user/languages/java/#caching)
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
 - rm -fr $HOME/.gradle/caches/*/plugin-resolution/

@@ -1,0 +1,32 @@
+downloadLicenses {
+    includeProjectDependencies true
+    dependencyConfiguration 'compileClasspath'
+}
+
+license {
+    header rootProject.file('config/license_finder/LICENSE.header')
+    strictCheck true
+
+    ext.year = Calendar.getInstance().get(Calendar.YEAR)
+    ext.name = 'Lorenz Barnkow'
+
+    includes([
+        '**/*.java',
+    ])
+
+    headerDefinitions {
+        custom_definition {
+            firstLine = "/*"
+            beforeEachLine = " * "
+            endLine   = " */\n"
+            afterEachLine = ""
+            firstLineDetectionPattern = "/*"
+            lastLineDetectionPattern  = " */\n"
+            allowBlankLines = false
+            skipLinePattern = null // don't skip any lines
+            isMultiline = false
+        }
+    }
+    
+    mapping('java','custom_definition')
+}

@@ -1,0 +1,43 @@
+---
+- - :whitelist
+  - Apache 2.0
+  - :who: lbarnkow
+    :why: GPL compatible, https://www.gnu.org/licenses/license-list.html
+    :versions: []
+    :when: 2019-03-29 15:43:17.566924218 Z
+- - :whitelist
+  - GPL2 w/ CPE
+  - :who: lbarnkow
+    :why: GPL compatible, https://www.gnu.org/licenses/license-list.html
+    :versions: []
+    :when: 2019-03-29 15:43:31.808428346 Z
+- - :whitelist
+  - GNU General Public License, version 2 (GPL2), with the classpath exception
+  - :who: lbarnkow
+    :why: GPL compatible, https://www.gnu.org/licenses/license-list.html
+    :versions: []
+    :when: 2019-03-29 15:43:46.433098142 Z
+- - :whitelist
+  - GNU General Public License, version 2 with the GNU Classpath Exception
+  - :who: lbarnkow
+    :why: GPL compatible, https://www.gnu.org/licenses/license-list.html
+    :versions: []
+    :when: 2019-03-29 15:44:08.381692407 Z
+- - :whitelist
+  - The GNU General Public License (GPL), Version 2, With Classpath Exception
+  - :who: lbarnkow
+    :why: GPL compatible, https://www.gnu.org/licenses/license-list.html
+    :versions: []
+    :when: 2019-03-29 15:44:39.552524010 Z
+- - :whitelist
+  - CDDL + GPLv2 with classpath exception
+  - :who: lbarnkow
+    :why: GPL compatible, https://www.gnu.org/licenses/license-list.html
+    :versions: []
+    :when: 2019-03-29 15:44:54.920116025 Z
+- - :whitelist
+  - MIT
+  - :who: lbarnkow
+    :why: GPL compatible, https://www.gnu.org/licenses/license-list.html
+    :versions: []
+    :when: 2019-03-29 15:47:07.241154517 Z
