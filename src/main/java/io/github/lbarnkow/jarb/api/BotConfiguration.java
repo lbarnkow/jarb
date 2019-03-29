@@ -1,7 +1,7 @@
 package io.github.lbarnkow.jarb.api;
 
 import io.github.lbarnkow.jarb.JarbJsonSettings;
-import io.github.lbarnkow.jarb.bots.DummyBot;
+import io.github.lbarnkow.jarb.bots.dummy.DummyBot;
 import java.util.Collections;
 import java.util.Map;
 import lombok.Data;

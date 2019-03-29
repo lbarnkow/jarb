@@ -21,7 +21,7 @@ class TaskManagerTest {
     // given
 
     // when
-    manager.start(Optional.empty(), task1, task2, task3);
+    manager.start(Optional.empty(), true, task1, task2, task3);
     Thread.sleep(25L);
     final TaskState state1 = manager.getTaskState(task1);
     final TaskState state2 = manager.getTaskState(task2);
@@ -29,7 +29,7 @@ class TaskManagerTest {
     Thread.sleep(100L);
 
     // then
-    assertThat(manager.getTaskCount() - manager.getNumberOfManagementTasks()).isEqualTo(3);
+    assertThat(manager.getTaskCount()).isEqualTo(3);
     assertThat(manager.getTasks()).containsAllOf(task3, task2, task1);
 
     assertThat(task1.succeeded).isTrue();
@@ -50,7 +50,7 @@ class TaskManagerTest {
     // given
 
     // when
-    manager.start(Optional.empty(), task1, task2, task3);
+    manager.start(Optional.empty(), true, task1, task2, task3);
     Thread.sleep(25L);
     manager.stopAll();
 
@@ -69,7 +69,7 @@ class TaskManagerTest {
     // given
 
     // when
-    manager.start(Optional.empty(), task1, task2, task3);
+    manager.start(Optional.empty(), true, task1, task2, task3);
     Thread.sleep(25L);
     manager.stop(task1, task3);
     Thread.sleep(60L);
@@ -87,8 +87,8 @@ class TaskManagerTest {
   @Test
   void testPrune() {
     // given
-    manager.start(Optional.empty(), task1);
-    assertThat(manager.getTasks()).hasSize(1 + manager.getNumberOfManagementTasks());
+    manager.start(Optional.empty(), true, task1);
+    assertThat(manager.getTasks()).hasSize(1);
     Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
 
     // when
@@ -103,7 +103,7 @@ class TaskManagerTest {
   @Test
   void testPruneLiveTask() {
     // given
-    manager.start(Optional.empty(), task1);
+    manager.start(Optional.empty(), true, task1);
     Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
 
     // when

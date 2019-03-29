@@ -55,7 +55,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
     int numCandidates = 25;
     TaskManager tasks = new TaskManager();
     ElectionCandidate[] candidates = generateCandidates(numCandidates);
-    tasks.start(Optional.empty(), candidates);
+    tasks.start(Optional.empty(), true, candidates);
     waitForNewLeader();
 
     // when
@@ -71,7 +71,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
     final ElectionCandidate secondLeader = findLeader(candidates);
 
     tasks.stopAll();
-    Thread.sleep(50L);
+    Thread.sleep(100L);
     Map<ElectionCandidate, ElectionCandidateState> statesAfterShutdown = new HashMap<>(states);
 
     // then

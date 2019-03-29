@@ -1,24 +1,19 @@
-package io.github.lbarnkow.jarb.bots;
+package io.github.lbarnkow.jarb.bots.nohelp;
 
-import io.github.lbarnkow.jarb.api.Bot;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.Room;
+import io.github.lbarnkow.jarb.bots.AbstractBaseBot;
 import java.util.Optional;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class DummyBot extends AbstractBaseBot implements Bot {
-  public DummyBot() {
-  }
-
+public class NoHelpBot extends AbstractBaseBot {
   @Override
   public boolean offerRoom(Room room) {
-    return true;
+    return false;
   }
 
   @Override
   public Optional<Message> offerMessage(Message message) {
-    log.error(message.toString());
     return Optional.empty();
   }
+
 }

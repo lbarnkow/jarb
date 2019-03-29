@@ -5,11 +5,11 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 
 import io.github.lbarnkow.jarb.taskmanager.managementtasks.DeadTaskPrunerTask;
 import io.github.lbarnkow.jarb.taskmanager.managementtasks.TaskTableLoggerTask;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.Synchronized;
 import lombok.ToString;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class TaskManager {
   private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
   private boolean started = false;
-  private final Map<Task, TaskWrapper> tasks = new HashMap<>();
+  private final Map<Task, TaskWrapper> tasks = new ConcurrentHashMap<>();
 
   private final Task[] managementTasks =
       new Task[] { new TaskTableLoggerTask(this), new DeadTaskPrunerTask(this) };
@@ -37,9 +37,25 @@ public class TaskManager {
    */
   @Synchronized
   public void start(Optional<TaskEndedCallback> callback, Task... tasks) {
-    // TODO: Allow managementTasks to be deactivated?
+    start(callback, false, tasks);
+  }
+
+  /**
+   * Spawns threads for a set of given tasks and monitors their progress in the
+   * task lifecycle.
+   *
+   * @param callback               a function to call upon each tasks termination
+   * @param disableManagementTasks allows to disable managements tasks, for
+   *                               example automatically pruning DEAD tasks
+   * @param tasks                  the tasks to run and track
+   */
+  @Synchronized
+  public void start(Optional<TaskEndedCallback> callback, boolean disableManagementTasks,
+      Task... tasks) {
     if (!started) {
-      startTasks(callback, managementTasks);
+      if (!disableManagementTasks) {
+        startTasks(callback, managementTasks);
+      }
       started = true;
     }
 
@@ -66,7 +82,6 @@ public class TaskManager {
    *
    * @param tasks the tasks to stop
    */
-  @Synchronized
   public void stop(Task... tasks) {
     for (Task task : tasks) {
       this.tasks.get(task).stopTask();
@@ -80,7 +95,6 @@ public class TaskManager {
    *
    * @param tasks the terminated tasks to prune
    */
-  @Synchronized
   public void prune(Task... tasks) {
     for (Task task : tasks) {
       TaskWrapper wrapper = this.tasks.get(task);
