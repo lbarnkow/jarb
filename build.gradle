@@ -11,53 +11,58 @@ plugins {
     id 'pmd'
 
     id 'jacoco'
+
+    id 'com.github.hierynomus.license' version '0.15.0'
 }
 
 repositories {
     jcenter()
 }
 
-apply from: "build.gradle.d/dependency-check.gradle"
-apply from: "build.gradle.d/dependency-updates.gradle"
-apply from: "build.gradle.d/checkstyle.gradle"
-apply from: "build.gradle.d/pmd.gradle"
-apply from: 'build.gradle.d/jacoco.gradle'
+apply from: 'config/gradle/dependency-check.gradle'
+apply from: 'config/gradle/dependency-updates.gradle'
+apply from: 'config/gradle/checkstyle.gradle'
+apply from: 'config/gradle/pmd.gradle'
+apply from: 'config/gradle/jacoco.gradle'
+apply from: 'config/gradle/license.gradle'
 
 mainClassName = 'io.github.lbarnkow.jarb.Main'
 
 dependencies {
     // SHA-256 digest to hash passwords
-    compile 'commons-codec:commons-codec:1.12'
+    implementation 'commons-codec:commons-codec:1.12'
 
     // ToStringBuilder
-    compile 'org.apache.commons:commons-lang3:3.8.1'
+    implementation 'org.apache.commons:commons-lang3:3.8.1'
 
     // Logging
-    compile 'org.slf4j:slf4j-simple:1.7.26'
+    implementation 'org.slf4j:slf4j-simple:1.7.26'
 
     // javax.websocket implementation
-    compile 'org.glassfish.tyrus:tyrus-container-jdk-client:1.15'
+    implementation 'org.glassfish.tyrus:tyrus-container-jdk-client:1.15'
 
     // REST client and JSON bindings for jaxrs (via jackson)
-    compile 'org.glassfish.jersey.core:jersey-client:2.28'
-    compile 'org.glassfish.jersey.inject:jersey-hk2:2.28'
-    compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.28'
+    implementation 'org.glassfish.jersey.core:jersey-client:2.28'
+    implementation 'org.glassfish.jersey.inject:jersey-hk2:2.28'
+    implementation 'org.glassfish.jersey.media:jersey-media-json-jackson:2.28'
 
     // YAML bindings for jackson
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.8'
 
     // JSR-330 dependency injection; implemented by Google guice
-    compile 'com.google.inject:guice:4.2.2:no_aop'
+    implementation('com.google.inject:guice:4.2.2:no_aop') {
+        exclude group: 'aopalliance', module: 'aopalliance'
+    }
 
     // Use JUnit test framework
-    testCompile("org.junit.jupiter:junit-jupiter-api:5.4.1")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.4.1")
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.4.1')
+    testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine:5.4.1')
 
     // Google Truth - Fluent assertions for Java
-    testCompile "com.google.truth:truth:0.43"
+    testImplementation 'com.google.truth:truth:0.43'
 
     // Mocking Framework für unit tests
-    testCompile 'org.mockito:mockito-core:2.25.1'
+    testImplementation 'org.mockito:mockito-core:2.25.1'
 
     // Lombok Project to generate getters/setters/etc.
     compileOnly 'org.projectlombok:lombok:1.18.6'
