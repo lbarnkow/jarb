@@ -20,6 +20,7 @@ package io.github.lbarnkow.jarb.rocketchat.tasks;
 
 import io.github.lbarnkow.jarb.api.AuthInfo;
 import io.github.lbarnkow.jarb.api.Bot;
+import io.github.lbarnkow.jarb.api.Credentials;
 import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
 import io.github.lbarnkow.jarb.rocketchat.realtime.messages.ReceiveLoginReply;
@@ -36,6 +37,7 @@ public class LoginTask extends AbstractBotSpecificTask {
 
   private final RealtimeClient realtimeClient;
   private final LoginTaskListener listener;
+  private final Credentials credentials;
 
   /**
    * <code>LoginTask</code> constructor.
@@ -47,22 +49,22 @@ public class LoginTask extends AbstractBotSpecificTask {
    * @param listener       a listener to inform about successful logins and
    *                       updated tokens
    */
-  public LoginTask(Bot bot, RealtimeClient realtimeClient, LoginTaskListener listener) {
+  public LoginTask(Bot bot, Credentials credentials, RealtimeClient realtimeClient,
+      LoginTaskListener listener) {
     super(bot);
 
     this.realtimeClient = realtimeClient;
     this.listener = listener;
+    this.credentials = credentials;
   }
 
   @Override
   public void runTask() throws Throwable {
     final Bot bot = getBot();
-    final String username = bot.getCredentials().getUsername();
-    final String password = bot.getCredentials().getPassword();
 
     try {
       while (true) {
-        SendLogin message = new SendLogin(username, password);
+        SendLogin message = new SendLogin(credentials);
 
         ReceiveLoginReply reply =
             realtimeClient.sendMessageAndWait(message, ReceiveLoginReply.class);

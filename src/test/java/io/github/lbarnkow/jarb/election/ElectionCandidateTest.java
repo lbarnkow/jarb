@@ -22,8 +22,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.LEADER;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.RUNNING_FOR_ELECTION;
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 

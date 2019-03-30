@@ -28,6 +28,7 @@ import io.github.lbarnkow.jarb.misc.GuiceModule;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -78,7 +79,19 @@ public class Main {
       result = new BotManagerConfiguration();
     }
 
-    return result;
+    return validateConfiguration(result);
+  }
+
+  private static BotManagerConfiguration validateConfiguration(BotManagerConfiguration config) {
+    // Bot names must be unique!
+    HashSet<String> names = new HashSet<>();
+    config.getBots().forEach(botConfig -> names.add(botConfig.getName()));
+    if (names.size() != config.getBots().size()) {
+      throw new IllegalArgumentException(
+          "Configuration error: Every bot must have a unique 'name'!");
+    }
+
+    return config;
   }
 
   private static Bot[] createBots(BotManagerConfiguration config, Injector guice) {
@@ -88,7 +101,7 @@ public class Main {
       try {
         val clazz = loadClass(botConfig);
         val bot = guice.getInstance(clazz);
-        bot.initialize(botConfig.getName(), botConfig.getCredentials());
+        bot.initialize(botConfig.getName(), botConfig.getCredentials().getUsername());
         bots.add(bot);
       } catch (Exception e) {
         log.error("Failed to load, instantiate and initialize the bot '{}'!", botConfig.getName(),

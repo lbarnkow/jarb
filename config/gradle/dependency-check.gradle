@@ -1,4 +1,4 @@
-final int VULNERABLE_DEPENDENCIES_THRESHOLD = 25
+final int VULNERABLE_DEPENDENCIES_THRESHOLD = 5
 final String STATS_DIR = 'build/stats'
 
 dependencyCheck {

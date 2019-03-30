@@ -20,7 +20,6 @@ package io.github.lbarnkow.jarb.bots;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import io.github.lbarnkow.jarb.api.Credentials;
 import io.github.lbarnkow.jarb.bots.help.HelpBot;
 import io.github.lbarnkow.jarb.bots.nohelp.NoHelpBot;
 import java.io.IOException;
@@ -30,11 +29,8 @@ class AbstractBaseBotTest {
 
   private static final String TEST_BOTNAME = "test bot";
   private static final String TEST_USERNAME = "username";
-  private static final String TEST_PASSWORD = "password";
 
   private static final String TEST_HELP_TEXT = "help\nhelp\nhelp\n";
-
-  private static final Credentials CREDENTIALS = new Credentials(TEST_USERNAME, TEST_PASSWORD);
 
   @Test
   void testHelpTextNonExistant() {
@@ -42,11 +38,11 @@ class AbstractBaseBotTest {
     NoHelpBot bot = new NoHelpBot();
 
     // when
-    bot.initialize(TEST_BOTNAME, CREDENTIALS);
+    bot.initialize(TEST_BOTNAME, TEST_USERNAME);
 
     // then
     assertThat(bot.getName()).isEqualTo(TEST_BOTNAME);
-    assertThat(bot.getCredentials()).isSameAs(CREDENTIALS);
+    assertThat(bot.getUsername()).isSameAs(TEST_USERNAME);
     assertThat(bot.getHelpText()).isNull();
   }
 
@@ -56,11 +52,11 @@ class AbstractBaseBotTest {
     HelpBot bot = new HelpBot();
 
     // when
-    bot.initialize(TEST_BOTNAME, CREDENTIALS);
+    bot.initialize(TEST_BOTNAME, TEST_USERNAME);
 
     // then
     assertThat(bot.getName()).isEqualTo(TEST_BOTNAME);
-    assertThat(bot.getCredentials()).isSameAs(CREDENTIALS);
+    assertThat(bot.getUsername()).isSameAs(TEST_USERNAME);
     assertThat(bot.getHelpText()).hasSize(1);
     assertThat(bot.getHelpText().get(0).getText()).isEqualTo(TEST_HELP_TEXT);
   }
@@ -71,11 +67,11 @@ class AbstractBaseBotTest {
     TestBot bot = new TestBot();
 
     // when
-    bot.initialize(TEST_BOTNAME, CREDENTIALS);
+    bot.initialize(TEST_BOTNAME, TEST_USERNAME);
 
     // then
     assertThat(bot.getName()).isEqualTo(TEST_BOTNAME);
-    assertThat(bot.getCredentials()).isSameAs(CREDENTIALS);
+    assertThat(bot.getUsername()).isSameAs(TEST_USERNAME);
     assertThat(bot.getHelpText()).isNull();
   }
 
