@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class TaskManager {
   private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
 
-  private boolean started = false;
+  private boolean started;
   private final Map<Task, TaskWrapper> tasks = new ConcurrentHashMap<>();
 
   private final Task[] managementTasks =
@@ -82,6 +82,7 @@ public class TaskManager {
 
   private void startTasks(Optional<TaskEndedCallback> callback, Task... tasks) {
     for (Task task : tasks) {
+      @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // unique objects needed
       TaskWrapper wrapper = new TaskWrapper(task);
       wrapper.startTask(callback);
       this.tasks.put(task, wrapper);

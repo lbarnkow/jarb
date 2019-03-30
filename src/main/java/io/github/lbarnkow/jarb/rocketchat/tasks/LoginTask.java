@@ -63,9 +63,9 @@ public class LoginTask extends AbstractBotSpecificTask {
     final Bot bot = getBot();
 
     try {
-      while (true) {
-        SendLogin message = new SendLogin(credentials);
+      SendLogin message = new SendLogin(credentials);
 
+      while (true) {
         ReceiveLoginReply reply =
             realtimeClient.sendMessageAndWait(message, ReceiveLoginReply.class);
         AuthInfo authInfo = convertReply(reply);
