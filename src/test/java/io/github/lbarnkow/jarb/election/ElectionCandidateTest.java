@@ -25,12 +25,12 @@ import static io.github.lbarnkow.jarb.election.ElectionCandidateState.RUNNING_FO
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
+import io.github.lbarnkow.jarb.taskmanager.TaskEndedCallback;
+import io.github.lbarnkow.jarb.taskmanager.TaskEndedEvent;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
-class ElectionCandidateTest implements ElectionCandidateListener {
+class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallback {
 
   private static final long DEFAULT_LEASE_TTL = 1000L;
 
@@ -52,6 +52,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
 
   private Map<ElectionCandidate, ElectionCandidateState> states = new HashMap<>();
   private Semaphore waitForElection = new Semaphore(0);
+  private Semaphore taskEndedSemaphore = new Semaphore(0);
 
   @Test
   void testIdUniquness() throws IOException {
@@ -75,7 +76,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
     int numCandidates = 25;
     TaskManager tasks = new TaskManager();
     ElectionCandidate[] candidates = generateCandidates(numCandidates);
-    tasks.start(Optional.empty(), true, candidates);
+    tasks.start(Optional.of(this), true, candidates);
     waitForNewLeader();
 
     // when
@@ -230,24 +231,13 @@ class ElectionCandidateTest implements ElectionCandidateListener {
         tasks.stop(c);
       }
     }
-    tasks.stopAll();
-
-    Instant timeout = Instant.now().plus(5, ChronoUnit.SECONDS);
-    boolean allInactive = false;
-    do {
-      allInactive = true;
-      for (ElectionCandidate c : candidates) {
-        if (c.state.get() != INACTIVE) {
-          allInactive = false;
-        }
-        Thread.sleep(25L);
-      }
-    } while (!allInactive && Instant.now().isBefore(timeout));
-
-    if (!allInactive) {
+    boolean success = taskEndedSemaphore.tryAcquire(candidates.length - 1, 5, TimeUnit.SECONDS);
+    if (!success) {
       throw new RuntimeException(
-          "All candidates took more than 5 seconds to go into state INACTIVE!");
+          "Non-leader candidate tasks took more than 5 seconds to go into state DEAD!");
     }
+
+    tasks.stopAll();
   }
 
   @Override
@@ -257,6 +247,11 @@ class ElectionCandidateTest implements ElectionCandidateListener {
     if (newState == LEADER) {
       waitForElection.release();
     }
+  }
+
+  @Override
+  public void onTaskEnded(TaskEndedEvent event) {
+    taskEndedSemaphore.release();
   }
 
 }

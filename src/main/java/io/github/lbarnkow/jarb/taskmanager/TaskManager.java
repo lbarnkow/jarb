@@ -19,7 +19,6 @@
 package io.github.lbarnkow.jarb.taskmanager;
 
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
-import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 
 import io.github.lbarnkow.jarb.taskmanager.managementtasks.DeadTaskPrunerTask;
 import io.github.lbarnkow.jarb.taskmanager.managementtasks.TaskTableLoggerTask;
@@ -147,7 +146,7 @@ public class TaskManager {
       while (!done) {
         done = true;
         for (TaskWrapper wrapper : tasks.values()) {
-          if (wrapper.getState() != UNUSED && wrapper.getState() != DEAD) {
+          if (wrapper.getState() != DEAD) {
             done = false;
           }
         }

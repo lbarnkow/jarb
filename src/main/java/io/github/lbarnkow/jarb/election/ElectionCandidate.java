@@ -122,10 +122,10 @@ public class ElectionCandidate extends AbstractBaseTask {
   private void releaseLease() throws IOException {
     ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
+      updateState(INACTIVE);
       Files.delete(config.getSyncFile().toPath());
       log.info("Released lease (deleted lease file)!");
     }
-    updateState(INACTIVE);
   }
 
   private void challengeLease(ElectionLease leaseFile) throws IOException {
