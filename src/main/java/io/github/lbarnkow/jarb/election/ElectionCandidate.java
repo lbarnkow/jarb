@@ -26,6 +26,7 @@ import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -35,7 +36,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 
   private final String id = UUID.randomUUID().toString();
 
-  volatile ElectionCandidateState state = null;
+  AtomicReference<ElectionCandidateState> state = new AtomicReference<ElectionCandidateState>(null);
   private ElectionCandidateListener listener;
   private ElectionConfiguration config;
 
@@ -56,7 +57,7 @@ public class ElectionCandidate extends AbstractBaseTask {
   }
 
   public boolean isLeader() {
-    return state == LEADER;
+    return state.get() == LEADER;
   }
 
   public String getId() {
@@ -76,6 +77,7 @@ public class ElectionCandidate extends AbstractBaseTask {
           handleStolenLeaseFile(leaseFile);
           handleExpiredLeaseFile(leaseFile);
 
+          ElectionCandidateState state = this.state.get();
           if (state == LEADER || state == RUNNING_FOR_ELECTION) {
             leaseFile = refreshLease(leaseFile);
           } else {
@@ -118,6 +120,7 @@ public class ElectionCandidate extends AbstractBaseTask {
   }
 
   private void releaseLease() throws IOException {
+    ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       Files.delete(config.getSyncFile().toPath());
       log.info("Released lease (deleted lease file)!");
@@ -140,7 +143,7 @@ public class ElectionCandidate extends AbstractBaseTask {
     ElectionLease newLease = new ElectionLease(oldLease, config.getLeaseTimeToLive());
     writeLeaseFile(newLease);
 
-    if (state == RUNNING_FOR_ELECTION) {
+    if (state.get() == RUNNING_FOR_ELECTION) {
       log.info("Won election w/ id '{}'! Promoted to state '{}'!", id, LEADER);
     }
     updateState(LEADER);
@@ -149,13 +152,12 @@ public class ElectionCandidate extends AbstractBaseTask {
   }
 
   private void updateState(ElectionCandidateState newState) {
-    if (state == newState) {
+    ElectionCandidateState oldState = state.getAndSet(newState);
+    if (oldState == newState) {
       return;
     }
 
-    ElectionCandidateState oldState = state;
-    state = newState;
-    log.trace("Switched to state '{}'.", state.toString());
+    log.trace("Switched to state '{}'.", newState.toString());
 
     listener.onStateChanged(this, oldState, newState);
   }
@@ -163,6 +165,7 @@ public class ElectionCandidate extends AbstractBaseTask {
   private void sleep() throws InterruptedException {
     long sleepTime = SLEEP_VARIANCE_MSEC;
 
+    ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       sleepTime += config.getLeaseRefreshInterval();
     } else {
@@ -177,6 +180,7 @@ public class ElectionCandidate extends AbstractBaseTask {
       return;
     }
 
+    ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       log.error("Lease file missing even though my state was '{}'! Reverting back to '{}'.", state,
           INACTIVE);
@@ -189,6 +193,8 @@ public class ElectionCandidate extends AbstractBaseTask {
     if (leaseFile == null) {
       return;
     }
+
+    ElectionCandidateState state = this.state.get();
 
     if (state != LEADER && state != RUNNING_FOR_ELECTION) {
       return;
@@ -216,6 +222,7 @@ public class ElectionCandidate extends AbstractBaseTask {
       return;
     }
 
+    ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       log.error("Lease file expired during my term (state '{}')! Reverting back to '{}'.", state,
           INACTIVE);
