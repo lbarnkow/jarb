@@ -22,6 +22,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.LEADER;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.RUNNING_FOR_ELECTION;
+import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.condition.OS.LINUX;
@@ -30,6 +31,8 @@ import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,6 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
@@ -216,19 +220,36 @@ class ElectionCandidateTest implements ElectionCandidateListener {
   }
 
   private void waitForNewLeader() throws InterruptedException {
-    if (!waitForElection.tryAcquire(5, SECONDS)) {
+    if (!waitForElection.tryAcquire(5, TimeUnit.SECONDS)) {
       throw new RuntimeException("Election took longer than 5 seconds; aborting!");
     }
   }
 
   private void shutdownAllWithLeaderStoppingLast(TaskManager tasks, ElectionCandidate[] candidates,
-      ElectionCandidate leader) {
+      ElectionCandidate leader) throws InterruptedException {
     for (ElectionCandidate c : candidates) {
       if (c != leader) {
         tasks.stop(c);
       }
     }
     tasks.stopAll();
+
+    Instant timeout = Instant.now().plus(5, ChronoUnit.SECONDS);
+    boolean allInactive = false;
+    do {
+      allInactive = true;
+      for (ElectionCandidate c : candidates) {
+        if (c.state.get() != INACTIVE) {
+          allInactive = false;
+        }
+        Thread.sleep(25L);
+      }
+    } while (!allInactive && Instant.now().isBefore(timeout));
+
+    if (!allInactive) {
+      throw new RuntimeException(
+          "All candidates took more than 5 seconds to go into state INACTIVE!");
+    }
   }
 
   @Override

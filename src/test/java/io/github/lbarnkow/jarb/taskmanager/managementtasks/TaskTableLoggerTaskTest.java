@@ -27,16 +27,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import io.github.lbarnkow.jarb.taskmanager.Task;
+import io.github.lbarnkow.jarb.taskmanager.TaskEndedCallback;
+import io.github.lbarnkow.jarb.taskmanager.TaskEndedEvent;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import io.github.lbarnkow.jarb.taskmanager.TaskWrapper;
 import io.github.lbarnkow.jarb.taskmanager.managementtasks.TaskTableLoggerTask.TaskStates;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-class TaskTableLoggerTaskTest {
+class TaskTableLoggerTaskTest implements TaskEndedCallback {
+
+  private Semaphore taskEndedSemaphore = new Semaphore(0);
 
   @Test
   void testCountTasks() {
@@ -79,13 +86,25 @@ class TaskTableLoggerTaskTest {
     TaskWrapper wrapper = new TaskWrapper(task);
 
     // when
-    wrapper.startTask(null);
-    Thread.sleep(10L);
+    wrapper.startTask(Optional.of(this));
+    Thread.sleep(30L);
     wrapper.stopTask();
-    Thread.sleep(10L);
+    waitForTasksToEnd(1);
 
     // then
     assertThat(wrapper.getState()).isEqualTo(DEAD);
     verify(manager, atLeastOnce()).getTasks();
+  }
+
+  private void waitForTasksToEnd(int number) throws InterruptedException {
+    boolean success = taskEndedSemaphore.tryAcquire(number, 5, TimeUnit.SECONDS);
+    if (!success) {
+      throw new RuntimeException(number + " tasks took too long to end!");
+    }
+  }
+
+  @Override
+  public void onTaskEnded(TaskEndedEvent event) {
+    taskEndedSemaphore.release();
   }
 }
