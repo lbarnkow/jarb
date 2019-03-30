@@ -22,7 +22,6 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import io.github.lbarnkow.jarb.api.Attachment;
 import io.github.lbarnkow.jarb.api.Bot;
-import io.github.lbarnkow.jarb.api.Credentials;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,12 +37,12 @@ public abstract class AbstractBaseBot implements Bot {
   @Getter
   private String name;
   @Getter
-  private Credentials credentials;
+  private String username;
   @Getter
   private List<Attachment> helpText = null;
 
   @Override
-  public Bot initialize(String name, Credentials credentials) {
+  public Bot initialize(String name, String username) {
     try {
       loadHelpText();
     } catch (IOException e) {
@@ -51,7 +50,7 @@ public abstract class AbstractBaseBot implements Bot {
     }
 
     this.name = name;
-    this.credentials = credentials;
+    this.username = username;
 
     return this;
   }

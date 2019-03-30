@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.lbarnkow.jarb.api.Attachment;
-import io.github.lbarnkow.jarb.api.Credentials;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.User;
@@ -53,7 +52,6 @@ import org.junit.jupiter.api.Test;
 class PugMeBotTest {
   private static final String TEST_BOTNAME = "PugMeBot";
   private static final String TEST_USERNAME = "pugme";
-  private static final String TEST_PASSWORD = "password";
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -78,8 +76,7 @@ class PugMeBotTest {
       return loadTestData();
     });
 
-    Credentials credentials = new Credentials(TEST_USERNAME, TEST_PASSWORD);
-    bot.initialize(TEST_BOTNAME, credentials);
+    bot.initialize(TEST_BOTNAME, TEST_USERNAME);
   }
 
   @Test

@@ -25,6 +25,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.inject.Provider;
 import io.github.lbarnkow.jarb.api.AuthInfo;
 import io.github.lbarnkow.jarb.api.Bot;
+import io.github.lbarnkow.jarb.api.BotConfiguration;
+import io.github.lbarnkow.jarb.api.Credentials;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.election.ElectionCandidate;
 import io.github.lbarnkow.jarb.election.ElectionCandidateListener;
@@ -236,12 +238,22 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 
     log.info("Real-time session established for bot '{}'; logging in bot...", bot.getName());
 
-    LoginTask loginTask = new LoginTask(bot, realtimeClient, this);
+    Credentials credentials = findCredentials(bot);
+    LoginTask loginTask = new LoginTask(bot, credentials, realtimeClient, this);
     dataStruct.loginTask = loginTask;
 
     tasks.start(Optional.of(this), loginTask);
 
     return true;
+  }
+
+  private Credentials findCredentials(Bot bot) {
+    for (BotConfiguration configBot : config.getBots()) {
+      if (bot.getName().equals(configBot.getName())) {
+        return configBot.getCredentials();
+      }
+    }
+    throw new IllegalStateException("Can't find BotConfiguration for Bot '" + bot.getName() + "'!");
   }
 
   private boolean handleRealtimeSessionClosed(QueuedEvent event) {

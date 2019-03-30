@@ -68,9 +68,8 @@ class LoginTaskTest implements LoginTaskListener {
     Bot bot = mock(Bot.class);
     Credentials credentials = new Credentials(TEST_USERNAME, TEST_PASSWORD);
     when(bot.getName()).thenReturn(TEST_BOTNAME);
-    when(bot.getCredentials()).thenReturn(credentials);
 
-    LoginTask task = new LoginTask(bot, rtClient, this);
+    LoginTask task = new LoginTask(bot, credentials, rtClient, this);
     TaskWrapper wrapper = new TaskWrapper(task);
 
     // when

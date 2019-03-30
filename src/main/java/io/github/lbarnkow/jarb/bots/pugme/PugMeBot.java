@@ -26,7 +26,6 @@ import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 import io.github.lbarnkow.jarb.api.Attachment;
 import io.github.lbarnkow.jarb.api.Bot;
-import io.github.lbarnkow.jarb.api.Credentials;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.bots.AbstractBaseBot;
@@ -51,7 +50,6 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
   private static final String REGEX_BASE = "^\\s*@%BOTNAME%(\\s+(?:help|bomb))?(\\s+\\d+)?\\s*$";
   private Pattern regex;
 
-  private String myUsername;
   private Instant lastUpdate;
   private List<String> pugsCache = new ArrayList<>(100);
   private Random random = new Random();
@@ -71,11 +69,10 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
   }
 
   @Override
-  public Bot initialize(String name, Credentials credentials) {
-    myUsername = credentials.getUsername();
-    val expression = REGEX_BASE.replace("%BOTNAME%", myUsername);
+  public Bot initialize(String name, String username) {
+    val expression = REGEX_BASE.replace("%BOTNAME%", username);
     regex = Pattern.compile(expression, DOTALL);
-    return super.initialize(name, credentials);
+    return super.initialize(name, username);
   }
 
   @Override
@@ -91,7 +88,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
     if (message.getType() != REGULAR_CHAT_MESSAGE) {
       return Optional.empty(); // Only care about regular chat posts
     }
-    if (message.getUser().getName().equals(myUsername)) {
+    if (message.getUser().getName().equals(getUsername())) {
       return Optional.empty(); // Don't process our own posts
     }
 

@@ -21,11 +21,11 @@ package io.github.lbarnkow.jarb.api;
 import java.util.Optional;
 
 public interface Bot {
-  Bot initialize(String name, Credentials credentials);
+  Bot initialize(String name, String username);
 
   String getName();
 
-  Credentials getCredentials();
+  String getUsername();
 
   boolean offerRoom(Room room);
 

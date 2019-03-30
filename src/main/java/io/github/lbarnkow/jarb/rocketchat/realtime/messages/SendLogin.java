@@ -19,6 +19,7 @@
 package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 
 import io.github.lbarnkow.jarb.JarbJsonSettings;
+import io.github.lbarnkow.jarb.api.Credentials;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,9 +31,9 @@ public class SendLogin extends BaseMessageWithMethod {
 
   private Params[] params;
 
-  public SendLogin(String username, String password) {
+  public SendLogin(Credentials credentials) {
     super(METHOD);
-    this.params = new Params[] { new Params(username, password) };
+    this.params = new Params[] { new Params(credentials) };
   }
 
   @JarbJsonSettings
@@ -41,9 +42,9 @@ public class SendLogin extends BaseMessageWithMethod {
     private final User user;
     private final Password password;
 
-    public Params(String username, String password) {
-      this.user = new User(username);
-      this.password = new Password(password);
+    public Params(Credentials credentials) {
+      this.user = new User(credentials.getUsername());
+      this.password = new Password(credentials.getPassword());
     }
   }
 
