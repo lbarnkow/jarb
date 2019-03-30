@@ -10,14 +10,14 @@ pmd.toolVersion = '6.12.0'
 pmd {
     ignoreFailures = true
     ruleSets = [
-        "category/java/bestpractices.xml",
-        // "category/java/codestyle.xml",
-        // "category/java/design.xml",
-        // "category/java/documentation.xml",
-        // "category/java/errorprone.xml",
-        // "category/java/multithreading.xml",
-        // "category/java/performance.xml",
-        // "category/java/security.xml",
+        "config/pmd/jarb-bestpractices.xml",
+        "config/pmd/jarb-multithreading.xml",
+        "config/pmd/jarb-security.xml",
+        // "category/java/codestyle.xml", (627)
+        // "category/java/design.xml", (297)
+        // "category/java/documentation.xml", (542)
+        // "category/java/errorprone.xml", (132)
+        // "category/java/performance.xml", (18)
     ]
 }
 

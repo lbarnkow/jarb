@@ -109,6 +109,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
 
   private Map<String, RawChannel> findChannelsNotJoined(List<RawChannel> channels,
       List<RawChannel> joinedChannels) {
+    @SuppressWarnings("PMD.UseConcurrentHashMap")
     Map<String, RawChannel> channelsNotJoined = new HashMap<>();
 
     for (RawChannel channel : channels) {

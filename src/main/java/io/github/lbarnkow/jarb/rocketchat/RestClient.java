@@ -45,6 +45,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
+import lombok.Synchronized;
 
 public class RestClient {
   private final Client client;
@@ -55,7 +56,8 @@ public class RestClient {
     this.client = client;
   }
 
-  public synchronized void initialize(ConnectionConfiguration config) {
+  @Synchronized
+  public void initialize(ConnectionConfiguration config) {
     baseTarget = client.target(config.getRestUrl());
   }
 

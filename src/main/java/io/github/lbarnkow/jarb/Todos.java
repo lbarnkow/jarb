@@ -16,12 +16,13 @@
  *    limitations under the License.
  */
 
+package io.github.lbarnkow.jarb;
+
 // Kept as .java file to use eclipse IDE's built-in task tracking
 // This file will go through the Java compiler; so keep it compilable!
 
 // TODO: get code coverage up to where it should be!
-// TODO: look into semantic commits?
-// TODO: look into automatically manage versioning?
+// TODO: prototype release with: https://github.com/semantic-release/semantic-release
 // TODO: create a docker hub account to publish pre-built images?
 // TODO: CI: build an publish docker image (master & develop)
 // TODO: lock dependencies (including transitive)

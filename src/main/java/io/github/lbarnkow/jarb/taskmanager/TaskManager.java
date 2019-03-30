@@ -88,7 +88,8 @@ public class TaskManager {
     }
   }
 
-  public synchronized void stopAll() {
+  @Synchronized
+  public void stopAll() {
     tasks.keySet().stream().forEach(task -> stop(task));
     waitForAllTasksToFinish();
   }

@@ -88,7 +88,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
         new HashMap<>(states);
     final ElectionCandidate secondLeader = findLeader(candidates);
 
-    tasks.stopAll();
+    shutdownAllWithLeaderStoppingLast(tasks, candidates, secondLeader);
     Thread.sleep(100L);
     Map<ElectionCandidate, ElectionCandidateState> statesAfterShutdown = new HashMap<>(states);
 
@@ -126,7 +126,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
     ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
     ElectionLease lease = new ElectionLease(candidate.getId(), DEFAULT_LEASE_TTL);
 
-    candidate.state = LEADER;
+    candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
 
     // when
@@ -141,7 +141,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
   void testMissingLease() {
     // given
     ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
-    candidate.state = LEADER;
+    candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
 
     // when
@@ -158,8 +158,8 @@ class ElectionCandidateTest implements ElectionCandidateListener {
     final ElectionLease lease = new ElectionLease("testing", DEFAULT_LEASE_TTL);
     ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
     ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
-    candidate1.state = LEADER;
-    candidate2.state = RUNNING_FOR_ELECTION;
+    candidate1.state.set(LEADER);
+    candidate2.state.set(RUNNING_FOR_ELECTION);
     assertThat(candidate1.isLeader()).isTrue();
     assertThat(candidate2.isLeader()).isFalse();
 
@@ -178,7 +178,7 @@ class ElectionCandidateTest implements ElectionCandidateListener {
   void testExpiredLease() {
     // given
     ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
-    candidate.state = LEADER;
+    candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
     ElectionLease lease = new ElectionLease(candidate.getId(), 50L, 100L);
 
@@ -219,6 +219,16 @@ class ElectionCandidateTest implements ElectionCandidateListener {
     if (!waitForElection.tryAcquire(5, SECONDS)) {
       throw new RuntimeException("Election took longer than 5 seconds; aborting!");
     }
+  }
+
+  private void shutdownAllWithLeaderStoppingLast(TaskManager tasks, ElectionCandidate[] candidates,
+      ElectionCandidate leader) {
+    for (ElectionCandidate c : candidates) {
+      if (c != leader) {
+        tasks.stop(c);
+      }
+    }
+    tasks.stopAll();
   }
 
   @Override
