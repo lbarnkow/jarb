@@ -67,12 +67,12 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
   public void runTask() throws Throwable {
     Set<String> knownIds = new HashSet<>();
     try {
+      SendGetSubscriptions message = new SendGetSubscriptions();
+      Set<String> newIds = new HashSet<>();
+
       while (true) {
-        SendGetSubscriptions message = new SendGetSubscriptions();
         ReceiveGetSubscriptionsReply reply =
             realtimeClient.sendMessageAndWait(message, ReceiveGetSubscriptionsReply.class);
-
-        Set<String> newIds = new HashSet<>();
 
         for (RawSubscription sub : reply.getResult()) {
           newIds.add(sub.getId());
@@ -88,6 +88,7 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
         }
 
         knownIds = newIds;
+        newIds.clear();
         Thread.sleep(sleepTime);
       }
     } catch (InterruptedException e) {

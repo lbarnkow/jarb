@@ -44,9 +44,9 @@ public class WebsocketClient {
   private WebsocketClientListener listener;
   private Session session;
 
-  private boolean closedByClient = false;
+  private boolean closedByClient;
 
-  private long receivedMessages = 0L;
+  private long receivedMessages;
 
   @Inject
   WebsocketClient(WebSocketContainer container) {

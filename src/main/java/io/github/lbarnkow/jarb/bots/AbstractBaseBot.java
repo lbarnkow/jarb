@@ -39,7 +39,7 @@ public abstract class AbstractBaseBot implements Bot {
   @Getter
   private String username;
   @Getter
-  private List<Attachment> helpText = null;
+  private List<Attachment> helpText;
 
   @Override
   public Bot initialize(String name, String username) {

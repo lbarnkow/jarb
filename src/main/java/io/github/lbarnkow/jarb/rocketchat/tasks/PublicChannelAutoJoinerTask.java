@@ -88,6 +88,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
           boolean shouldJoin = bot.offerRoom(room);
           // What about join code?! Currently API doesn't enforce the passwords (0.73)
           if (shouldJoin) {
+            @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // don't reuse msg objects
             SendJoinRoom message = new SendJoinRoom(room);
             ReceiveJoinRoomReply reply =
                 realtimeClient.sendMessageAndWait(message, ReceiveJoinRoomReply.class);
@@ -109,7 +110,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
 
   private Map<String, RawChannel> findChannelsNotJoined(List<RawChannel> channels,
       List<RawChannel> joinedChannels) {
-    @SuppressWarnings("PMD.UseConcurrentHashMap")
+    @SuppressWarnings("PMD.UseConcurrentHashMap") // no thrad-safety required
     Map<String, RawChannel> channelsNotJoined = new HashMap<>();
 
     for (RawChannel channel : channels) {

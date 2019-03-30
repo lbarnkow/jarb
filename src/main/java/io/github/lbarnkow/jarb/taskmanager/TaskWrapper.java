@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TaskWrapper {
   private final Task task;
-  private Thread thread = null;
+  private Thread thread;
   private TaskState state = UNUSED;
   private Throwable lastError;
 

@@ -107,6 +107,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     this.config = config;
 
     for (Bot bot : bots) {
+      @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // unique objects needed
       BotDataStruct dataStruct = new BotDataStruct();
       dataStruct.realtimeClient = realtimeClientProvider.get();
       this.bots.put(bot, dataStruct);

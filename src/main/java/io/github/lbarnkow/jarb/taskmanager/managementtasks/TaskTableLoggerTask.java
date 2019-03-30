@@ -97,11 +97,11 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
   }
 
   static class TaskStates {
-    int unused = 0;
-    int activating = 0;
-    int active = 0;
-    int deactivating = 0;
-    int dead = 0;
+    int unused;
+    int activating;
+    int active;
+    int deactivating;
+    int dead;
 
     int getTotal() {
       return unused + activating + active + deactivating + dead;

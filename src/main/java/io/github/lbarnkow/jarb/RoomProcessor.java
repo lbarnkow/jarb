@@ -102,7 +102,9 @@ public class RoomProcessor {
         }
         try {
           if (reply.isPresent()) {
-            realtimeClient.sendMessage(new SendSendMessage(reply.get()));
+            @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // don't reuse msg objects
+            SendSendMessage outgoing = new SendSendMessage(reply.get());
+            realtimeClient.sendMessage(outgoing);
           }
         } catch (Throwable e) {
           log.error("Failed to send Bot '{}'s reply '{}'!", bot.getName(), reply.get(), e);
