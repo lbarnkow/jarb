@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<ruleset name="jarb-bestpractices"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Based on the official pmd category 'documentation', however, ommiting rules that should not apply to jarb.
+    </description>
+
+    <rule ref="category/java/documentation.xml">
+        <exclude name="CommentSize"/>
+    </rule>
+
+    <!-- Allow at least enough lines for the license header! -->
+    <rule ref="category/java/documentation.xml/CommentSize">
+        <properties>
+            <property name="maxLines" value="20"/>
+            <property name="maxLineLength" value="100"/>
+        </properties>
+    </rule>
+</ruleset>
