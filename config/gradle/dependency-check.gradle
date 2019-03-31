@@ -8,8 +8,8 @@ dependencyCheck {
 }
 
 dependencyCheckAnalyze.doLast {
-    dependencyCheckExportStats(VULNERABLE_DEPENDENCIES_THRESHOLD, STATS_DIR)
     dependencyCheckExportReport()
+    dependencyCheckExportStats(VULNERABLE_DEPENDENCIES_THRESHOLD, STATS_DIR)
 }
 
 def dependencyCheckExportStats(threshold, statsDir) {

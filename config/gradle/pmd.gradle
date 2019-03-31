@@ -22,8 +22,8 @@ pmd {
 }
 
 pmdMain.doLast {
-    pmdExportStats(PMD_VIOLATIONS_THRESHOLD, STATS_DIR)
     pmdExportReport()
+    pmdExportStats(PMD_VIOLATIONS_THRESHOLD, STATS_DIR)
 }
 
 def pmdExportStats(threshold, statsDir) {

@@ -8,8 +8,8 @@ checkstyle.toolVersion = '8.18'
 
 
 checkstyleMain.doLast {
-    checkstyleExportStats(CHECKSTYLE_VIOLATIONS_THRESHOLD, STATS_DIR)
     checkstyleExportReport()
+    checkstyleExportStats(CHECKSTYLE_VIOLATIONS_THRESHOLD, STATS_DIR)
 }
 
 def checkstyleExportStats(threshold, statsDir) {
