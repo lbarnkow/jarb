@@ -11,11 +11,9 @@ env:
   - DECISIONS_FILE: "config/license_finder/dependency_decisions.yml"
 
 install:
-- "set -e"
 - "gem install license_finder"
 
 script:
-- "set -e"
 - "./gradlew compileJava compileTestJava"
 - "./gradlew license"
 - "license_finder action_items --decisions_file ${DECISIONS_FILE}"
