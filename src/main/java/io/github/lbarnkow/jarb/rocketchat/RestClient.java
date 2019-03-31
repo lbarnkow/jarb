@@ -64,8 +64,9 @@ public class RestClient {
   /**
    * Fetches all public channels on the server.<br>
    * <br>
-   * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/channels/list/">https://rocket.chat/docs/developer-guides/rest-api/channels/list/</a>
+   * See:
+   * <a href= "https://rocket.chat/docs/developer-guides/rest-api/channels/list/">
+   * https://rocket.chat/docs/developer-guides/rest-api/channels/list/</a>
    *
    * @param authInfo valid auth token
    * @return public channels on the server
@@ -85,7 +86,8 @@ public class RestClient {
    * server.<br>
    * <br>
    * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/channels/list-joined/">https://rocket.chat/docs/developer-guides/rest-api/channels/list-joined/</a>
+   * "https://rocket.chat/docs/developer-guides/rest-api/channels/list-joined/">
+   * https://rocket.chat/docs/developer-guides/rest-api/channels/list-joined/</a>
    *
    * @param authInfo valid auth token
    * @return public channels the user has joined on the server
@@ -104,7 +106,8 @@ public class RestClient {
    * Gets the subscription object for a given room id.<br>
    * <br>
    * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/subscriptions/getone/">https://rocket.chat/docs/developer-guides/rest-api/subscriptions/getone/</a>
+   * "https://rocket.chat/docs/developer-guides/rest-api/subscriptions/getone/">
+   * https://rocket.chat/docs/developer-guides/rest-api/subscriptions/getone/</a>
    *
    * @param authInfo valid auth token
    * @param roomId   the room's id
@@ -127,11 +130,14 @@ public class RestClient {
    * channels, private groups and direct messages use different end points.<br>
    * <br>
    * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/channels/counters/">https://rocket.chat/docs/developer-guides/rest-api/channels/counters/</a><br>
+   * "https://rocket.chat/docs/developer-guides/rest-api/channels/counters/">
+   * https://rocket.chat/docs/developer-guides/rest-api/channels/counters/</a><br>
    * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/groups/counters/">https://rocket.chat/docs/developer-guides/rest-api/groups/counters/</a><br>
-   * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/im/counters/">https://rocket.chat/docs/developer-guides/rest-api/im/counters/</a>
+   * "https://rocket.chat/docs/developer-guides/rest-api/groups/counters/">
+   * https://rocket.chat/docs/developer-guides/rest-api/groups/counters/</a><br>
+   * See:
+   * <a href= "https://rocket.chat/docs/developer-guides/rest-api/im/counters/">
+   * https://rocket.chat/docs/developer-guides/rest-api/im/counters/</a>
    *
    * @param authInfo valid auth token
    * @param roomType the room's type
@@ -157,11 +163,13 @@ public class RestClient {
    * groups and direct messages use different end points.<br>
    * <br>
    * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/channels/history/">https://rocket.chat/docs/developer-guides/rest-api/channels/history/</a>
-   * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/groups/history/">https://rocket.chat/docs/developer-guides/rest-api/groups/history/</a>
-   * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/im/history/">https://rocket.chat/docs/developer-guides/rest-api/im/history/</a>
+   * "https://rocket.chat/docs/developer-guides/rest-api/channels/history/">
+   * https://rocket.chat/docs/developer-guides/rest-api/channels/history/</a> See:
+   * <a href=
+   * "https://rocket.chat/docs/developer-guides/rest-api/groups/history/">
+   * https://rocket.chat/docs/developer-guides/rest-api/groups/history/</a> See:
+   * <a href= "https://rocket.chat/docs/developer-guides/rest-api/im/history/">
+   * https://rocket.chat/docs/developer-guides/rest-api/im/history/</a>
    *
    * @param authInfo  valid auth token
    * @param room      the room
@@ -194,7 +202,8 @@ public class RestClient {
    * messages in that room up to this point in time are marked as read.<br>
    * <br>
    * See: <a href=
-   * "https://rocket.chat/docs/developer-guides/rest-api/subscriptions/read/">https://rocket.chat/docs/developer-guides/rest-api/subscriptions/read/</a>
+   * "https://rocket.chat/docs/developer-guides/rest-api/subscriptions/read/">
+   * https://rocket.chat/docs/developer-guides/rest-api/subscriptions/read/</a>
    *
    * @param authInfo valid auth token
    * @param roomId   the room's id
