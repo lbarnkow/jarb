@@ -22,6 +22,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
+/**
+ * POJO mapping the subreddit JSON response.
+ *
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class RedditChildData {

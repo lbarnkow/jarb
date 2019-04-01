@@ -18,6 +18,11 @@
 
 package io.github.lbarnkow.jarb.taskmanager;
 
+/**
+ * The states of the task life-cycle.
+ *
+ * @author lbarnkow
+ */
 public enum TaskState {
   UNUSED, ACTIVATING, ACTIVE, DEACTIVATING, DEAD
 }

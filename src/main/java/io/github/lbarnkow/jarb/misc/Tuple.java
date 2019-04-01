@@ -20,6 +20,14 @@ package io.github.lbarnkow.jarb.misc;
 
 import lombok.Data;
 
+/**
+ * Type-safe generic composition of two references into one structure.
+ *
+ * @author lbarnkow
+ *
+ * @param <A> type of the first tuple member
+ * @param <B> type of the second tuple member
+ */
 @Data
 public class Tuple<A, B> {
   private final A first;

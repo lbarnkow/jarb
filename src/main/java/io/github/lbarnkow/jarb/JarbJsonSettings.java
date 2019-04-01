@@ -31,6 +31,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Combines Jackson annotations to be used as defaults for all mapped entities.
+ *
+ * <ul>
+ * <li>attribute detection by POJO fields only.</li>
+ * <li>ignore unknown JSON fields missing in the POJOs.</li>
+ * <li>don't serialize null values.</li>
+ * </ul>
+ *
+ * @author lbarnkow
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @JacksonAnnotationsInside

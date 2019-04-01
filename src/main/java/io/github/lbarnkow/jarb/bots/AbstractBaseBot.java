@@ -31,6 +31,14 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+/**
+ * Abstract base implementation of interface <code>Bot</code> to handle
+ * properties like <code>name</code> and <code>username</code>. Additionally,
+ * this base class also loads help texts from a resource named 'HELP.md' which
+ * can then be accessed by the sub class.
+ *
+ * @author lbarnkow
+ */
 @Slf4j
 @ToString
 public abstract class AbstractBaseBot implements Bot {

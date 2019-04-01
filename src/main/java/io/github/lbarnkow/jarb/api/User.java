@@ -21,6 +21,11 @@ package io.github.lbarnkow.jarb.api;
 import lombok.Builder;
 import lombok.Value;
 
+/**
+ * A User.
+ *
+ * @author lbarnkow
+ */
 @Value
 @Builder
 public class User {

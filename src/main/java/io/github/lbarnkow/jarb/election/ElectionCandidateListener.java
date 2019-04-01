@@ -18,6 +18,11 @@
 
 package io.github.lbarnkow.jarb.election;
 
+/**
+ * Listens to state changes of candidates in the election process / life-cycle.
+ *
+ * @author lbarnkow
+ */
 public interface ElectionCandidateListener {
   void onStateChanged(ElectionCandidate source, ElectionCandidateState oldState,
       ElectionCandidateState newState);

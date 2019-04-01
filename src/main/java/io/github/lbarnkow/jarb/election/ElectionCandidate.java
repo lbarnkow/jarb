@@ -29,6 +29,20 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * An <code>ElectionCandidate</code> represents one member in a group of
+ * processes where only one member at a time shall be active. This
+ * implementation uses a shared file on the file system (might be remote via
+ * NFS). Every process reads that file to determine if an active leader is
+ * around (file exists, recorded lease has not expired). If there is no active
+ * leader this process will generate a new <code>ElectionLease</code> and write
+ * it to the shared file. If a after a configurable time the file still shows
+ * this process as active leader, then leadership role is assumed. Configurable
+ * lease durations are rather short, so this process has to refresh the lease
+ * regularly.
+ *
+ * @author lbarnkow
+ */
 @Slf4j
 public class ElectionCandidate extends AbstractBaseTask {
 

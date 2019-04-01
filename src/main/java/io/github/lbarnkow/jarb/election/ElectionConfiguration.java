@@ -22,7 +22,11 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import java.io.File;
 import lombok.Data;
 
-//@JsonIgnoreProperties({ "syncFile" })
+/**
+ * POJO representation of 'election' subsection of the main configuration file.
+ *
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class ElectionConfiguration {

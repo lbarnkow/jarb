@@ -21,6 +21,11 @@ package io.github.lbarnkow.jarb.api;
 import lombok.Builder;
 import lombok.Value;
 
+/**
+ * A chat room/channel.
+ *
+ * @author lbarnkow
+ */
 @Value
 @Builder
 public class Room {

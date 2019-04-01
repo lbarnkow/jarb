@@ -23,6 +23,11 @@ import java.time.Instant;
 import lombok.Builder;
 import lombok.Value;
 
+/**
+ * An attachment to a chat <code>Message</code>.
+ *
+ * @author lbarnkow
+ */
 @Value
 @Builder
 public class Attachment {

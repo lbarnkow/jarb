@@ -23,6 +23,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Abstract base class extending <code>AbstractBaseTask</code> storing a
+ * <code>Bot</code> instance. It also names the task extending this class after
+ * the bot it encapsulates.
+ *
+ * @author lbarnkow
+ */
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractBotSpecificTask extends AbstractBaseTask {

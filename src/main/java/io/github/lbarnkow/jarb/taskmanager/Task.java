@@ -18,6 +18,11 @@
 
 package io.github.lbarnkow.jarb.taskmanager;
 
+/**
+ * A background task.
+ *
+ * @author lbarnkow
+ */
 public interface Task {
   String getName();
 

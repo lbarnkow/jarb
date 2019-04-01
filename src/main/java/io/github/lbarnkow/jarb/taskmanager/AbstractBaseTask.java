@@ -21,6 +21,13 @@ package io.github.lbarnkow.jarb.taskmanager;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Abstract base implementation of interface <code>Task</code> that
+ * automatically determines the tasks name based on the name of the class
+ * extending this base class.
+ *
+ * @author lbarnkow
+ */
 public abstract class AbstractBaseTask implements Task {
   @Getter
   @Setter

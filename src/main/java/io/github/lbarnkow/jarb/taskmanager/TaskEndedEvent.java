@@ -23,6 +23,13 @@ import java.util.Optional;
 import lombok.Builder;
 import lombok.Value;
 
+/**
+ * An event produced by <code>TaskWrapper</code> upon termination of a task.
+ * Usually, this event will be sent to <code>TaskManager</code> and from there
+ * relayed to the party initially supplying the task.
+ *
+ * @author lbarnkow
+ */
 @Value
 @Builder
 public class TaskEndedEvent {

@@ -32,6 +32,11 @@ import java.util.HashSet;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+/**
+ * Main class for jarb (contains main method).
+ *
+ * @author lbarnkow
+ */
 @Slf4j
 public class Main {
   /**

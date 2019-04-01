@@ -18,6 +18,12 @@
 
 package io.github.lbarnkow.jarb.api;
 
+/**
+ * Enumeration of room types (e.g. public channel, private channel, direct
+ * messages, …).
+ *
+ * @author lbarnkow
+ */
 public enum RoomType {
   PUBLIC_CHANNEL("c"), //
   PRIVATE_GROUP("g"), //

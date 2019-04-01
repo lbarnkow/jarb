@@ -22,6 +22,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Login credentials for the chat server.
+ *
+ * @author lbarnkow
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

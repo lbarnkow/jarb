@@ -25,6 +25,12 @@ import io.github.lbarnkow.jarb.bots.AbstractBaseBot;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Test bot that joins every public channel and dumps every encountered message
+ * to the log.
+ *
+ * @author lbarnkow
+ */
 @Slf4j
 public class DummyBot extends AbstractBaseBot implements Bot {
   public DummyBot() {

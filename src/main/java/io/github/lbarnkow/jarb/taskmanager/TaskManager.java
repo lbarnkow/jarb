@@ -32,6 +32,14 @@ import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The <code>TaskManager</code> collects multiple tasks and controls their
+ * life-cycle. It uses <code>TaskWrapper</code> to spawn a thread per task.
+ * Furthermore, it starts additional management tasks for house-keeping (e.g. to
+ * automatically prune DEAD tasks from the list of managed tasks).
+ *
+ * @author lbarnkow
+ */
 @ToString
 public class TaskManager {
   private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);

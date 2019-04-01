@@ -42,6 +42,12 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+/**
+ * <code>PugMeBot</code> replies with images of pugs fetched from reddit. It's a
+ * fun proof-of-concept kind-of thing.
+ *
+ * @author lbarnkow
+ */
 @Slf4j
 @ToString
 public class PugMeBot extends AbstractBaseBot implements Bot {
