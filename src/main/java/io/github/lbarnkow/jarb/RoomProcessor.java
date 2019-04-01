@@ -47,6 +47,12 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * This class fetches all unread messages for a given <code>Bot</code> and room
+ * id and marks the room as read on the chat server.
+ *
+ * @author lbarnkow
+ */
 @ToString
 @EqualsAndHashCode
 @Slf4j

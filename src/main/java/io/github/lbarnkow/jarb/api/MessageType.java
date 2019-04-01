@@ -20,6 +20,12 @@ package io.github.lbarnkow.jarb.api;
 
 import lombok.Getter;
 
+/**
+ * Enumeration of message types (e.g. regular chat messagem, user joined
+ * notification, room changed notification, …).
+ *
+ * @author lbarnkow
+ */
 public enum MessageType {
   REGULAR_CHAT_MESSAGE(null), //
 

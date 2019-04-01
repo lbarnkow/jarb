@@ -63,6 +63,17 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
+/**
+ * This is <i>the</i> central management class in jarb. It
+ * <code>ElectionCandidate</code> to try and acquire a leading role within a
+ * group of processes. Once it has established leadership it will try to
+ * establish connections / sessions to the chat server for each individual
+ * <code>Bot</code>. It also manages various related background tasks to
+ * continually refresh authorization tokens, to discover new unsubscribed
+ * channels or to listen to subscribed channels on a per-bot-basis.
+ *
+ * @author lbarnkow
+ */
 @Slf4j
 @ToString
 public class BotManager extends AbstractBaseTask implements ElectionCandidateListener,

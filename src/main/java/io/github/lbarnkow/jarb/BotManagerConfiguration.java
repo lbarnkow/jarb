@@ -25,6 +25,11 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.Data;
 
+/**
+ * POJO representation of the main configuration file.
+ *
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class BotManagerConfiguration {

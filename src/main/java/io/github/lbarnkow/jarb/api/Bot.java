@@ -20,6 +20,11 @@ package io.github.lbarnkow.jarb.api;
 
 import java.util.Optional;
 
+/**
+ * Every bot handled by jarb must implement this interface.
+ *
+ * @author lbarnkow
+ */
 public interface Bot {
   Bot initialize(String name, String username);
 

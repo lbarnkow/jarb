@@ -35,6 +35,14 @@ import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A management task that periodically prints a report of all tasks handled by a
+ * given <code>TaskManager</code>. Depending on the active log level it prints
+ * every tasks name and life-cycle state (level debug) and a summary showing the
+ * number of tasks per life-cycle state (level info).
+ *
+ * @author lbarnkow
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

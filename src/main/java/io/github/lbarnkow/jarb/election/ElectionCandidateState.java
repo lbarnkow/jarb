@@ -18,6 +18,11 @@
 
 package io.github.lbarnkow.jarb.election;
 
+/**
+ * Valid states for <code>ElectionCandidate</code>s.
+ *
+ * @author lbarnkow
+ */
 public enum ElectionCandidateState {
   INACTIVE, RUNNING_FOR_ELECTION, LEADER
 }

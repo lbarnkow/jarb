@@ -21,6 +21,15 @@ package io.github.lbarnkow.jarb.misc;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Type-safe generic composition of three references into one structure.
+ *
+ * @author lbarnkow
+ *
+ * @param <A> type of the first triple member
+ * @param <B> type of the second triple member
+ * @param <C> type of the third triple member
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Triple<A, B, C> extends Tuple<A, B> {

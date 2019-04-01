@@ -23,6 +23,11 @@ import java.util.Collections;
 import java.util.List;
 import lombok.Data;
 
+/**
+ * POJO mapping the subreddit JSON response.
+ *
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class RedditListingData {

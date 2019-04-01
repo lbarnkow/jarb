@@ -21,6 +21,11 @@ package io.github.lbarnkow.jarb.bots.pugme;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
+/**
+ * POJO mapping the subreddit JSON response.
+ *
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class RedditChild {

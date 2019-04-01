@@ -20,25 +20,31 @@ package io.github.lbarnkow.jarb.election;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
+import io.github.lbarnkow.jarb.JarbJsonSettings;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
+import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+/**
+ * Represents a leadership lease file as POJO.
+ *
+ * @author lbarnkow
+ */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JarbJsonSettings
 public class ElectionLease {
   private static final Logger logger = LoggerFactory.getLogger(ElectionLease.class);
 
@@ -50,23 +56,12 @@ public class ElectionLease {
   private long leaseAcquired;
   private long leaseExpiration;
 
-  ElectionLease(String leaderId, long leaseAcquired, long leaseExpiration) {
-    this.leaderId = leaderId;
-    this.leaseAcquired = leaseAcquired;
-    this.leaseExpiration = leaseExpiration;
-  }
-
   public ElectionLease(String leaderId, long ttl) {
     this(leaderId, System.currentTimeMillis(), System.currentTimeMillis() + ttl);
   }
 
   public ElectionLease(ElectionLease oldLease, long ttl) {
     this(oldLease.leaderId, ttl);
-  }
-
-  // for Jackson deserialization
-  @SuppressWarnings("unused")
-  private ElectionLease() {
   }
 
   public boolean isExpired() {

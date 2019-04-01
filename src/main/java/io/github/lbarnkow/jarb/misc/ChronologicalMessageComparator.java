@@ -21,6 +21,11 @@ package io.github.lbarnkow.jarb.misc;
 import io.github.lbarnkow.jarb.api.Message;
 import java.util.Comparator;
 
+/**
+ * A comparator to sort chat messages according to their time stamps.
+ *
+ * @author lbarnkow
+ */
 public class ChronologicalMessageComparator implements Comparator<Message> {
   public static final ChronologicalMessageComparator CHRONOLOGICAL_MESSAGE_COMPARATOR =
       new ChronologicalMessageComparator();

@@ -25,6 +25,11 @@ import java.util.Map;
 import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;
 
+/**
+ * Central jarb configuration loaded from YAML.
+ *
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class BotConfiguration {

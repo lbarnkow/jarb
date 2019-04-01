@@ -28,6 +28,16 @@ import java.util.Optional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Wrapper around a <code>Task</code> that handles a tasks life-cycle, from
+ * being <code>UNUSED</code> to its termination in state <code>DEAD</code>. The
+ * wrapper spawns a background thread on with the tasks code is executed. It
+ * catches and handles uncaught exception occurring within the tasks code to
+ * make sure the background threads shutdown in a somewhat controlled manner.
+ * Optionally, a listener can be informed about the end of the task life-cycle.
+ *
+ * @author lbarnkow
+ */
 @Data
 @Slf4j
 public class TaskWrapper {

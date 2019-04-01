@@ -23,6 +23,12 @@ import java.time.Instant;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Authorization information and token received from the chat server after
+ * successful login.
+ *
+ * @author lbarnkow
+ */
 @Data
 @Builder
 public class AuthInfo {

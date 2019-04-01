@@ -26,6 +26,11 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import lombok.Generated;
 
+/**
+ * Configuration for guice dependency injection.
+ *
+ * @author u111642
+ */
 // To exclude this class from code coverage. I know, it's wrong, but jacoco currently doesn't offer
 // anything better. :(
 @Generated

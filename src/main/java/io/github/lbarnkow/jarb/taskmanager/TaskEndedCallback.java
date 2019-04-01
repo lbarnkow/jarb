@@ -18,6 +18,12 @@
 
 package io.github.lbarnkow.jarb.taskmanager;
 
+/**
+ * An interface for listeners wanting to be informed about the termination of a
+ * task.
+ *
+ * @author lbarnkow
+ */
 public interface TaskEndedCallback {
   void onTaskEnded(TaskEndedEvent event);
 }

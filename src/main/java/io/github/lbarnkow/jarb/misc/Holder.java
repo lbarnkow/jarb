@@ -24,6 +24,15 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * <code>Holder</code> is an update-able object reference. This way dependent
+ * systems can always reference the most recent object through this holder
+ * without resorting to notifications via event systems and observer patterns.
+ *
+ * @author lbarnkow
+ *
+ * @param <T> type of the reference to hold
+ */
 @ToString
 @EqualsAndHashCode
 public class Holder<T> {

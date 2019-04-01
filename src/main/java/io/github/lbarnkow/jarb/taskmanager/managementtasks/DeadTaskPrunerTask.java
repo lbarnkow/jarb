@@ -28,6 +28,12 @@ import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A management task that periodically removes all <code>DEAD</code> tasks from
+ * a given <code>TaskManager</code>.
+ *
+ * @author lbarnkow
+ */
 @ToString
 @AllArgsConstructor
 public class DeadTaskPrunerTask extends AbstractBaseTask {
