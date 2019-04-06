@@ -418,8 +418,20 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     eventPool.release();
   }
 
+  /**
+   * Event data for the main event loop.
+   *
+   * @author lbarnkow
+   */
   private static class QueuedEvent {
+    /**
+     * The event type.
+     */
     private EventTypes type;
+
+    /**
+     * The event data (depends on the type).
+     */
     private Object data;
 
     QueuedEvent(EventTypes type, Object data) {
@@ -428,6 +440,11 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     }
   }
 
+  /**
+   * The types of events for the main event loop.
+   *
+   * @author lbarnkow
+   */
   private static enum EventTypes {
     TASK_ENDED, //
     REALTIME_SESSION_CLOSED, //
@@ -439,12 +456,37 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     PROCESS_ROOM
   }
 
+  /**
+   * A simple POJO tying together various object references logically connected to
+   * a <code>Bot</code> instance.
+   *
+   * @author lbarnkow
+   */
   @SuppressWarnings("unused")
   private static class BotDataStruct {
+    /**
+     * The <code>RealtimeClient</code> for this <code>Bot</code>.
+     */
     private RealtimeClient realtimeClient;
-    private Holder<AuthInfo> authInfo = new Holder<>(AuthInfo.INVALID);
+
+    /**
+     * The <code>AuthInfo</code> for this <code>Bot</code>.
+     */
+    private Holder<AuthInfo> authInfo = new Holder<>(AuthInfo.EXPIRED);
+
+    /**
+     * The <code>LoginTask</code> for this <code>Bot</code>.
+     */
     private LoginTask loginTask;
+
+    /**
+     * The <code>SubscriptionsTrackerTask</code> for this <code>Bot</code>.
+     */
     private SubscriptionsTrackerTask subscriptionsTrackerTask;
+
+    /**
+     * The <code>PublicChannelAutoJoinerTask</code> for this <code>Bot</code>.
+     */
     private PublicChannelAutoJoinerTask autoJoinerTask;
   }
 }

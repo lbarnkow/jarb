@@ -30,6 +30,9 @@ public enum RoomType {
   INSTANT_MESSAGE("d"), //
   LIVE_CHAT("l"); //
 
+  /**
+   * The raw room type.
+   */
   private final String rawType;
 
   private RoomType(String rawType) {

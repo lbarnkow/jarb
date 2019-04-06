@@ -33,7 +33,18 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class BotManagerConfiguration {
+  /**
+   * Subsection for election parameters.
+   */
   private ElectionConfiguration election = new ElectionConfiguration();
+
+  /**
+   * Subsection for chat server connection parameters.
+   */
   private ConnectionConfiguration connection = new ConnectionConfiguration();
+
+  /**
+   * Subsection for bot configurations.
+   */
   private List<BotConfiguration> bots = Arrays.asList(new BotConfiguration());
 }

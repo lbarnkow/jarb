@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.Invocation.Builder;
@@ -61,7 +62,7 @@ class PugMeBotTest {
   private final StatusType typeMock = mock(StatusType.class);
   private final Response responseMock = mock(Response.class);
 
-  private final PugMeBot bot = new PugMeBot(jerseyMock);
+  private final PugMeBot bot = new PugMeBot(new Random(), jerseyMock);
 
   @BeforeEach
   void beforeEach() {

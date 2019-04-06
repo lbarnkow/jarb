@@ -26,13 +26,47 @@ import java.util.Optional;
  * @author lbarnkow
  */
 public interface Bot {
+  /**
+   * Called by jarb to initialize the <code>Bot</code> instance with its logical
+   * name within the jarb run-time, as well as, its user name on the chat server.
+   *
+   * @param name     the logical <code>Bot</code> name within the jarb run-time
+   * @param username the user name on the chat server
+   * @return this instance
+   */
   Bot initialize(String name, String username);
 
+  /**
+   * Gets the logical name within the jarb run-time.
+   *
+   * @return the logical name within the jarb run-time
+   */
   String getName();
 
+  /**
+   * Gets the user name on the chat server.
+   *
+   * @return the user name on the chat server.
+   */
   String getUsername();
 
+  /**
+   * Called by jarb to offer a <code>Bot</code> to join a (new) <code>Room</code>
+   * it hasn't yet subscribed to.
+   *
+   * @param room the <code>Room</code>
+   * @return <code>true</code> if the <code>Bot</code> wishes to join;
+   *         <code>false</code> otherwise
+   */
   boolean offerRoom(Room room);
 
+  /**
+   * Called by jarb to offer a <code>Message</code> received from one of the
+   * <code>Room</code>s this <code>Bot</code> has joined.
+   *
+   * @param message the <code>Message</code> received
+   * @return an optional <code>Message</code> this <code>Bot</code> wishes to send
+   *         as an answer
+   */
   Optional<Message> offerMessage(Message message);
 }

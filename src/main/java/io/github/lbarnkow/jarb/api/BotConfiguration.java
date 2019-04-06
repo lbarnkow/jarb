@@ -33,13 +33,41 @@ import org.apache.commons.codec.digest.DigestUtils;
 @JarbJsonSettings
 @Data
 public class BotConfiguration {
+  /**
+   * The default name for a bot, when it is missing from the yaml file.
+   */
   private static final String DEFAULT_NAME = "demobot";
+
+  /**
+   * The default implementation for a bot, when it is missing from the yaml file.
+   */
   private static final String DEFAULT_QUALIFIED_CLASS_NAME = DummyBot.class.getName();
+
+  /**
+   * The default login credentials to the chat server for a bot, when they are
+   * missing from the yaml file.
+   */
   private static final Credentials DEFAULT_CREDENTIALS =
       new Credentials("demobot", DigestUtils.sha256Hex("demobot"));
 
+  /**
+   * The bot's name.
+   */
   private String name = DEFAULT_NAME;
+
+  /**
+   * The bot's implementation.
+   */
   private String qualifiedClassName = DEFAULT_QUALIFIED_CLASS_NAME;
+
+  /**
+   * The bot's chat server login credentials.
+   */
   private Credentials credentials = DEFAULT_CREDENTIALS;
+
+  /**
+   * Custom run-time settings to be interpreted by the bot's actual
+   * implementation.
+   */
   private Map<String, Object> settings = Collections.emptyMap();
 }

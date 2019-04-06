@@ -29,7 +29,18 @@ import lombok.Value;
 @Value
 @Builder
 public class Room {
+  /**
+   * The room id.
+   */
   final String id;
+
+  /**
+   * The human-readable name.
+   */
   final String name;
+
+  /**
+   * The room type.
+   */
   final RoomType type;
 }

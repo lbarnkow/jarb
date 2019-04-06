@@ -30,7 +30,14 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RedditChildData {
+  /**
+   * The url of this reddit post.
+   */
   private String url;
+
+  /**
+   * Indicates if this reddit post contains a video.
+   */
   @JsonProperty("is_video")
   private boolean isVideo;
 }

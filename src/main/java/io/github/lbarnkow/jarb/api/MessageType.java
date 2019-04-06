@@ -64,6 +64,9 @@ public enum MessageType {
 
   UNKNOWN(null);
 
+  /**
+   * The raw message type.
+   */
   @Getter
   private final String rawType;
 

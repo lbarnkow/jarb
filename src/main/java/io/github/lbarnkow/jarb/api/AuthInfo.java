@@ -32,12 +32,32 @@ import lombok.Data;
 @Data
 @Builder
 public class AuthInfo {
-  public static final AuthInfo INVALID = new AuthInfo(null, null, Instant.ofEpochMilli(0));
+  /**
+   * An <code>AuthInfo</code> instance that is expired.
+   */
+  public static final AuthInfo EXPIRED = new AuthInfo(null, null, Instant.ofEpochMilli(0));
 
+  /**
+   * The user id to use in API calls.
+   */
   private final String userId;
+
+  /**
+   * The authorization token to use in API calls.
+   */
   private final String authToken;
+
+  /**
+   * Expiration date of this token.
+   */
   private final Instant expires;
 
+  /**
+   * Checks if this token is still valid (i.e. not expired).
+   *
+   * @return <code>true</code> if the token hasn't expired; <code>false</code>
+   *         otherwise.
+   */
   public boolean isValid() {
     return expires.isAfter(Instant.now());
   }
