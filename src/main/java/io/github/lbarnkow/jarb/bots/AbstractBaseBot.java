@@ -42,10 +42,21 @@ import lombok.val;
 @Slf4j
 @ToString
 public abstract class AbstractBaseBot implements Bot {
+  /**
+   * Stores the logical jarb run-time name.
+   */
   @Getter
   private String name;
+
+  /**
+   * Stores the user name on the chat server.
+   */
   @Getter
   private String username;
+
+  /**
+   * Stores the help text from 'HELP.md'.
+   */
   @Getter
   private List<Attachment> helpText;
 

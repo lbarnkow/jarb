@@ -29,6 +29,13 @@ import lombok.Value;
 @Value
 @Builder
 public class User {
+  /**
+   * The user id.
+   */
   String id;
+
+  /**
+   * The user name.
+   */
   String name;
 }

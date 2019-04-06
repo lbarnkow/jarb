@@ -29,5 +29,8 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RedditResponse {
+  /**
+   * The payload of the reddit response.
+   */
   private RedditListingData data;
 }

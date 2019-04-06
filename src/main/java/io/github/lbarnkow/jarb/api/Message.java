@@ -33,14 +33,39 @@ import lombok.Value;
 @Value
 @Builder
 public class Message {
+  /**
+   * The message id.
+   */
   String id;
+
+  /**
+   * The <code>Room</code> - Identify the room the message belongs.
+   */
   Room room;
+
+  /**
+   * The textual message.
+   */
   String message;
+
+  /**
+   * The message time stamp (date of creation on client).
+   */
   Instant timestamp;
+
+  /**
+   * The <code>User</code> that sent the message.
+   */
   User user;
 
+  /**
+   * The <code>Attachment</code>s.
+   */
   @Builder.Default
   List<Attachment> attachments = Collections.emptyList();
 
+  /**
+   * The <code>MessageType</code>.
+   */
   MessageType type;
 }

@@ -31,19 +31,84 @@ import lombok.Value;
 @Value
 @Builder
 public class Attachment {
+  /**
+   * The color you want the order on the left side to be, any value background-css
+   * supports.
+   */
   String color;
+
+  /**
+   * The text to display for this attachment, it is different than the message's
+   * text.
+   */
   String text;
+
+  /**
+   * Displays the time next to the text portion.
+   */
   Instant timestamp;
+
+  /**
+   * An image that displays to the left of the text, looks better when this is
+   * relatively small.
+   */
   String thumbUrl;
+
+  /**
+   * Only applicable if the ts is provided, as it makes the time clickable to this
+   * link.
+   */
   String messageLink;
+
+  /**
+   * Causes the image, audio, and video sections to be hiding when collapsed is
+   * true.
+   */
   boolean collapsed;
+
+  /**
+   * Name of the author.
+   */
   String authorName;
+
+  /**
+   * Providing this makes the author name clickable and points to this link.
+   */
   String authorLink;
+
+  /**
+   * Displays a tiny icon to the left of the Author’s name.
+   */
   String authorIcon;
+
+  /**
+   * Title to display for this attachment, displays under the author.
+   */
   String title;
+
+  /**
+   * Providing this makes the title clickable, pointing to this link.
+   */
   String titleLink;
+
+  /**
+   * When this is true, a download icon appears and clicking this saves the link
+   * to file.
+   */
   boolean titleLinkDownload;
+
+  /**
+   * The image to display, will be “big” and easy to see.
+   */
   String imageUrl;
+
+  /**
+   * Audio file to play, only supports what html audio does.
+   */
   String audioUrl;
+
+  /**
+   * Video file to play, only supports what html video does.
+   */
   String videoUrl;
 }

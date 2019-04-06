@@ -18,6 +18,8 @@
 
 package io.github.lbarnkow.jarb;
 
+import static io.github.lbarnkow.jarb.misc.ChronologicalMessageComparator.CHRONOLOGICAL_MESSAGE_COMPARATOR;
+
 import io.github.lbarnkow.jarb.api.AuthInfo;
 import io.github.lbarnkow.jarb.api.Bot;
 import io.github.lbarnkow.jarb.api.Message;
@@ -25,7 +27,6 @@ import io.github.lbarnkow.jarb.api.MessageType;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
 import io.github.lbarnkow.jarb.api.User;
-import io.github.lbarnkow.jarb.misc.ChronologicalMessageComparator;
 import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.RestClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
@@ -57,11 +58,18 @@ import lombok.extern.slf4j.Slf4j;
 @EqualsAndHashCode
 @Slf4j
 public class RoomProcessor {
-  private static final ChronologicalMessageComparator COMPARATOR =
-      ChronologicalMessageComparator.CHRONOLOGICAL_MESSAGE_COMPARATOR;
 
+  /**
+   * A local cache associating raw room ids with their respective
+   * <code>Room</code> instances.
+   */
   private Map<String, Room> roomCache = new ConcurrentHashMap<>();
 
+  /**
+   * Adds a <code>Room</code> instance to the local cache.
+   *
+   * @param room the <code>Room</code>
+   */
   public void cacheRoom(Room room) {
     log.debug("Cached room object: {}", room);
     roomCache.put(room.getId(), room);
@@ -159,7 +167,7 @@ public class RoomProcessor {
       result.add(message);
     }
 
-    Collections.sort(result, COMPARATOR);
+    Collections.sort(result, CHRONOLOGICAL_MESSAGE_COMPARATOR);
     return result;
   }
 }

@@ -29,5 +29,8 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RedditChild {
+  /**
+   * The data per reddit post.
+   */
   private RedditChildData data;
 }

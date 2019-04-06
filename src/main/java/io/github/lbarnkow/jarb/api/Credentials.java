@@ -31,6 +31,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Credentials {
+  /**
+   * The username to use to log in to the chat server.
+   */
   private String username;
+
+  /**
+   * The password to use to log in to the chat server.
+   */
   private String password;
 }

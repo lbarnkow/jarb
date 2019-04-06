@@ -33,8 +33,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class DummyBot extends AbstractBaseBot implements Bot {
-  public DummyBot() {
-  }
 
   @Override
   public boolean offerRoom(Room room) {

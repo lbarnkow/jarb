@@ -31,5 +31,8 @@ import lombok.Data;
 @JarbJsonSettings
 @Data
 public class RedditListingData {
+  /**
+   * The list containing all reddit posts.
+   */
   private List<RedditChild> children = Collections.emptyList();
 }

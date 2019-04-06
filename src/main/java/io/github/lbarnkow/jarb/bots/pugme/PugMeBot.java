@@ -52,14 +52,41 @@ import lombok.val;
 @ToString
 public class PugMeBot extends AbstractBaseBot implements Bot {
 
+  /**
+   * Limits the maximum number of pug images deliverd in a single "pug bomb"
+   * reply.
+   */
   public static final int MAX_PUGS_PER_POST = 25;
+
+  /**
+   * The base regular expression pattern to parse incoming messages. Contains a
+   * place holder ("%BOTNAME%") that will be replaced a runtime.
+   */
   private static final String REGEX_BASE = "^\\s*@%BOTNAME%(\\s+(?:help|bomb))?(\\s+\\d+)?\\s*$";
+
+  /**
+   * The regular expression pattern instance to use to parse incoming messages
+   * (see methond <code>initialize</code>).
+   */
   private Pattern regex;
 
+  /**
+   * The time stamp marking the last update of pug picture URLs from reddit.
+   */
   private Instant lastUpdate;
+  /**
+   * A local cache containing pug picture URLs.
+   */
   private List<String> pugsCache = new ArrayList<>(100);
-  private Random random = new Random();
 
+  /**
+   * RNG to select pug picture URLs from the cache.
+   */
+  private Random random;
+
+  /**
+   * The REST client instance to access reddit.
+   */
   private Client jersey;
 
   /**
@@ -68,9 +95,10 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
    * @param jerseyClient a jerseyClient instance to do the REST calls
    */
   @Inject
-  public PugMeBot(Client jerseyClient) {
+  public PugMeBot(Random random, Client jerseyClient) {
     super();
 
+    this.random = random;
     this.jersey = jerseyClient;
   }
 
