@@ -1,12 +1,15 @@
 #!/bin/bash
 
+set -x
+
 export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 
 export REPO_NAME=$(basename -s .git $(git config --get remote.origin.url))
 export STATS_BRANCH="${REPO_NAME}/stats-${BRANCH}"
 
-DIR=$(dirname $0)
-cd $DIR
+export DIR=$(realpath $(dirname ${0}))
+cd ${DIR}
+
 
 if [[ "${BRANCH}" == "develop" || "${BRANCH}" == "master" ]]; then
     mkdir publish-stats
