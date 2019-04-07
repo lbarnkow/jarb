@@ -46,12 +46,32 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ElectionCandidate extends AbstractBaseTask {
 
-  static final long SLEEP_VARIANCE_MSEC = (long) (Math.random() * 100L);
+  /**
+   * Per instance sleep time variation. This is intended to help with
+   * race-conditions where multiple processes plan on pausing at the same time for
+   * the same amount of time. This random variation per instance will make their
+   * sleep times every so slightly different.
+   */
+  private final long sleepVarianceMsec = (long) (Math.random() * 100L);
 
+  /**
+   * Random unique id of this <code>ElectionCandidate</code>.
+   */
   private final String id = UUID.randomUUID().toString();
 
+  /**
+   * The current <code>ElectionCandidateState</code> of this candidate.
+   */
   AtomicReference<ElectionCandidateState> state = new AtomicReference<ElectionCandidateState>(null);
+
+  /**
+   * A listener to inform on changes of state changes for this candidate.
+   */
   private ElectionCandidateListener listener;
+
+  /**
+   * Externally supplied configuration.
+   */
   private ElectionConfiguration config;
 
   /**
@@ -61,7 +81,7 @@ public class ElectionCandidate extends AbstractBaseTask {
    *
    * @param listener the listener to inform about state changes
    * @param config   the parsed configuration
-   * @return
+   * @return this instance
    */
   public ElectionCandidate configure(ElectionCandidateListener listener,
       ElectionConfiguration config) {
@@ -70,10 +90,21 @@ public class ElectionCandidate extends AbstractBaseTask {
     return this;
   }
 
+  /**
+   * Returns whether or not this candidate is currently in leadership state.
+   *
+   * @return <code>true</code> if this candidate is in leadership state;
+   *         <code>false</code> otherwise
+   */
   public boolean isLeader() {
     return state.get() == LEADER;
   }
 
+  /**
+   * Gets the unique id of this candidate.
+   *
+   * @return the unique id
+   */
   public String getId() {
     return id;
   }
@@ -144,7 +175,7 @@ public class ElectionCandidate extends AbstractBaseTask {
 
   private void challengeLease(ElectionLease leaseFile) throws IOException {
     if (leaseFile == null || leaseFile.isExpired()) {
-      ElectionLease newLease = new ElectionLease(id, config.getLeaseTimeToLive());
+      ElectionLease newLease = new ElectionLease(this, config.getLeaseTimeToLive());
       writeLeaseFile(newLease);
 
       log.info("Running for election w/ id '{}'", id);
@@ -177,7 +208,7 @@ public class ElectionCandidate extends AbstractBaseTask {
   }
 
   private void sleep() throws InterruptedException {
-    long sleepTime = SLEEP_VARIANCE_MSEC;
+    long sleepTime = sleepVarianceMsec;
 
     ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
@@ -213,7 +244,7 @@ public class ElectionCandidate extends AbstractBaseTask {
     if (state != LEADER && state != RUNNING_FOR_ELECTION) {
       return;
     }
-    if (leaseFile.isOwnedBy(id)) {
+    if (leaseFile.isOwnedBy(this)) {
       return;
     }
 

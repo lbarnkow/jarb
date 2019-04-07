@@ -27,6 +27,9 @@ import java.util.Comparator;
  * @author lbarnkow
  */
 public class ChronologicalMessageComparator implements Comparator<Message> {
+  /**
+   * Static thread-safe instance of this comparator.
+   */
   public static final ChronologicalMessageComparator CHRONOLOGICAL_MESSAGE_COMPARATOR =
       new ChronologicalMessageComparator();
 

@@ -32,8 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A management task that periodically prints a report of all tasks handled by a
@@ -46,15 +45,32 @@ import org.slf4j.LoggerFactory;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
+@Slf4j
 public class TaskTableLoggerTask extends AbstractBaseTask {
-  private static final Logger logger = LoggerFactory.getLogger(TaskTableLoggerTask.class);
-
+  /**
+   * The default interval in which a table of the running tasks should be written
+   * to the log.
+   */
   private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
 
+  /**
+   * Externally supplied <code>TaskManager</code> to query about the running
+   * tasks.
+   */
   @ToString.Exclude
   private final TaskManager manager;
+
+  /**
+   * The interval in which a table of the running tasks should be written to the
+   * log.
+   */
   private final long taskInterval;
 
+  /**
+   * Constructs a new instance for a given <code>TaskManager</code>.
+   *
+   * @param manager the <code>TaskManager</code>
+   */
   public TaskTableLoggerTask(TaskManager manager) {
     this(manager, TASK_INTERVAL_MSEC);
   }
@@ -62,16 +78,16 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
   @Override
   public void runTask() throws Throwable {
     while (true) {
-      logger.info("Logging running background tasks");
+      log.info("Logging running background tasks");
 
       TaskStates tasks = countTasks();
 
-      logger.info("UNUSED......: {}", tasks.unused);
-      logger.info("ACTIVATING..: {}", tasks.activating);
-      logger.info("ACTIVE......: {}", tasks.active);
-      logger.info("DEACTIVATING: {}", tasks.deactivating);
-      logger.info("DEAD........: {}", tasks.dead);
-      logger.info("TOTAL.......: {}", tasks.getTotal());
+      log.info("UNUSED......: {}", tasks.unused);
+      log.info("ACTIVATING..: {}", tasks.activating);
+      log.info("ACTIVE......: {}", tasks.active);
+      log.info("DEACTIVATING: {}", tasks.deactivating);
+      log.info("DEAD........: {}", tasks.dead);
+      log.info("TOTAL.......: {}", tasks.getTotal());
 
       try {
         Thread.sleep(taskInterval);
@@ -86,7 +102,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
 
     for (Task task : manager.getTasks()) {
       TaskState state = manager.getTaskState(task);
-      logger.debug("{} : {}", task.getName(), state);
+      log.debug("{} : {}", task.getName(), state);
 
       if (state == UNUSED) {
         result.unused++;
@@ -104,11 +120,31 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
     return result;
   }
 
+  /**
+   * Helper structure to collect the amount of tasks per state.
+   *
+   * @author lbarnkow
+   */
   static class TaskStates {
+    /**
+     * The amount of tasks in state 'UNUSED'.
+     */
     int unused;
+    /**
+     * The amount of tasks in state 'ACTIVATING'.
+     */
     int activating;
+    /**
+     * The amount of tasks in state 'ACTIVE'.
+     */
     int active;
+    /**
+     * The amount of tasks in state 'DEACTIVATING'.
+     */
     int deactivating;
+    /**
+     * The amount of tasks in state 'DEAD'.
+     */
     int dead;
 
     int getTotal() {

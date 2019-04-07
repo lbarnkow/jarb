@@ -34,9 +34,17 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public abstract class AbstractBotSpecificTask extends AbstractBaseTask {
 
+  /**
+   * The <code>Bot</code> associated with this <code>Task</code>.
+   */
   @Getter
   private final Bot bot;
 
+  /**
+   * Construct a new instance associated with a given <code>Bot</code>.
+   *
+   * @param bot the <code>Bot</code>
+   */
   public AbstractBotSpecificTask(Bot bot) {
     this.bot = bot;
     this.setName(getClass().getSimpleName() + "-" + bot.getName() + "-thread");

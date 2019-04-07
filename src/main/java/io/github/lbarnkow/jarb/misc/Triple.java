@@ -33,8 +33,18 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class Triple<A, B, C> extends Tuple<A, B> {
+  /**
+   * The third element of this instance.
+   */
   private final C third;
 
+  /**
+   * Constructs a new triple from three given elements.
+   *
+   * @param first  the first element
+   * @param second the second element
+   * @param third  the third element
+   */
   public Triple(A first, B second, C third) {
     super(first, second);
     this.third = third;

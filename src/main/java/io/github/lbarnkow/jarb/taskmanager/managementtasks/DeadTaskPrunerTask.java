@@ -25,8 +25,7 @@ import io.github.lbarnkow.jarb.taskmanager.Task;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A management task that periodically removes all <code>DEAD</code> tasks from
@@ -36,15 +35,30 @@ import org.slf4j.LoggerFactory;
  */
 @ToString
 @AllArgsConstructor
+@Slf4j
 public class DeadTaskPrunerTask extends AbstractBaseTask {
-  private static final Logger logger = LoggerFactory.getLogger(DeadTaskPrunerTask.class);
-
+  /**
+   * The default interval in which dead tasks should be pruned.
+   */
   private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
 
+  /**
+   * Externally supplied <code>TaskManager</code> to find and prune dead tasks
+   * for.
+   */
   @ToString.Exclude
   private final TaskManager manager;
+
+  /**
+   * The interval in which dead tasks should be pruned.
+   */
   private final long taskInterval;
 
+  /**
+   * Constructs a new instance for a given <code>TaskManager</code>.
+   *
+   * @param manager the <code>TaskManager</code>
+   */
   public DeadTaskPrunerTask(TaskManager manager) {
     this(manager, TASK_INTERVAL_MSEC);
   }
@@ -67,14 +81,14 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
 
     for (Task task : manager.getTasks()) {
       if (manager.getTaskState(task) == DEAD) {
-        logger.debug("Pruning task '{}' in state '{}'.", task.getName(), DEAD);
+        log.debug("Pruning task '{}' in state '{}'.", task.getName(), DEAD);
         pruned++;
         manager.prune(task);
       }
     }
 
     if (pruned > 0) {
-      logger.info("Pruned {} background tasks in state '{}'.", pruned, DEAD);
+      log.info("Pruned {} background tasks in state '{}'.", pruned, DEAD);
     }
 
     return pruned;

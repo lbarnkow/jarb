@@ -25,5 +25,11 @@ package io.github.lbarnkow.jarb.taskmanager;
  * @author lbarnkow
  */
 public interface TaskEndedCallback {
+  /**
+   * Called when a <code>TaskWrapper</code> reaches the end of the task
+   * life-cycle.
+   *
+   * @param event event data
+   */
   void onTaskEnded(TaskEndedEvent event);
 }

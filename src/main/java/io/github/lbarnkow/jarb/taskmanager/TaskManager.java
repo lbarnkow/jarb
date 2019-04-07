@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.NoArgsConstructor;
 import lombok.Synchronized;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The <code>TaskManager</code> collects multiple tasks and controls their
@@ -41,17 +41,26 @@ import org.slf4j.LoggerFactory;
  * @author lbarnkow
  */
 @ToString
+@NoArgsConstructor
+@Slf4j
 public class TaskManager {
-  private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
-
+  /**
+   * A flag indicating whether this instance has started its management tasks or
+   * not.
+   */
   private boolean started;
+
+  /**
+   * The collection <code>Task</code>s and associated <code>TaskWrapper</code>s
+   * managed by this instance.
+   */
   private final Map<Task, TaskWrapper> tasks = new ConcurrentHashMap<>();
 
+  /**
+   * The management tasks employed by this instance.
+   */
   private final Task[] managementTasks =
       new Task[] { new TaskTableLoggerTask(this), new DeadTaskPrunerTask(this) };
-
-  public TaskManager() {
-  }
 
   /**
    * Spawns threads for a set of given tasks and monitors their progress in the
@@ -96,6 +105,10 @@ public class TaskManager {
     }
   }
 
+  /**
+   * Signals this instance to stop all managed tasks (including management tasks).
+   * This method blocks until all tasks have reached the state 'DEAD'.
+   */
   @Synchronized
   public void stopAll() {
     tasks.keySet().stream().forEach(task -> stop(task));
@@ -132,18 +145,39 @@ public class TaskManager {
     }
   }
 
+  /**
+   * Gets the number of managed tasks (including management tasks).
+   *
+   * @return the number of managed tasks
+   */
   public int getTaskCount() {
     return tasks.size();
   }
 
+  /**
+   * Gets the number of management tasks.
+   *
+   * @return the number of management tasks.
+   */
   public int getNumberOfManagementTasks() {
     return managementTasks.length;
   }
 
+  /**
+   * Gets the tasks managed by this instance (including management tasks).
+   *
+   * @return the tasks
+   */
   public Set<Task> getTasks() {
     return new HashSet<>(tasks.keySet());
   }
 
+  /**
+   * Gets the <code>TaskState</code> for a given <code>Task</code>.
+   *
+   * @param task the <code>Task</code>
+   * @return the <code>TaskState</code>
+   */
   public TaskState getTaskState(Task task) {
     return tasks.get(task).getState();
   }
@@ -162,7 +196,7 @@ public class TaskManager {
       }
 
     } catch (InterruptedException e) {
-      logger.error("Caught InterruptedException while waiting for all tasks to stop!");
+      log.error("Caught InterruptedException while waiting for all tasks to stop!");
     }
   }
 }

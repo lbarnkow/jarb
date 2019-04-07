@@ -33,7 +33,19 @@ import lombok.Value;
 @Value
 @Builder
 public class TaskEndedEvent {
+  /**
+   * The <code>Task</code> that has reached the end of the task life-cycle.
+   */
   private Task task;
+
+  /**
+   * The final <code>TaskState</code>.
+   */
   private TaskState state;
+
+  /**
+   * The last <code>Exception</code> thrown by the <code>Task</code> (if any error
+   * occurred).
+   */
   private Optional<Throwable> lastError;
 }

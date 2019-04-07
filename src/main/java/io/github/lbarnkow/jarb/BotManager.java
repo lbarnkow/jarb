@@ -79,19 +79,62 @@ import lombok.val;
 public class BotManager extends AbstractBaseTask implements ElectionCandidateListener,
     RealtimeClientListener, LoginTaskListener, SubscriptionsTrackerTaskListener, TaskEndedCallback {
 
+  /**
+   * Externally supplied <code>TaskManager</code>. Used to manage and schedule
+   * background tasks like public channel discovery.
+   */
   private TaskManager tasks;
+
+  /**
+   * Externally supplied <code>ElectionCandidate</code>. Used to synchronize with
+   * other concurrent jarb instances. This instance will only run bots, when it
+   * acquired the leadership position.
+   */
   private ElectionCandidate election;
 
+  /**
+   * Externally supplied configuration.
+   */
   private BotManagerConfiguration config;
+
+  /**
+   * Externally supplied factory for <code>RealtimeClient</code> instances. Each
+   * managed bot will get its own real-time client.
+   */
   private Provider<RealtimeClient> realtimeClientProvider;
+
+  /**
+   * Map associating each managed bot with additional data and object references.
+   */
   private Map<Bot, BotDataStruct> bots = new ConcurrentHashMap<>();
+
+  /**
+   * Externally supplied <code>RestClient</code>, which is shared among all bots.
+   */
   private RestClient restClient;
 
+  /**
+   * Flag indicating if this instance is shutting down. Used for synchronization
+   * purposes, to prevent triggering multiple shutdowns based on different causes
+   * from different threads.
+   */
   private AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
+  /**
+   * Used as signalling device for the main event loop. It will sleep/block until
+   * this semaphore indicates a new event is available.
+   */
   private Semaphore eventPool = new Semaphore(0);
+
+  /**
+   * The main event queue.
+   */
   private BlockingDeque<QueuedEvent> eventQueue = new LinkedBlockingDeque<>();
 
+  /**
+   * Externally supplied <code>RoomProcessor</code> used to act upon new messages
+   * to a <code>Room</code> for a <code>Bot</code>.
+   */
   private RoomProcessor roomProcessor;
 
   @Inject

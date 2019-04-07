@@ -24,6 +24,14 @@ package io.github.lbarnkow.jarb.election;
  * @author lbarnkow
  */
 public interface ElectionCandidateListener {
+  /**
+   * Called by the <code>ElectionCandidate</code> when ever its
+   * <code>ElectionCandidateState</code> changes.
+   *
+   * @param source   the <code>ElectionCandidate</code> emitting the event
+   * @param oldState the old state before the change
+   * @param newState the new state after the change
+   */
   void onStateChanged(ElectionCandidate source, ElectionCandidateState oldState,
       ElectionCandidateState newState);
 }

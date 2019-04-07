@@ -30,6 +30,13 @@ import lombok.Data;
  */
 @Data
 public class Tuple<A, B> {
+  /**
+   * The first element of this instance.
+   */
   private final A first;
+
+  /**
+   * The second element of this instance.
+   */
   private final B second;
 }

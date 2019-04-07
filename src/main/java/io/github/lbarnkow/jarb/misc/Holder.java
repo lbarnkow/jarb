@@ -36,17 +36,32 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class Holder<T> {
+  /**
+   * The initial value assigned to this instance upon construction.
+   */
   private final T initialValue;
+
+  /**
+   * The current value assigned to this instance.
+   */
   @NonNull
   @Getter
   @Setter
   private T value;
 
+  /**
+   * Constructs a new instance with a given initial value.
+   *
+   * @param value the inital value.
+   */
   public Holder(T value) {
     this.initialValue = value;
     this.value = value;
   }
 
+  /**
+   * Resets this instance to the initial value supplied upon construction.
+   */
   public void reset() {
     setValue(initialValue);
   }

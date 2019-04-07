@@ -35,19 +35,54 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * A background task periodically querying the chat server to find new
+ * server-side subscriptions to chat rooms for a given bot.
+ *
+ * @author lbarnkow
+ */
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @Slf4j
 public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
-
+  /**
+   * The default interval in which a the chat server should be queried for new
+   * subscriptions.
+   */
   public static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
+  /**
+   * The <code>Bot</code> for which sever-side subscriptions should be tracked.
+   */
   private final Bot bot;
+
+  /**
+   * Externally supplied and pre-configured <code>RealtimeClient</code> to use to
+   * query the chat server.
+   */
   private final RealtimeClient realtimeClient;
+
+  /**
+   * The interval in which a the chat server should be queried for new
+   * subscriptions.
+   */
   @Getter(PACKAGE)
   private final long sleepTime;
+
+  /**
+   * The listener to inform about new subscriptions.
+   */
   private final SubscriptionsTrackerTaskListener listener;
 
+  /**
+   * Constructs a new subscriptions tracker for a given <code>Bot</code> using a
+   * given <code>RealtimeClient</code>.
+   *
+   * @param bot            the <code>Bot</code>
+   * @param realtimeClient the <code>RealtimeClient</code>
+   * @param sleepTime      the interval between each query
+   * @param listener       the listener to inform about new subscriptions
+   */
   SubscriptionsTrackerTask(Bot bot, RealtimeClient realtimeClient, long sleepTime,
       SubscriptionsTrackerTaskListener listener) {
     super(bot);
@@ -58,6 +93,14 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
     this.listener = listener;
   }
 
+  /**
+   * Constructs a new subscriptions tracker for a given <code>Bot</code> using a
+   * given <code>RealtimeClient</code>.
+   *
+   * @param bot            the <code>Bot</code>
+   * @param realtimeClient the <code>RealtimeClient</code>
+   * @param listener       the listener to inform about new subscriptions
+   */
   public SubscriptionsTrackerTask(Bot bot, RealtimeClient realtimeClient,
       SubscriptionsTrackerTaskListener listener) {
     this(bot, realtimeClient, DEFAULT_SLEEP_TIME, listener);
@@ -96,7 +139,20 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
     }
   }
 
+  /**
+   * A listener that is to be informed whenever a new server-side subscription is
+   * detected for the configured <code>Bot</code>.
+   *
+   * @author lbarnkow
+   */
   public static interface SubscriptionsTrackerTaskListener {
+    /**
+     * Called on every new server-side subscription.
+     *
+     * @param source the <code>SubscriptionsTrackerTask</code> emitting this event
+     * @param bot    the <code>Bot</code> associated with the new subscription
+     * @param room   the <code>Room</code> being subscribed to
+     */
     void onNewSubscription(SubscriptionsTrackerTask source, Bot bot, Room room);
   }
 }
