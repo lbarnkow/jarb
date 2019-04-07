@@ -127,7 +127,7 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
     // given
     config.setSyncFileName("/dev/rtc0");
     ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
-    ElectionLease lease = new ElectionLease(candidate.getId(), DEFAULT_LEASE_TTL);
+    ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
 
     candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
@@ -158,7 +158,8 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
   @Test
   void testStolenLeaseFile() {
     // given
-    final ElectionLease lease = new ElectionLease("testing", DEFAULT_LEASE_TTL);
+    final ElectionCandidate thief = new ElectionCandidate();
+    final ElectionLease lease = new ElectionLease(thief, DEFAULT_LEASE_TTL);
     ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
     ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
     candidate1.state.set(LEADER);

@@ -33,8 +33,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a leadership lease file as POJO.
@@ -45,32 +44,79 @@ import org.slf4j.LoggerFactory;
 @AllArgsConstructor
 @NoArgsConstructor
 @JarbJsonSettings
+@Slf4j
 public class ElectionLease {
-  private static final Logger logger = LoggerFactory.getLogger(ElectionLease.class);
-
+  /**
+   * Maximum number of retries upon IOExceptions.
+   */
   private static final int MAX_FILE_IO_RETRIES = 5;
 
+  /**
+   * The <code>ObjectMapper</code> to de-/serialize the election lease file.
+   */
   private static final ObjectMapper MAPPER = new ObjectMapper(new YAMLFactory());
 
+  /**
+   * The <code>ElectionCandidate</code> id claiming leadership in this lease.
+   */
   private String leaderId;
+
+  /**
+   * The timestamp when leadership was acquired or refreshed.
+   */
   private long leaseAcquired;
+
+  /**
+   * The timestamp when leadership will expire unless it is refreshed beforehand.
+   */
   private long leaseExpiration;
 
-  public ElectionLease(String leaderId, long ttl) {
+  private ElectionLease(String leaderId, long ttl) {
     this(leaderId, System.currentTimeMillis(), System.currentTimeMillis() + ttl);
   }
 
+  /**
+   * Constructing a lease from a <code>ElectionCandidate</code> starting from now
+   * and expiring after a given time-to-live.
+   *
+   * @param leader the candidate
+   * @param ttl    the time-to-live for this lease
+   */
+  public ElectionLease(ElectionCandidate leader, long ttl) {
+    this(leader.getId(), ttl);
+  }
+
+  /**
+   * Constructing a lease reusing the id from a previous lease.
+   *
+   * @param oldLease the previous lease
+   * @param ttl      the time-to-live for this lease
+   */
   public ElectionLease(ElectionLease oldLease, long ttl) {
     this(oldLease.leaderId, ttl);
   }
 
+  /**
+   * Gets whether or not this lease has expired.
+   *
+   * @return <code>true</code> if this lease has expired; <code>false</code>
+   *         otherwise
+   */
   public boolean isExpired() {
     long now = System.currentTimeMillis();
     return leaseExpiration < now;
   }
 
-  public boolean isOwnedBy(String candidateId) {
-    return Objects.equals(leaderId, candidateId);
+  /**
+   * Gets whether or not this lease is owned by a given
+   * <code>ElectionCandidate</code>.
+   *
+   * @param candidate the candidate
+   * @return <code>true</code> if the id of the given candidate matches the leader
+   *         id in this lease; <code>false</code> otherwise
+   */
+  public boolean isOwnedBy(ElectionCandidate candidate) {
+    return Objects.equals(leaderId, candidate.getId());
   }
 
   /**
@@ -100,7 +146,7 @@ public class ElectionLease {
 
     if (lease == null) {
       if (lastException instanceof JsonProcessingException) {
-        logger.warn("Failed to deserialize election lease file; assuming file was empty!");
+        log.warn("Failed to deserialize election lease file; assuming file was empty!");
       } else {
         throw lastException;
       }

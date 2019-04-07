@@ -29,11 +29,17 @@ import lombok.Setter;
  * @author lbarnkow
  */
 public abstract class AbstractBaseTask implements Task {
+  /**
+   * The logical name for this <code>Task</code>. Defaults to the class name
+   * suffixed by "-thread".
+   */
   @Getter
   @Setter
   private String name = getClass().getSimpleName() + "-thread";
 
   @Override
   public void initializeTask() throws Throwable {
+    // A lot of tasks don't need to do initialization. This empty method body
+    // reduces the clutter in sub classes.
   }
 }

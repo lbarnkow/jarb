@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 
@@ -52,15 +51,16 @@ class ElectionLeaseTest {
   @Test
   void testIsOwnedBy() {
     // given
-    String id2 = UUID.randomUUID().toString();
-    ElectionLease lease1 = new ElectionLease(id, 0L);
-    ElectionLease lease2 = new ElectionLease(id2, 0L);
+    ElectionCandidate candidate1 = new ElectionCandidate();
+    ElectionCandidate candidate2 = new ElectionCandidate();
+    ElectionLease lease1 = new ElectionLease(candidate1, 0L);
+    ElectionLease lease2 = new ElectionLease(candidate2, 0L);
 
     // when
-    boolean idOwnsLease1 = lease1.isOwnedBy(id);
-    boolean id2OwnsLease1 = lease1.isOwnedBy(id2);
-    boolean idOwnsLease2 = lease2.isOwnedBy(id);
-    boolean id2OwnsLease2 = lease2.isOwnedBy(id2);
+    boolean idOwnsLease1 = lease1.isOwnedBy(candidate1);
+    boolean id2OwnsLease1 = lease1.isOwnedBy(candidate2);
+    boolean idOwnsLease2 = lease2.isOwnedBy(candidate1);
+    boolean id2OwnsLease2 = lease2.isOwnedBy(candidate2);
 
     // then
     assertThat(idOwnsLease1).isTrue();
@@ -104,7 +104,8 @@ class ElectionLeaseTest {
   void testLoadAndSave() throws IOException {
     // given
     File tmpFile = Files.createTempFile("test", null).toFile();
-    ElectionLease lease = new ElectionLease(id, DEFAULT_LEASE_TTL);
+    ElectionCandidate candidate = new ElectionCandidate();
+    ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
 
     // when
     ElectionLease.save(lease, tmpFile);
@@ -142,7 +143,8 @@ class ElectionLeaseTest {
   @Test
   void testSaveWithBadTargetPath() {
     // given
-    ElectionLease lease = new ElectionLease(id, DEFAULT_LEASE_TTL);
+    ElectionCandidate candidate = new ElectionCandidate();
+    ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
 
     // when
     assertThrows(IOException.class, () -> {

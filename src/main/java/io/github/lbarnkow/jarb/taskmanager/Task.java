@@ -24,9 +24,26 @@ package io.github.lbarnkow.jarb.taskmanager;
  * @author lbarnkow
  */
 public interface Task {
+  /**
+   * Gets the logical name of this <code>Task</code>.
+   *
+   * @return the logical name
+   */
   String getName();
 
+  /**
+   * Handles any work necessary to initialize the backround tasks.
+   *
+   * @throws Throwable on errors
+   */
   void initializeTask() throws Throwable;
 
+  /**
+   * Handles the main workload of the background task. This method <b>MUST</b>
+   * return control to the caller when an <code>InterruptedException</code>
+   * occurs!
+   *
+   * @throws Throwable on errors
+   */
   void runTask() throws Throwable;
 }

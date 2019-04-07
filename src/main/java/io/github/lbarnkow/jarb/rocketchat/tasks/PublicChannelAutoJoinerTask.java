@@ -38,22 +38,58 @@ import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * A background task periodically querying the chat server to find new chat
+ * rooms.
+ *
+ * @author lbarnkow
+ */
 @ToString
 @EqualsAndHashCode(callSuper = true)
+@Slf4j
 public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
-  private static final Logger logger = LoggerFactory.getLogger(SubscriptionsTrackerTask.class);
 
+  /**
+   * The default interval in which a the chat server should be queried for new
+   * rooms.
+   */
   public static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
 
+  /**
+   * Externally supplied <code>RestClient</code> to use to query the chat server.
+   */
   private final RestClient restClient;
+
+  /**
+   * Externally supplied and pre-configured <code>RealtimeClient</code> to use to
+   * query the chat server.
+   */
   private final RealtimeClient realtimeClient;
+
+  /**
+   * Externally supplied authorization token to use in conjunction with the
+   * <code>RestClient</code>.
+   */
   private final Holder<AuthInfo> authInfo;
+
+  /**
+   * The interval in which a the chat server should be queried for new rooms.
+   */
   @Getter(PACKAGE)
   private final long sleepTime;
 
+  /**
+   * Constructs a new auto joiner task for a given <code>Bot</code> using a given
+   * <code>RealtimeClient</code> / <code>RestClient</code>.
+   *
+   * @param restClient     the <code>RestClient</code>
+   * @param realtimeClient the <code>RealtimeClient</code>
+   * @param bot            the <code>Bot</code>
+   * @param authInfo       authorization token for the <code>RestClient</code>
+   * @param sleepTime      the interval between each query
+   */
   PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
       Holder<AuthInfo> authInfo, long sleepTime) {
     super(bot);
@@ -64,6 +100,15 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
     this.sleepTime = sleepTime;
   }
 
+  /**
+   * Constructs a new auto joiner task for a given <code>Bot</code> using a given
+   * <code>RealtimeClient</code> / <code>RestClient</code>.
+   *
+   * @param restClient     the <code>RestClient</code>
+   * @param realtimeClient the <code>RealtimeClient</code>
+   * @param bot            the <code>Bot</code>
+   * @param authInfo       authorization token for the <code>RestClient</code>
+   */
   public PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
       Holder<AuthInfo> authInfo) {
     this(restClient, realtimeClient, bot, authInfo, DEFAULT_SLEEP_TIME);
@@ -94,9 +139,9 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
                 realtimeClient.sendMessageAndWait(message, ReceiveJoinRoomReply.class);
 
             if (reply.isSuccess()) {
-              logger.info("Bot '{}' joined channel '{}'.", bot.getName(), room.getName());
+              log.info("Bot '{}' joined channel '{}'.", bot.getName(), room.getName());
             } else {
-              logger.error("Bot '{}' failed to join channel '{}'.", bot.getName(), room.getName());
+              log.error("Bot '{}' failed to join channel '{}'.", bot.getName(), room.getName());
             }
           }
         }
@@ -104,7 +149,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
         Thread.sleep(sleepTime);
       }
     } catch (InterruptedException e) {
-      logger.trace("{} was interrupted.", getClass().getSimpleName());
+      log.trace("{} was interrupted.", getClass().getSimpleName());
     }
   }
 

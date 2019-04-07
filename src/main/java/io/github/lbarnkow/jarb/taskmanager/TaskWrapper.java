@@ -41,9 +41,24 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public class TaskWrapper {
+  /**
+   * The <code>Task</code> wrapped by this instance.
+   */
   private final Task task;
+
+  /**
+   * The <code>Thread</code> running the wrapped tasks work load.
+   */
   private Thread thread;
+
+  /**
+   * The state of the task life-cycle this instance is currently in.
+   */
   private TaskState state = UNUSED;
+
+  /**
+   * The last Exception thrown by the wrapped task.
+   */
   private Throwable lastError;
 
   /**

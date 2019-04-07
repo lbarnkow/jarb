@@ -26,7 +26,7 @@ import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
- * Central jarb configuration loaded from YAML.
+ * Per bot configuration loaded from YAML.
  *
  * @author lbarnkow
  */
