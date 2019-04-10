@@ -23,20 +23,42 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/realtime-api/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class BaseMessageWithMethod extends BaseMessage {
+public class BaseMethod extends BaseMessage {
+  /**
+   * The type of communication ('method'!).
+   */
   private static final String MSG = "method";
 
+  /**
+   * The method.
+   */
   private String method;
 
-  BaseMessageWithMethod(String id, String method) {
+  /**
+   * Constructs a new instance.
+   * 
+   * @param id     The unique id matching up a request/response pair
+   * @param method The method
+   */
+  BaseMethod(String id, String method) {
     super(MSG, id);
     this.method = method;
   }
 
-  public BaseMessageWithMethod(String method) {
+  /**
+   * Constructs a new instance (with a random id).
+   * 
+   * @param method The method
+   */
+  public BaseMethod(String method) {
     this(UUID.randomUUID().toString(), method);
   }
 }

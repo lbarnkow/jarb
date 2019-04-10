@@ -26,14 +26,32 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/send-message/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SendSendMessage extends BaseMessageWithMethod {
+public class SendSendMessage extends BaseMethod {
+  /**
+   * The method name.
+   */
   private static final String METHOD = "sendMessage";
 
+  /**
+   * The parameters.
+   */
   private List<RawMessage> params;
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param message the message to send
+   */
   public SendSendMessage(Message message) {
     super(METHOD);
     params = Arrays.asList(RawMessage.of(message));

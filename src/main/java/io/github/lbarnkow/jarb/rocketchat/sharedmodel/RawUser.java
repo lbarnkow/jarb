@@ -26,14 +26,28 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/rest-api/authentication/login/#payload
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @Builder
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawUser {
+  /**
+   * Your username or email.
+   */
   @JsonProperty("_id")
   private String id;
+
+  /**
+   * Your password.
+   */
   private String username;
 
   /**

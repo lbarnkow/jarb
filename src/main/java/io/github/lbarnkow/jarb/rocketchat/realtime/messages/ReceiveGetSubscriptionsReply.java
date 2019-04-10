@@ -24,9 +24,19 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/get-subscriptions/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ReceiveGetSubscriptionsReply extends BaseMessage {
+  /**
+   * The result list.
+   */
   private List<RawSubscription> result;
 }

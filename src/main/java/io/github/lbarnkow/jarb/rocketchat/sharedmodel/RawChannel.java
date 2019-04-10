@@ -27,18 +27,39 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/rest-api/channels/list/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @Builder
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawChannel {
+  /**
+   * The channel id.
+   */
   @JsonProperty("_id")
   private String id;
+
+  /**
+   * The channel name.
+   */
   private String name;
+
+  /**
+   * The channel type.
+   */
   @JsonProperty("t")
   private String type;
 
+  /**
+   * Converts this instance to a <code>Room</code> instance.
+   *
+   * @return the resulting <code>Room</code>
+   */
   public Room convert() {
     RoomType type = RoomType.parse(this.type);
     return Room.builder().id(id).name(name).type(type).build();

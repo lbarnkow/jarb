@@ -32,37 +32,94 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 // see https://rocket.chat/docs/developer-guides/realtime-api/the-message-object/
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/the-message-object/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @Builder
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawMessage {
+  /**
+   * The message id.
+   */
   @JsonProperty("_id")
   private String id;
+
+  /**
+   * The room id - Identify the room the message belongs.
+   */
   private String rid;
+
+  /**
+   * The textual message.
+   */
   private String msg;
+
+  /**
+   * The message time stamp (date of creation on client).
+   */
   private String ts;
+
+  /**
+   * The user that sent the message.
+   */
   @JsonProperty("u")
   private RawUser user;
+
+  /**
+   * The time stamp when the message got saved on the server.
+   */
   @JsonProperty("_updatedAt")
   private String updatedAt;
+
+  /**
+   * (Optional) The time stamp of when the message was edited.
+   */
   private String editedAt;
+
+  /**
+   * (Optional) The user that edited the message.
+   */
   private String editedBy;
 
   // urls: (Optional) A collection of URLs metadata. Available when the message
   // contains at least one URL
 
+  /**
+   * (Optional) A collection of attachment objects, available only when the
+   * message has at least one attachment.
+   */
   @Builder.Default
   private List<RawAttachment> attachments = Collections.emptyList();
 
   // alias: (Optional) A way to display the message is “sent” from someone else
   // other than the user who sent the message
 
+  /**
+   * (Optional) A url to an image, that is accessible to anyone, to display as the
+   * avatar instead of the message user’s account avatar.
+   */
   private String avatar;
+
+  /**
+   * (Optional) Boolean that states whether or not this message should be grouped
+   * together with other messages from the same user.
+   */
   private boolean groupable;
+
+  /**
+   * (Optional) Whether Rocket.Chat should try and parse the urls or not.
+   */
   private boolean parseUrls;
 
+  /**
+   * The message type.
+   */
   @JsonProperty("t")
   private String type;
 

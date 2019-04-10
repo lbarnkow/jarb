@@ -22,12 +22,28 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/joining-channels/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ReceiveJoinRoomReply extends BaseMessage {
+  /**
+   * Boolean indicating if the user could join the room.
+   */
   private boolean result;
 
+  /**
+   * Alias to access the join request result.
+   * 
+   * @return <code>true</code> when the user joined the room; <code>false</code>
+   *         otherwise
+   */
   public boolean isSuccess() {
     return result;
   }

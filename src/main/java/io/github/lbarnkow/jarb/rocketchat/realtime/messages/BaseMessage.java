@@ -22,32 +22,86 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/realtime-api/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @NoArgsConstructor
 public class BaseMessage {
-
+  /**
+   * The type of communication ('method' or 'sub').
+   */
   private String msg;
+
+  /**
+   * A unique id matching up a request/response pair.
+   */
   private String id;
+
+  /**
+   * Used in responses, not to be sent in requests.
+   */
   private String collection;
+
+  /**
+   * Used in responses, not to be sent in requests.
+   */
   private Error error;
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param msg The type of communication ('method' or 'sub')
+   * @param id  The unique id matching up a request/response pair
+   */
   BaseMessage(String msg, String id) {
     this.msg = msg;
     this.id = id;
   }
 
+  /**
+   * Constructs a new instance (with a random id).
+   * 
+   * @param msg The type of communication ('method' or 'sub')
+   */
   BaseMessage(String msg) {
     this(msg, null);
   }
 
+  /**
+   * Error structure, used in responses.
+   * 
+   * @author lbarnkow
+   */
   @JarbJsonSettings
   @Data
   public static class Error {
+    /**
+     * Purpose unknown.
+     */
     private boolean isClientSafe;
+
+    /**
+     * The error code.
+     */
     private int error;
+
+    /**
+     * The reason.
+     */
     private String reason;
+
+    /**
+     * The error message.
+     */
     private String message;
+
+    /**
+     * The error type.
+     */
     private String errorType;
   }
 }

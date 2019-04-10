@@ -23,17 +23,34 @@ import io.github.lbarnkow.jarb.api.Room;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/stream-room-messages/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendStreamRoomMessages extends BaseSubscription {
-  private static final String NAME = "stream-room-messages";
-  public static final String COLLECTION = NAME;
+  /**
+   * The collection to subscribe to.
+   */
+  public static final String COLLECTION = "stream-room-messages";
 
+  /**
+   * The parameters.
+   */
   private final Object[] params;
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param room the <code>Room</code> to subscribe to
+   */
   public SendStreamRoomMessages(Room room) {
-    super(NAME);
+    super(COLLECTION);
     params = new Object[] { room.getId(), false };
   }
 }

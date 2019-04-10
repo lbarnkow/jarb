@@ -31,38 +31,113 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.val;
 
-// see: https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/#attachments-detail
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @Builder
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
 public class RawAttachment {
+  /**
+   * The color you want the order on the left side to be, any value background-css
+   * supports.
+   */
   private String color;
+
+  /**
+   * The text to display for this attachment, it is different than the message’s
+   * text.
+   */
   private String text;
+
+  /**
+   * Displays the time next to the text portion.
+   */
   private String ts;
+
+  /**
+   * An image that displays to the left of the text, looks better when this is
+   * relatively small.
+   */
   @JsonProperty("thumb_url")
   private String thumbUrl;
+
+  /**
+   * Only applicable if the ts is provided, as it makes the time clickable to this
+   * link.
+   */
   @JsonProperty("message_link")
   private String messageLink;
+
+  /**
+   * Causes the image, audio, and video sections to be hiding when collapsed is
+   * true.
+   */
   private boolean collapsed;
+
+  /**
+   * Name of the author.
+   */
   @JsonProperty("author_name")
   private String authorName;
+
+  /**
+   * Providing this makes the author name clickable and points to this link.
+   */
   @JsonProperty("author_link")
   private String authorLink;
+
+  /**
+   * Displays a tiny icon to the left of the Author’s name.
+   */
   @JsonProperty("author_icon")
   private String authorIcon;
+
+  /**
+   * Title to display for this attachment, displays under the author.
+   */
   private String title;
+
+  /**
+   * Providing this makes the title clickable, pointing to this link.
+   */
   @JsonProperty("title_link")
   private String titleLink;
+
+  /**
+   * When this is true, a download icon appears and clicking this saves the link
+   * to file.
+   */
   @JsonProperty("title_link_download")
   private boolean titleLinkDownload;
+
+  /**
+   * The image to display, will be “big” and easy to see.
+   */
   @JsonProperty("image_url")
   private String imageUrl;
+
+  /**
+   * Audio file to play, only supports what html audio does.
+   */
   @JsonProperty("audio_url")
   private String audioUrl;
+
+  /**
+   * Video file to play, only supports what html video does.
+   */
   @JsonProperty("video_url")
   private String videoUrl;
+
+  /**
+   * An array of Attachment Field Objects.
+   */
   @Builder.Default
   private List<RawAttachmentField> fields = Collections.emptyList();
 

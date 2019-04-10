@@ -23,12 +23,29 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Set https://rocket.chat/docs/developer-guides/rest-api/subscriptions/getone/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SubscriptionsGetOneReply extends BaseReply {
+  /**
+   * The room id.
+   */
   private String rid;
+
+  /**
+   * The room / subscription name.
+   */
   private String name;
+
+  /**
+   * The room type.
+   */
   @JsonProperty("t")
   private String type;
 }

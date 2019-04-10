@@ -20,6 +20,12 @@ package io.github.lbarnkow.jarb.rocketchat.rest.messages;
 
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/rest-api/subscriptions/unread/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 public class SubscriptionsUnreadReply extends BaseReply {
 }

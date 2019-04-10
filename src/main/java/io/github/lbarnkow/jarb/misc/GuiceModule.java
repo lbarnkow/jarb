@@ -29,10 +29,10 @@ import lombok.Generated;
 /**
  * Configuration for guice dependency injection.
  *
- * @author u111642
+ * @author lbarnkow
  */
-// To exclude this class from code coverage. I know, it's wrong, but jacoco currently doesn't offer
-// anything better. :(
+// To exclude this class from code coverage. I know, it's wrong to (ab-)use the
+// lombok annotation, but jacoco currently doesn't offer anything better. :(
 @Generated
 public class GuiceModule extends AbstractModule implements Provider<Client> {
   @Override
