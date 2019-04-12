@@ -45,7 +45,18 @@ def pmdExportStats(threshold, statsDir) {
     schemaVersion = 1
     label = "pmd"
     message = (violations == 0 ? "all good" : "${violations} violations")
-    color = (violations == 0 ? "success" : "yellow")
+    color = 'red'
+
+    if (violations == 0)
+        color = 'success'
+    else if (violations <= (threshold * 0.25))
+        color = 'green'
+    else if (violations <= (threshold * 0.50))
+        color = 'yellowgreen'
+    else if (violations <= (threshold * 0.75))
+        color = 'yellow'
+    else if (violations <= (threshold * 1.00))
+        color = 'orange'
 
     json = groovy.json.JsonOutput.toJson([schemaVersion: schemaVersion, label: label, message: message, color: color])
     new File(statsDir).mkdirs()
