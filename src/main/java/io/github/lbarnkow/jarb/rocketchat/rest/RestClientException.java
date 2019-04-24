@@ -22,9 +22,19 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+/**
+ * Exception wrapping any error occuring during a REST call to the chat server.
+ * 
+ * @author lbarnkow
+ */
 public class RestClientException extends Exception {
   private static final long serialVersionUID = 245562960868828052L;
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param object The response from the REST endpoint
+   */
   public RestClientException(Object object) {
     super("Bad response from REST endpoint: "
         + ToStringBuilder.reflectionToString(object, SHORT_PREFIX_STYLE));

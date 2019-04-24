@@ -18,8 +18,25 @@
 
 package io.github.lbarnkow.jarb.rocketchat.realtime;
 
+/**
+ * A listener that is to be informed on all changes regarding the websocket
+ * connection to the chat server.
+ * 
+ * @author lbarnkow
+ */
 public interface WebsocketClientListener {
+  /**
+   * Occurs upon websocket connection termination.
+   * 
+   * @param initiatedByClient <code>true</code> if the termination was initiated
+   *                          by the client; <code>false</code> otherwise
+   */
   void onWebsocketClose(boolean initiatedByClient);
 
+  /**
+   * Occurs upon receiving a message from the chat server through the websocket.
+   * 
+   * @param message the message
+   */
   void onWebsocketMessage(String message);
 }
