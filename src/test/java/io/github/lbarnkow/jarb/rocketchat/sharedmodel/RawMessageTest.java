@@ -54,7 +54,7 @@ class RawMessageTest {
     assertThat(message.getId()).isEqualTo(rawMessage.getId());
     assertThat(message.getRoom()).isSameAs(room);
     assertThat(message.getRoom().getId()).isEqualTo(rawMessage.getRid());
-    assertThat(message.getMessage()).isEqualTo(rawMessage.getMsg());
+    assertThat(message.getText()).isEqualTo(rawMessage.getMsg());
     assertThat(message.getTimestamp().toString()).isEqualTo(rawMessage.getTs());
     assertThat(message.getUser().getId()).isEqualTo(rawMessage.getUser().getId());
     assertThat(message.getUser().getName()).isEqualTo(rawMessage.getUser().getUsername());
@@ -72,7 +72,7 @@ class RawMessageTest {
     Message message = Message.builder() //
         .id("id") //
         .room(room) //
-        .message("message") //
+        .text("message") //
         .timestamp(Instant.now()) //
         .user(user) //
         .attachments(Collections.emptyList()) //
@@ -85,7 +85,7 @@ class RawMessageTest {
     assertThat(message.getId()).isEqualTo(rawMessage.getId());
     assertThat(message.getRoom()).isSameAs(room);
     assertThat(message.getRoom().getId()).isEqualTo(rawMessage.getRid());
-    assertThat(message.getMessage()).isEqualTo(rawMessage.getMsg());
+    assertThat(message.getText()).isEqualTo(rawMessage.getMsg());
     assertThat(message.getTimestamp().toString()).isEqualTo(rawMessage.getTs());
     assertThat(message.getUser().getId()).isEqualTo(rawMessage.getUser().getId());
     assertThat(message.getUser().getName()).isEqualTo(rawMessage.getUser().getUsername());

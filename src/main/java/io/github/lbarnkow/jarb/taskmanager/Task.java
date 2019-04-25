@@ -36,7 +36,7 @@ public interface Task {
    *
    * @throws Throwable on errors
    */
-  void initializeTask() throws Throwable;
+  void initializeTask() throws Exception;
 
   /**
    * Handles the main workload of the background task. This method <b>MUST</b>
@@ -45,5 +45,5 @@ public interface Task {
    *
    * @throws Throwable on errors
    */
-  void runTask() throws Throwable;
+  void runTask() throws Exception;
 }

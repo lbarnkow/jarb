@@ -58,13 +58,13 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
    * tasks.
    */
   @ToString.Exclude
-  private final TaskManager manager;
+  private final transient TaskManager manager;
 
   /**
    * The interval in which a table of the running tasks should be written to the
    * log.
    */
-  private final long taskInterval;
+  private final transient long taskInterval;
 
   /**
    * Constructs a new instance for a given <code>TaskManager</code>.
@@ -76,7 +76,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     while (true) {
       log.info("Logging running background tasks");
 
@@ -129,23 +129,23 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
     /**
      * The amount of tasks in state 'UNUSED'.
      */
-    int unused;
+    transient int unused;
     /**
      * The amount of tasks in state 'ACTIVATING'.
      */
-    int activating;
+    transient int activating;
     /**
      * The amount of tasks in state 'ACTIVE'.
      */
-    int active;
+    transient int active;
     /**
      * The amount of tasks in state 'DEACTIVATING'.
      */
-    int deactivating;
+    transient int deactivating;
     /**
      * The amount of tasks in state 'DEAD'.
      */
-    int dead;
+    transient int dead;
 
     int getTotal() {
       return unused + activating + active + deactivating + dead;

@@ -36,14 +36,14 @@ public class ReplyErrorException extends Exception {
    * The error.
    */
   @Getter
-  private final BaseMessage.Error error;
+  private final BaseMessage.BaseError error;
 
   /**
    * Constructs a new instance.
    * 
    * @param error the error
    */
-  public ReplyErrorException(BaseMessage.Error error) {
+  public ReplyErrorException(BaseMessage.BaseError error) {
     this.error = error;
   }
 }

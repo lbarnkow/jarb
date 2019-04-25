@@ -79,10 +79,11 @@ public abstract class AbstractBaseBot implements Bot {
 
     if (stream != null) {
       val reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
-      String line = null;
       val sb = new StringBuilder();
-      while ((line = reader.readLine()) != null) {
+      String line = reader.readLine();
+      while (line != null) {
         sb.append(line).append("\n");
+        line = reader.readLine();
       }
 
       helpText = Lists.asList(Attachment.builder().text(sb.toString()).build(), new Attachment[0]);

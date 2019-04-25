@@ -52,27 +52,28 @@ public class ElectionCandidate extends AbstractBaseTask {
    * the same amount of time. This random variation per instance will make their
    * sleep times every so slightly different.
    */
-  private final long sleepVarianceMsec = (long) (Math.random() * 100L);
+  private final transient long sleepVarianceMsec = (long) (Math.random() * 100L);
 
   /**
    * Random unique id of this <code>ElectionCandidate</code>.
    */
-  private final String id = UUID.randomUUID().toString();
+  private final transient String id = UUID.randomUUID().toString();
 
   /**
    * The current <code>ElectionCandidateState</code> of this candidate.
    */
-  AtomicReference<ElectionCandidateState> state = new AtomicReference<ElectionCandidateState>(null);
+  transient AtomicReference<ElectionCandidateState> state =
+      new AtomicReference<ElectionCandidateState>(null);
 
   /**
    * A listener to inform on changes of state changes for this candidate.
    */
-  private ElectionCandidateListener listener;
+  private transient ElectionCandidateListener listener;
 
   /**
    * Externally supplied configuration.
    */
-  private ElectionConfiguration config;
+  private transient ElectionConfiguration config;
 
   /**
    * Post-construction initialization by the user of this instance. Since this
@@ -110,7 +111,7 @@ public class ElectionCandidate extends AbstractBaseTask {
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     updateState(INACTIVE);
 
     try {

@@ -68,26 +68,26 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
    * The regular expression pattern instance to use to parse incoming messages
    * (see methond <code>initialize</code>).
    */
-  private Pattern regex;
+  private transient Pattern regex;
 
   /**
    * The time stamp marking the last update of pug picture URLs from reddit.
    */
-  private Instant lastUpdate;
+  private transient Instant lastUpdate;
   /**
    * A local cache containing pug picture URLs.
    */
-  private List<String> pugsCache = new ArrayList<>(100);
+  private transient List<String> pugsCache = new ArrayList<>(100);
 
   /**
    * RNG to select pug picture URLs from the cache.
    */
-  private Random random;
+  private transient Random random;
 
   /**
    * The REST client instance to access reddit.
    */
-  private Client jersey;
+  private transient Client jersey;
 
   /**
    * PugMeBot constructor.
@@ -128,7 +128,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
 
     try {
       Room room = message.getRoom();
-      val matcher = regex.matcher(message.getMessage());
+      val matcher = regex.matcher(message.getText());
       if (matcher.matches()) {
         val action = parseAction(matcher.group(1));
 
@@ -144,7 +144,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
     } catch (Exception e) {
       log.error("Failed to handle message '{}'!", message, e);
       reply = Message.builder().room(message.getRoom())
-          .message("*PugMeBot made a doody!* :poop: _(i.e. an internal error occured.)_").build();
+          .text("*PugMeBot made a doody!* :poop: _(i.e. an internal error occured.)_").build();
     }
 
     return Optional.ofNullable(reply);

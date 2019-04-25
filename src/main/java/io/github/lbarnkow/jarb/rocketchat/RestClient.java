@@ -48,8 +48,8 @@ import javax.ws.rs.core.Response.Status.Family;
 import lombok.Synchronized;
 
 public class RestClient {
-  private final Client client;
-  private WebTarget baseTarget;
+  private final transient Client client;
+  private transient WebTarget baseTarget;
 
   @Inject
   RestClient(Client client) {

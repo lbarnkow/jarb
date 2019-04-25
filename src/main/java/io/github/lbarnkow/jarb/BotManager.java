@@ -83,59 +83,59 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
    * Externally supplied <code>TaskManager</code>. Used to manage and schedule
    * background tasks like public channel discovery.
    */
-  private TaskManager tasks;
+  private transient TaskManager tasks;
 
   /**
    * Externally supplied <code>ElectionCandidate</code>. Used to synchronize with
    * other concurrent jarb instances. This instance will only run bots, when it
    * acquired the leadership position.
    */
-  private ElectionCandidate election;
+  private transient ElectionCandidate election;
 
   /**
    * Externally supplied configuration.
    */
-  private BotManagerConfiguration config;
+  private transient BotManagerConfiguration config;
 
   /**
    * Externally supplied factory for <code>RealtimeClient</code> instances. Each
    * managed bot will get its own real-time client.
    */
-  private Provider<RealtimeClient> realtimeClientProvider;
+  private transient Provider<RealtimeClient> realtimeClientProvider;
 
   /**
    * Map associating each managed bot with additional data and object references.
    */
-  private Map<Bot, BotDataStruct> bots = new ConcurrentHashMap<>();
+  private transient Map<Bot, BotDataStruct> bots = new ConcurrentHashMap<>();
 
   /**
    * Externally supplied <code>RestClient</code>, which is shared among all bots.
    */
-  private RestClient restClient;
+  private transient RestClient restClient;
 
   /**
    * Flag indicating if this instance is shutting down. Used for synchronization
    * purposes, to prevent triggering multiple shutdowns based on different causes
    * from different threads.
    */
-  private AtomicBoolean shuttingDown = new AtomicBoolean(false);
+  private transient AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
   /**
    * Used as signalling device for the main event loop. It will sleep/block until
    * this semaphore indicates a new event is available.
    */
-  private Semaphore eventPool = new Semaphore(0);
+  private transient Semaphore eventPool = new Semaphore(0);
 
   /**
    * The main event queue.
    */
-  private BlockingDeque<QueuedEvent> eventQueue = new LinkedBlockingDeque<>();
+  private transient BlockingDeque<QueuedEvent> eventQueue = new LinkedBlockingDeque<>();
 
   /**
    * Externally supplied <code>RoomProcessor</code> used to act upon new messages
    * to a <code>Room</code> for a <code>Bot</code>.
    */
-  private RoomProcessor roomProcessor;
+  private transient RoomProcessor roomProcessor;
 
   @Inject
   BotManager(TaskManager taskManager, ElectionCandidate election,
@@ -201,7 +201,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     boolean keepGoing = true;
 
     try {
@@ -470,12 +470,12 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     /**
      * The event type.
      */
-    private EventTypes type;
+    private transient EventTypes type;
 
     /**
      * The event data (depends on the type).
      */
-    private Object data;
+    private transient Object data;
 
     QueuedEvent(EventTypes type, Object data) {
       this.type = type;
@@ -510,26 +510,26 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     /**
      * The <code>RealtimeClient</code> for this <code>Bot</code>.
      */
-    private RealtimeClient realtimeClient;
+    private transient RealtimeClient realtimeClient;
 
     /**
      * The <code>AuthInfo</code> for this <code>Bot</code>.
      */
-    private Holder<AuthInfo> authInfo = new Holder<>(AuthInfo.EXPIRED);
+    private transient Holder<AuthInfo> authInfo = new Holder<>(AuthInfo.EXPIRED);
 
     /**
      * The <code>LoginTask</code> for this <code>Bot</code>.
      */
-    private LoginTask loginTask;
+    private transient LoginTask loginTask;
 
     /**
      * The <code>SubscriptionsTrackerTask</code> for this <code>Bot</code>.
      */
-    private SubscriptionsTrackerTask subscriptionsTrackerTask;
+    private transient SubscriptionsTrackerTask subscriptionsTrackerTask;
 
     /**
      * The <code>PublicChannelAutoJoinerTask</code> for this <code>Bot</code>.
      */
-    private PublicChannelAutoJoinerTask autoJoinerTask;
+    private transient PublicChannelAutoJoinerTask autoJoinerTask;
   }
 }

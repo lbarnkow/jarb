@@ -49,7 +49,7 @@ public class BaseMessage {
   /**
    * Used in responses, not to be sent in requests.
    */
-  private Error error;
+  private BaseError error;
 
   /**
    * Constructs a new instance.
@@ -78,7 +78,7 @@ public class BaseMessage {
    */
   @JarbJsonSettings
   @Data
-  public static class Error {
+  public static class BaseError {
     /**
      * Purpose unknown.
      */

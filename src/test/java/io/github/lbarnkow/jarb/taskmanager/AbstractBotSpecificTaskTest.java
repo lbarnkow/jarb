@@ -47,7 +47,7 @@ class AbstractBotSpecificTaskTest {
     }
 
     @Override
-    public void runTask() throws Throwable {
+    public void runTask() throws Exception {
     }
 
   }

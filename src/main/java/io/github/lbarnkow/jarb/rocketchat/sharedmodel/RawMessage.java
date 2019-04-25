@@ -135,7 +135,7 @@ public class RawMessage {
     return Message.builder() //
         .id(id) //
         .room(room) //
-        .message(msg) //
+        .text(msg) //
         .timestamp(ts != null ? Instant.parse(ts) : null) //
         .user(user.convert()) //
         .attachments(RawAttachment.convertList(attachments)) //
@@ -154,7 +154,7 @@ public class RawMessage {
     return RawMessage.builder() //
         .id(m.getId()) //
         .rid(m.getRoom().getId()) //
-        .msg(m.getMessage()) //
+        .msg(m.getText()) //
         .ts(m.getTimestamp() != null ? m.getTimestamp().toString() : null) //
         .user(m.getUser() != null ? RawUser.of(m.getUser()) : null) //
         .attachments(RawAttachment.of(m.getAttachments())) //

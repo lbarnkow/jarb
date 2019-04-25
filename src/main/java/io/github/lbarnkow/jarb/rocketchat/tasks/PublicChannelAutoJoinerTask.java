@@ -60,25 +60,25 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
   /**
    * Externally supplied <code>RestClient</code> to use to query the chat server.
    */
-  private final RestClient restClient;
+  private final transient RestClient restClient;
 
   /**
    * Externally supplied and pre-configured <code>RealtimeClient</code> to use to
    * query the chat server.
    */
-  private final RealtimeClient realtimeClient;
+  private final transient RealtimeClient realtimeClient;
 
   /**
    * Externally supplied authorization token to use in conjunction with the
    * <code>RestClient</code>.
    */
-  private final Holder<AuthInfo> authInfo;
+  private final transient Holder<AuthInfo> authInfo;
 
   /**
    * The interval in which a the chat server should be queried for new rooms.
    */
   @Getter(PACKAGE)
-  private final long sleepTime;
+  private final transient long sleepTime;
 
   /**
    * Constructs a new auto joiner task for a given <code>Bot</code> using a given
@@ -115,7 +115,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     Bot bot = getBot();
 
     try {
