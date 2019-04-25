@@ -22,13 +22,27 @@ import io.github.lbarnkow.jarb.rocketchat.realtime.messages.BaseMessage;
 import lombok.Getter;
 import lombok.ToString;
 
+/**
+ * Exception wrapping any error received from the chat server on the web socket
+ * connection.
+ * 
+ * @author lbarnkow
+ */
 @ToString
 public class ReplyErrorException extends Exception {
   private static final long serialVersionUID = -1709873181129875291L;
 
+  /**
+   * The error.
+   */
   @Getter
   private final BaseMessage.Error error;
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param error the error
+   */
   public ReplyErrorException(BaseMessage.Error error) {
     this.error = error;
   }
