@@ -78,7 +78,7 @@ public class SendLogin extends BaseMethod {
      */
     public Params(Credentials credentials) {
       this.user = new User(credentials.getUsername());
-      this.password = new Password(credentials.getPassword());
+      this.password = new Password(credentials.getPassword(), "sha-256");
     }
   }
 
@@ -112,6 +112,6 @@ public class SendLogin extends BaseMethod {
     /**
      * The hashing algorithm.
      */
-    private final String algorithm = "sha-256";
+    private final String algorithm;
   }
 }

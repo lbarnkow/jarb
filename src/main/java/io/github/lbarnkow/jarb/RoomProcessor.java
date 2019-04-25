@@ -20,6 +20,7 @@ package io.github.lbarnkow.jarb;
 
 import static io.github.lbarnkow.jarb.misc.ChronologicalMessageComparator.CHRONOLOGICAL_MESSAGE_COMPARATOR;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.lbarnkow.jarb.api.AuthInfo;
 import io.github.lbarnkow.jarb.api.Bot;
 import io.github.lbarnkow.jarb.api.Message;
@@ -63,7 +64,7 @@ public class RoomProcessor {
    * A local cache associating raw room ids with their respective
    * <code>Room</code> instances.
    */
-  private transient Map<String, Room> roomCache = new ConcurrentHashMap<>();
+  private final transient Map<String, Room> roomCache = new ConcurrentHashMap<>();
 
   /**
    * Adds a <code>Room</code> instance to the local cache.
@@ -120,7 +121,7 @@ public class RoomProcessor {
             SendSendMessage outgoing = new SendSendMessage(reply.get());
             realtimeClient.sendMessage(outgoing);
           }
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
           log.error("Failed to send Bot '{}'s reply '{}'!", bot.getName(), reply.get(), e);
         }
       }

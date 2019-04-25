@@ -76,6 +76,7 @@ import lombok.val;
  */
 @Slf4j
 @ToString
+@SuppressWarnings({ "PMD.TooManyMethods", "PMD.ExcessiveImports" })
 public class BotManager extends AbstractBaseTask implements ElectionCandidateListener,
     RealtimeClientListener, LoginTaskListener, SubscriptionsTrackerTaskListener, TaskEndedCallback {
 
@@ -83,14 +84,14 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
    * Externally supplied <code>TaskManager</code>. Used to manage and schedule
    * background tasks like public channel discovery.
    */
-  private transient TaskManager tasks;
+  private final transient TaskManager tasks;
 
   /**
    * Externally supplied <code>ElectionCandidate</code>. Used to synchronize with
    * other concurrent jarb instances. This instance will only run bots, when it
    * acquired the leadership position.
    */
-  private transient ElectionCandidate election;
+  private final transient ElectionCandidate election;
 
   /**
    * Externally supplied configuration.
@@ -101,41 +102,41 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
    * Externally supplied factory for <code>RealtimeClient</code> instances. Each
    * managed bot will get its own real-time client.
    */
-  private transient Provider<RealtimeClient> realtimeClientProvider;
+  private final transient Provider<RealtimeClient> realtimeClientProvider;
 
   /**
    * Map associating each managed bot with additional data and object references.
    */
-  private transient Map<Bot, BotDataStruct> bots = new ConcurrentHashMap<>();
+  private final transient Map<Bot, BotDataStruct> bots = new ConcurrentHashMap<>();
 
   /**
    * Externally supplied <code>RestClient</code>, which is shared among all bots.
    */
-  private transient RestClient restClient;
+  private final transient RestClient restClient;
 
   /**
    * Flag indicating if this instance is shutting down. Used for synchronization
    * purposes, to prevent triggering multiple shutdowns based on different causes
    * from different threads.
    */
-  private transient AtomicBoolean shuttingDown = new AtomicBoolean(false);
+  private final transient AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
   /**
    * Used as signalling device for the main event loop. It will sleep/block until
    * this semaphore indicates a new event is available.
    */
-  private transient Semaphore eventPool = new Semaphore(0);
+  private final transient Semaphore eventPool = new Semaphore(0);
 
   /**
    * The main event queue.
    */
-  private transient BlockingDeque<QueuedEvent> eventQueue = new LinkedBlockingDeque<>();
+  private final transient BlockingDeque<QueuedEvent> eventQueue = new LinkedBlockingDeque<>();
 
   /**
    * Externally supplied <code>RoomProcessor</code> used to act upon new messages
    * to a <code>Room</code> for a <code>Bot</code>.
    */
-  private transient RoomProcessor roomProcessor;
+  private final transient RoomProcessor roomProcessor;
 
   @Inject
   BotManager(TaskManager taskManager, ElectionCandidate election,
@@ -180,7 +181,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
    * This will stop all threads spawned by this instance.
    */
   public void stop() {
-    if (shuttingDown.getAndSet(true) == false) {
+    if (!shuttingDown.getAndSet(true)) {
       log.info("Stopping all background tasks...");
       tasks.stopAll();
 
@@ -470,12 +471,12 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     /**
      * The event type.
      */
-    private transient EventTypes type;
+    private final transient EventTypes type;
 
     /**
      * The event data (depends on the type).
      */
-    private transient Object data;
+    private final transient Object data;
 
     QueuedEvent(EventTypes type, Object data) {
       this.type = type;
@@ -515,7 +516,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     /**
      * The <code>AuthInfo</code> for this <code>Bot</code>.
      */
-    private transient Holder<AuthInfo> authInfo = new Holder<>(AuthInfo.EXPIRED);
+    private final transient Holder<AuthInfo> authInfo = new Holder<>(AuthInfo.EXPIRED);
 
     /**
      * The <code>LoginTask</code> for this <code>Bot</code>.

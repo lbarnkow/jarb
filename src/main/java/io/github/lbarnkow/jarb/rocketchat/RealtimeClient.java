@@ -46,6 +46,7 @@ import javax.websocket.DeploymentException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@SuppressWarnings("PMD.TooManyMethods")
 public class RealtimeClient implements WebsocketClientListener {
 
   private static final String REC_MSG_CONNECTED = "connected";
@@ -54,11 +55,11 @@ public class RealtimeClient implements WebsocketClientListener {
 
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private transient WebsocketClient client;
+  private final transient WebsocketClient client;
 
   private transient RealtimeClientListener listener;
 
-  private transient Map<String, Object> unansweredRequests = new ConcurrentHashMap<>();
+  private final transient Map<String, Object> unansweredRequests = new ConcurrentHashMap<>();
 
   @Inject
   RealtimeClient(WebsocketClient client) {

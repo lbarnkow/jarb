@@ -26,6 +26,7 @@ import static javax.ws.rs.core.Response.Status.Family.SUCCESSFUL;
 
 import io.github.lbarnkow.jarb.api.Attachment;
 import io.github.lbarnkow.jarb.api.Bot;
+import io.github.lbarnkow.jarb.api.BotException;
 import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.bots.AbstractBaseBot;
@@ -77,17 +78,17 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
   /**
    * A local cache containing pug picture URLs.
    */
-  private transient List<String> pugsCache = new ArrayList<>(100);
+  private final transient List<String> pugsCache = new ArrayList<>(100);
 
   /**
    * RNG to select pug picture URLs from the cache.
    */
-  private transient Random random;
+  private final transient Random random;
 
   /**
    * The REST client instance to access reddit.
    */
-  private transient Client jersey;
+  private final transient Client jersey;
 
   /**
    * PugMeBot constructor.
@@ -192,13 +193,13 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
         .get();
 
     if (response.getStatusInfo().getFamily() != SUCCESSFUL) {
-      throw new RuntimeException(response.readEntity(String.class));
+      throw new BotException(response.readEntity(String.class));
     }
 
     val posts = response.readEntity(RedditResponse.class);
 
     posts.getData().getChildren().stream() //
-        .filter(child -> child.getData().isVideo() == false) //
+        .filter(child -> !child.getData().isVideo()) //
         .filter(child -> child.getData().getUrl().endsWith(".jpg"))
         .forEach(child -> pugsCache.add(child.getData().getUrl()));
   }
