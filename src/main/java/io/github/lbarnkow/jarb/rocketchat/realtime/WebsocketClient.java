@@ -46,27 +46,27 @@ public class WebsocketClient {
    * A externally provided web socket container hosting all web socket
    * connections.
    */
-  private WebSocketContainer container;
+  private transient WebSocketContainer container;
 
   /**
    * A listener to be informed on various events.
    */
-  private WebsocketClientListener listener;
+  private transient WebsocketClientListener listener;
 
   /**
    * The web socket session.
    */
-  private Session session;
+  private transient Session session;
 
   /**
    * A flag indicating if the session was closed by the client.
    */
-  private boolean closedByClient;
+  private transient boolean closedByClient;
 
   /**
    * Counts the number of messages received.
    */
-  private long receivedMessages;
+  private transient long receivedMessages;
 
   @Inject
   WebsocketClient(WebSocketContainer container) {

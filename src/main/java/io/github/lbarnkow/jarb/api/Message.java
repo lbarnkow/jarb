@@ -46,7 +46,7 @@ public class Message {
   /**
    * The textual message.
    */
-  String message;
+  String text;
 
   /**
    * The message time stamp (date of creation on client).

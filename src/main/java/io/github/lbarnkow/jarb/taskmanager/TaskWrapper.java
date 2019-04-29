@@ -44,22 +44,22 @@ public class TaskWrapper {
   /**
    * The <code>Task</code> wrapped by this instance.
    */
-  private final Task task;
+  private final transient Task task;
 
   /**
    * The <code>Thread</code> running the wrapped tasks work load.
    */
-  private Thread thread;
+  private transient Thread thread;
 
   /**
    * The state of the task life-cycle this instance is currently in.
    */
-  private TaskState state = UNUSED;
+  private transient TaskState state = UNUSED;
 
   /**
    * The last Exception thrown by the wrapped task.
    */
-  private Throwable lastError;
+  private transient Throwable lastError;
 
   /**
    * Starts the thread on which the tasks work is being processed.
@@ -81,7 +81,7 @@ public class TaskWrapper {
   private void executeTask(Optional<TaskEndedCallback> callback) {
     try {
       task.initializeTask();
-    } catch (Throwable t) {
+    } catch (Exception t) {
       handleError("Initialization", t, callback);
       return;
     }
@@ -89,7 +89,7 @@ public class TaskWrapper {
     state = ACTIVE;
     try {
       task.runTask();
-    } catch (Throwable t) {
+    } catch (Exception t) {
       handleError("Execution", t, callback);
       return;
     }

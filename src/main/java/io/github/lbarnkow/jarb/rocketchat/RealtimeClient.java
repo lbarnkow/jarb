@@ -43,19 +43,22 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 import javax.websocket.DeploymentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RealtimeClient implements WebsocketClientListener {
 
-  private static final Logger logger = LoggerFactory.getLogger(RealtimeClient.class);
+  private static final String REC_MSG_CONNECTED = "connected";
+  private static final String REC_MSG_PING = "ping";
+  private static final String REC_MSG_CHANGED = "changed";
+
   private static final ObjectMapper MAPPER = new ObjectMapper();
 
-  private WebsocketClient client;
+  private transient WebsocketClient client;
 
-  private RealtimeClientListener listener;
+  private transient RealtimeClientListener listener;
 
-  private Map<String, Object> unansweredRequests = new ConcurrentHashMap<>();
+  private transient Map<String, Object> unansweredRequests = new ConcurrentHashMap<>();
 
   @Inject
   RealtimeClient(WebsocketClient client) {
@@ -116,10 +119,10 @@ public class RealtimeClient implements WebsocketClientListener {
     unansweredRequests.put(message.getId(), sem);
 
     sendMessage(message);
-    sem.tryAcquire(timeout, MILLISECONDS);
-
+    boolean wasAnswered = sem.tryAcquire(timeout, MILLISECONDS);
     Object value = unansweredRequests.remove(message.getId());
-    if (value == null || value == sem) {
+
+    if (!wasAnswered || value == null || sem.equals(value)) {
       throw new TimeoutException(message.toString());
     }
 
@@ -147,13 +150,14 @@ public class RealtimeClient implements WebsocketClientListener {
     try {
       BaseMessage baseMessage = MAPPER.readValue(message, BaseMessage.class);
 
-      if ("connected".equals(baseMessage.getMsg())) {
+      if (REC_MSG_CONNECTED.equals(baseMessage.getMsg())) {
         handleConnected();
 
-      } else if ("ping".equals(baseMessage.getMsg())) {
+      } else if (REC_MSG_PING.equals(baseMessage.getMsg())) {
         handlePing();
 
-      } else if ("changed".equals(baseMessage.getMsg()) && baseMessage.getCollection() != null) {
+      } else if (REC_MSG_CHANGED.equals(baseMessage.getMsg())
+          && baseMessage.getCollection() != null) {
         handleSubscriptionUpdate(baseMessage, message);
 
       } else if (baseMessage.getId() != null) {
@@ -162,12 +166,11 @@ public class RealtimeClient implements WebsocketClientListener {
       }
 
     } catch (IOException e) {
-      logger.error("Unexpected error deserializing server message '{}'; closing session!", message,
-          e);
+      log.error("Unexpected error deserializing server message '{}'; closing session!", message, e);
       try {
         client.close();
       } catch (IOException e1) {
-        logger.error("Unexpected error disconnecting!", e1);
+        log.error("Unexpected error disconnecting!", e1);
       }
     }
   }
@@ -186,7 +189,7 @@ public class RealtimeClient implements WebsocketClientListener {
       unansweredRequests.put(message.getId(), new Tuple<>(message, rawJson));
       semaphore.release();
     } else {
-      logger.debug("Unhandled message with id: {}", rawJson);
+      log.debug("Unhandled message with id: {}", rawJson);
     }
   }
 
@@ -201,7 +204,7 @@ public class RealtimeClient implements WebsocketClientListener {
       }
 
     } else {
-      logger.debug("Unhandled subscription update for collection '{}'.", message.getCollection());
+      log.debug("Unhandled subscription update for collection '{}'.", message.getCollection());
 
     }
   }

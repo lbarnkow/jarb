@@ -54,25 +54,25 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
   /**
    * The <code>Bot</code> for which sever-side subscriptions should be tracked.
    */
-  private final Bot bot;
+  private final transient Bot bot;
 
   /**
    * Externally supplied and pre-configured <code>RealtimeClient</code> to use to
    * query the chat server.
    */
-  private final RealtimeClient realtimeClient;
+  private final transient RealtimeClient realtimeClient;
 
   /**
    * The interval in which a the chat server should be queried for new
    * subscriptions.
    */
   @Getter(PACKAGE)
-  private final long sleepTime;
+  private final transient long sleepTime;
 
   /**
    * The listener to inform about new subscriptions.
    */
-  private final SubscriptionsTrackerTaskListener listener;
+  private final transient SubscriptionsTrackerTaskListener listener;
 
   /**
    * Constructs a new subscriptions tracker for a given <code>Bot</code> using a
@@ -107,7 +107,7 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     Set<String> knownIds = new HashSet<>();
     try {
       SendGetSubscriptions message = new SendGetSubscriptions();

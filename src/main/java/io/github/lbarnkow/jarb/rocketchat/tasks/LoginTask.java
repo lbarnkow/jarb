@@ -49,17 +49,17 @@ public class LoginTask extends AbstractBotSpecificTask {
    * Externally supplied and pre-configured <code>RealtimeClient</code> to use to
    * log in to the chat server.
    */
-  private final RealtimeClient realtimeClient;
+  private final transient RealtimeClient realtimeClient;
 
   /**
    * The listener to inform about new authorization tokens.
    */
-  private final LoginTaskListener listener;
+  private final transient LoginTaskListener listener;
 
   /**
    * Externally supplied <code>Credentials</code> to use to log in.
    */
-  private final Credentials credentials;
+  private final transient Credentials credentials;
 
   /**
    * <code>LoginTask</code> constructor.
@@ -81,7 +81,7 @@ public class LoginTask extends AbstractBotSpecificTask {
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     final Bot bot = getBot();
 
     try {

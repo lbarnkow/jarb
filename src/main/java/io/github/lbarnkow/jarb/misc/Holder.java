@@ -39,7 +39,7 @@ public class Holder<T> {
   /**
    * The initial value assigned to this instance upon construction.
    */
-  private final T initialValue;
+  private final transient T initialValue;
 
   /**
    * The current value assigned to this instance.

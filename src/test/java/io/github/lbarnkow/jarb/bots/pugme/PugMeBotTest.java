@@ -121,7 +121,7 @@ class PugMeBotTest {
     // given
     User user = User.builder().name(randomUUID().toString()).build();
     String text = "@" + TEST_USERNAME;
-    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).message(text).build();
+    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).text(text).build();
     when(typeMock.getFamily()).thenReturn(SERVER_ERROR);
 
     // when
@@ -129,7 +129,7 @@ class PugMeBotTest {
 
     // then
     assertThat(response.isPresent()).isTrue();
-    assertThat(response.get().getMessage()).contains("error");
+    assertThat(response.get().getText()).contains("error");
   }
 
   @Test
@@ -137,7 +137,7 @@ class PugMeBotTest {
     // given
     User user = User.builder().name(randomUUID().toString()).build();
     String text = "@" + TEST_USERNAME + "    ";
-    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).message(text).build();
+    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).text(text).build();
 
     // when
     Optional<Message> response = bot.offerMessage(message);
@@ -156,7 +156,7 @@ class PugMeBotTest {
     // given
     User user = User.builder().name(randomUUID().toString()).build();
     String text = "@" + TEST_USERNAME + " bomb";
-    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).message(text).build();
+    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).text(text).build();
 
     // when
     Optional<Message> response = bot.offerMessage(message);
@@ -175,7 +175,7 @@ class PugMeBotTest {
     // given
     User user = User.builder().name(randomUUID().toString()).build();
     String text = "@" + TEST_USERNAME + " bomb 0";
-    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).message(text).build();
+    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).text(text).build();
 
     // when
     Optional<Message> response = bot.offerMessage(message);
@@ -194,7 +194,7 @@ class PugMeBotTest {
     // given
     User user = User.builder().name(randomUUID().toString()).build();
     String text = "@" + TEST_USERNAME + " bomb 20";
-    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).message(text).build();
+    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).text(text).build();
 
     // when
     Optional<Message> response = bot.offerMessage(message);
@@ -213,7 +213,7 @@ class PugMeBotTest {
     // given
     User user = User.builder().name(randomUUID().toString()).build();
     String text = "@" + TEST_USERNAME + " bomb " + Integer.MAX_VALUE;
-    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).message(text).build();
+    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).text(text).build();
 
     // when
     Optional<Message> response = bot.offerMessage(message);
@@ -232,7 +232,7 @@ class PugMeBotTest {
     // given
     User user = User.builder().name(randomUUID().toString()).build();
     String text = "@" + TEST_USERNAME + " help";
-    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).message(text).build();
+    Message message = Message.builder().type(REGULAR_CHAT_MESSAGE).user(user).text(text).build();
 
     // when
     Optional<Message> response = bot.offerMessage(message);

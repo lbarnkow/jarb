@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<ruleset name="jarb-errorprone"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Based on the official pmd category 'errorprone', however, ommiting rules that should not apply to jarb.
+    </description>
+
+    <rule ref="category/java/errorprone.xml">
+        <!-- DataflowAnomalyAnalysis - (Currently) outdated rule that produces lots of false-positives. -->
+        <!-- see https://github.com/pmd/pmd/issues/1304#issuecomment-412925368 -->
+        <exclude name="DataflowAnomalyAnalysis"/>
+
+        <!-- AvoidDuplicateLiterals - Rule is included and configured below. -->
+        <exclude name="AvoidDuplicateLiterals"/>
+
+        <!-- DoNotUseThreads - jarb isn't a J2EE application! -->
+        <exclude name="DoNotCallSystemExit"/>
+
+        <!-- UseProperClassLoader - jarb isn't a J2EE application! -->
+        <exclude name="UseProperClassLoader"/>
+    </rule>
+
+    <!-- AvoidDuplicateLiterals - Allow duplicate literals in Annotations -->
+    <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
+        <properties>
+            <property name="skipAnnotations" value="true"/>
+        </properties>
+    </rule>
+</ruleset>

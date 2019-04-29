@@ -38,7 +38,7 @@ public abstract class AbstractBaseTask implements Task {
   private String name = getClass().getSimpleName() + "-thread";
 
   @Override
-  public void initializeTask() throws Throwable {
+  public void initializeTask() throws Exception {
     // A lot of tasks don't need to do initialization. This empty method body
     // reduces the clutter in sub classes.
   }

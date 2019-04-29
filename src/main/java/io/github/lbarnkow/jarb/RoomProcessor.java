@@ -63,7 +63,7 @@ public class RoomProcessor {
    * A local cache associating raw room ids with their respective
    * <code>Room</code> instances.
    */
-  private Map<String, Room> roomCache = new ConcurrentHashMap<>();
+  private transient Map<String, Room> roomCache = new ConcurrentHashMap<>();
 
   /**
    * Adds a <code>Room</code> instance to the local cache.
@@ -111,7 +111,7 @@ public class RoomProcessor {
         Optional<Message> reply = Optional.empty();
         try {
           reply = bot.offerMessage(message);
-        } catch (Throwable e) {
+        } catch (Exception e) {
           log.error("Bot '{}' failed to process message '{}'!", bot.getName(), message, e);
         }
         try {
@@ -120,7 +120,7 @@ public class RoomProcessor {
             SendSendMessage outgoing = new SendSendMessage(reply.get());
             realtimeClient.sendMessage(outgoing);
           }
-        } catch (Throwable e) {
+        } catch (Exception e) {
           log.error("Failed to send Bot '{}'s reply '{}'!", bot.getName(), reply.get(), e);
         }
       }
@@ -162,7 +162,7 @@ public class RoomProcessor {
       String rmMsg = rawMsg.getMsg();
       Instant rmTs = Instant.parse(rawMsg.getTs());
       MessageType rmType = MessageType.parse(rawMsg.getType());
-      Message message = Message.builder().id(rmId).message(rmMsg).room(room).timestamp(rmTs)
+      Message message = Message.builder().id(rmId).text(rmMsg).room(room).timestamp(rmTs)
           .type(rmType).user(user).build();
       result.add(message);
     }

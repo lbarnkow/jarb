@@ -64,7 +64,7 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     while (true) {
       pruneTasks();
 

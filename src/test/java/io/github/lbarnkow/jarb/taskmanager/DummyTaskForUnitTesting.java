@@ -63,7 +63,7 @@ public final class DummyTaskForUnitTesting extends AbstractBaseTask {
   }
 
   @Override
-  public void initializeTask() throws Throwable {
+  public void initializeTask() throws Exception {
     if (myWrapper != null) {
       stateOnInitialization = myWrapper.getState();
     }
@@ -74,7 +74,7 @@ public final class DummyTaskForUnitTesting extends AbstractBaseTask {
   }
 
   @Override
-  public void runTask() throws Throwable {
+  public void runTask() throws Exception {
     if (myWrapper != null) {
       stateOnRun = myWrapper.getState();
     }
@@ -94,10 +94,10 @@ public final class DummyTaskForUnitTesting extends AbstractBaseTask {
   }
 
   @SuppressWarnings("serial")
-  public static final class InitializeException extends Throwable {
+  public static final class InitializeException extends Exception {
   }
 
   @SuppressWarnings("serial")
-  public static final class RunException extends Throwable {
+  public static final class RunException extends Exception {
   }
 }
