@@ -43,6 +43,7 @@ import lombok.val;
 @Builder
 @NoArgsConstructor // Jackson needs this
 @AllArgsConstructor // @Builder needs this
+@SuppressWarnings("PMD.TooManyFields")
 public class RawAttachment {
   /**
    * The color you want the order on the left side to be, any value background-css

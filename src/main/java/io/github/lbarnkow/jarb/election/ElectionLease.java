@@ -162,6 +162,7 @@ public class ElectionLease {
    * @param file  the file to save to
    * @throws IOException on io errors
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity")
   public static void save(ElectionLease lease, File file) throws IOException {
     boolean success = false;
     IOException lastException = null;

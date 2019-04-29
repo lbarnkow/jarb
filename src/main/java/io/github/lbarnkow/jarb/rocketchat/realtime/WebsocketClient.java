@@ -46,7 +46,7 @@ public class WebsocketClient {
    * A externally provided web socket container hosting all web socket
    * connections.
    */
-  private transient WebSocketContainer container;
+  private final transient WebSocketContainer container;
 
   /**
    * A listener to be informed on various events.

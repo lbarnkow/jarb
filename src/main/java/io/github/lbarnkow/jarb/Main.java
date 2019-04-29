@@ -38,7 +38,10 @@ import lombok.val;
  * @author lbarnkow
  */
 @Slf4j
-public class Main {
+public final class Main {
+  private Main() {
+  }
+
   /**
    * Main code entry point for jarb.
    *

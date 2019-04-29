@@ -44,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author lbarnkow
  */
 @Slf4j
+@SuppressWarnings("PMD.TooManyMethods")
 public class ElectionCandidate extends AbstractBaseTask {
 
   /**

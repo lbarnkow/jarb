@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<ruleset name="jarb-design"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Based on the official pmd category 'design', however, ommiting rules that should not apply to jarb.
+    </description>
+
+    <rule ref="category/java/design.xml">
+        <!-- LawOfDemeter - Amongst other "problems" it makes lombok-builders unusable. -->
+        <exclude name="LawOfDemeter"/>
+
+        <!-- AvoidCatchingGenericException - Bots and other potentially unstable code are wrapped in generic try-catch-blocks often. -->
+        <exclude name="AvoidCatchingGenericException"/>
+
+        <!-- LoosePackageCoupling - Rule needs to be configured to be useful. -->
+        <exclude name="LoosePackageCoupling"/>
+    </rule>
+</ruleset>

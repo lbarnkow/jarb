@@ -16,36 +16,32 @@
  *    limitations under the License.
  */
 
-package io.github.lbarnkow.jarb.taskmanager;
+package io.github.lbarnkow.jarb.api;
 
 /**
- * A background task.
- *
+ * Custom run-time exception to be used by bots.
+ * 
  * @author lbarnkow
  */
-public interface Task {
-  /**
-   * Gets the logical name of this <code>Task</code>.
-   *
-   * @return the logical name
-   */
-  String getName();
+public class BotException extends RuntimeException {
+  private static final long serialVersionUID = -2319589237973725608L;
 
   /**
-   * Handles any work necessary to initialize the backround tasks.
-   *
-   * @throws Throwable on errors
+   * Constructs a new instance.
+   * 
+   * @param message the error message
    */
-  @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-  void initializeTask() throws Exception;
+  public BotException(String message) {
+    super(message);
+  }
 
   /**
-   * Handles the main workload of the background task. This method <b>MUST</b>
-   * return control to the caller when an <code>InterruptedException</code>
-   * occurs!
-   *
-   * @throws Throwable on errors
+   * Constructs a new instance.
+   * 
+   * @param message the error message
+   * @param cause   the root cause
    */
-  @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-  void runTask() throws Exception;
+  public BotException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }
