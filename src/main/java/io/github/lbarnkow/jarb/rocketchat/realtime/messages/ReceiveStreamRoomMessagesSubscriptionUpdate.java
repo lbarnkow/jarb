@@ -23,21 +23,51 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/stream-room-messages/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ReceiveStreamRoomMessagesSubscriptionUpdate extends BaseMessage {
+  /**
+   * Additional data.
+   */
   private Fields fields;
 
+  /**
+   * See
+   * https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/stream-room-messages/
+   * .
+   * 
+   * @author lbarnkow
+   */
   @JarbJsonSettings
   @Data
   public static class Fields {
+    /**
+     * Additional data.
+     */
     private List<Arg> args;
   }
 
+  /**
+   * See
+   * https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/stream-room-messages/
+   * .
+   * 
+   * @author lbarnkow
+   */
   @JarbJsonSettings
   @Data
   public static class Arg {
+    /**
+     * The room id.
+     */
     private String rid;
   }
 }

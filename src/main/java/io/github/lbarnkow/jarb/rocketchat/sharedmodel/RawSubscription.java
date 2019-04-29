@@ -22,23 +22,77 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/get-subscriptions/
+ * #subscription-object .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class RawSubscription {
+  /**
+   * The room type (the same used on the [room object][1]).
+   */
   @JsonProperty("t")
   private String type;
+
+  /**
+   * Timestamp the room was created at, so this should equal the room’s ts field.
+   */
   private RawDate ts;
+
+  /**
+   * Last seen timestamp (The last time the user has seen a message in the room).
+   */
   private RawDate ls;
+
+  /**
+   * The room name.
+   */
   private String name;
+
+  /**
+   * The room id.
+   */
   private String rid;
+
+  /**
+   * An simple user object with its id and username.
+   */
   @JsonProperty("u")
   private RawUser user;
+
+  /**
+   * Whether the room the subscription is for has been opened or not (defaults to
+   * false on direct messages). This is used in the clients to determine whether
+   * the user can see this subscription in their list, since you can hide rooms
+   * from being visible without leaving them.
+   */
   private boolean open;
+
+  /**
+   * Whether there is an alert to be displayed to the user.
+   */
   private boolean alert;
+
   // roles?
+
+  /**
+   * The total of unread messages.
+   */
   private int unread;
+
+  /**
+   * Timestamp of when the subscription record was updated.
+   */
   @JsonProperty("_updatedAt")
   private RawDate updatedAt;
+
+  /**
+   * The subscription id.
+   */
   @JsonProperty("_id")
   private String id;
 }

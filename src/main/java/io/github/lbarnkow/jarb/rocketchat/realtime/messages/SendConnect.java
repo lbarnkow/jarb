@@ -22,13 +22,28 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/realtime-api/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendConnect extends BaseMessage {
+  /**
+   * Real-time API version, see official docs.
+   */
   private String version = "1";
+
+  /**
+   * Hard-coded value, purpose unknown, see official docs.
+   */
   private String[] support = new String[] { "1" };
 
+  /**
+   * Constructs a new instance.
+   */
   public SendConnect() {
     super("connect");
   }

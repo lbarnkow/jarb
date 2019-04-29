@@ -22,11 +22,29 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/#attachment-field-objects
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class RawAttachmentField {
+  /**
+   * Whether this field should be a short field.
+   */
   @JsonProperty("short")
   private boolean bshort;
+
+  /**
+   * The title of this field.
+   */
   private String title;
+
+  /**
+   * The value of this field, displayed underneath the title value.
+   */
   private String value;
 }

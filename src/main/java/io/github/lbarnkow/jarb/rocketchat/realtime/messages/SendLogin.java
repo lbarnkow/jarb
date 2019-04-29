@@ -23,41 +23,95 @@ import io.github.lbarnkow.jarb.api.Credentials;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/login/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SendLogin extends BaseMessageWithMethod {
+public class SendLogin extends BaseMethod {
+  /**
+   * The method name.
+   */
   private static final String METHOD = "login";
 
+  /**
+   * The parameters.
+   */
   private Params[] params;
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param credentials the <code>Credentials</code> to use for log ins
+   */
   public SendLogin(Credentials credentials) {
     super(METHOD);
     this.params = new Params[] { new Params(credentials) };
   }
 
+  /**
+   * Login method parameters.
+   * 
+   * @author lbarnkow
+   */
   @JarbJsonSettings
   @Data
   private static class Params {
+    /**
+     * The user.
+     */
     private final User user;
+
+    /**
+     * The password.
+     */
     private final Password password;
 
+    /**
+     * Constructs a new instance.
+     * 
+     * @param credentials the <code>Credentials</code> to use for log ins
+     */
     public Params(Credentials credentials) {
       this.user = new User(credentials.getUsername());
       this.password = new Password(credentials.getPassword());
     }
   }
 
+  /**
+   * Login method User.
+   * 
+   * @author lbarnkow
+   */
   @JarbJsonSettings
   @Data
   private static class User {
+    /**
+     * The user name.
+     */
     private final String username;
   }
 
+  /**
+   * Login method Password.
+   * 
+   * @author lbarnkow
+   */
   @JarbJsonSettings
   @Data
   private static class Password {
+    /**
+     * The password hash.
+     */
     private final String digest;
+
+    /**
+     * The hashing algorithm.
+     */
     private final String algorithm = "sha-256";
   }
 }

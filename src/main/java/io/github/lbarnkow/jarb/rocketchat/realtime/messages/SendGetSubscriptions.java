@@ -22,12 +22,25 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/get-subscriptions/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SendGetSubscriptions extends BaseMessageWithMethod {
+public class SendGetSubscriptions extends BaseMethod {
+  /**
+   * The method name.
+   */
   private static final String METHOD = "subscriptions/get";
 
+  /**
+   * Constructs a new instance.
+   */
   public SendGetSubscriptions() {
     super(METHOD);
   }

@@ -23,18 +23,48 @@ import io.github.lbarnkow.jarb.rocketchat.sharedmodel.RawDate;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/login/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ReceiveLoginReply extends BaseMessage {
+  /**
+   * The result.
+   */
   private LoginResult result;
 
+  /**
+   * See
+   * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/login/ .
+   * 
+   * @author lbarnkow
+   */
   @JarbJsonSettings
   @Data
   public static class LoginResult {
+    /**
+     * The auth-id.
+     */
     private String id;
+
+    /**
+     * The auth-token.
+     */
     private String token;
+
+    /**
+     * The expiration date (unix timestamp).
+     */
     private RawDate tokenExpires;
+
+    /**
+     * The login type.
+     */
     private String type;
   }
 }

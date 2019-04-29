@@ -30,13 +30,35 @@ import java.time.Duration;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * A background task periodically trying to acquire new authorization tokens by
+ * logging in to the chat server for a given bot.
+ * 
+ * @author lbarnkow
+ */
 @Slf4j
 public class LoginTask extends AbstractBotSpecificTask {
 
+  /**
+   * The default interval in which a new authorization token should be acquired by
+   * logging in to the chat server.
+   */
   private static final long MAX_TOKEN_REFRESH_INTERVAL = Duration.ofMinutes(60L).toMillis();
 
+  /**
+   * Externally supplied and pre-configured <code>RealtimeClient</code> to use to
+   * log in to the chat server.
+   */
   private final RealtimeClient realtimeClient;
+
+  /**
+   * The listener to inform about new authorization tokens.
+   */
   private final LoginTaskListener listener;
+
+  /**
+   * Externally supplied <code>Credentials</code> to use to log in.
+   */
   private final Credentials credentials;
 
   /**
@@ -109,7 +131,20 @@ public class LoginTask extends AbstractBotSpecificTask {
     return sleepTime;
   }
 
+  /**
+   * A listener that is to be informed whenever a login was successful and
+   * produced a new authorization token.
+   *
+   * @author lbarnkow
+   */
   public static interface LoginTaskListener {
+    /**
+     * Called on every successful login to pass along the new authorization token.
+     *
+     * @param source   the <code>LoginTask</code> emitting this event
+     * @param bot      the <code>Bot</code> associated with the new subscription
+     * @param authInfo the <code>AuthInfo</code> containing the new token
+     */
     void onLoginAuthTokenRefreshed(LoginTask source, Bot bot, AuthInfo authInfo);
   }
 }

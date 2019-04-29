@@ -32,20 +32,40 @@ import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * A simplified abstraction from the <code>javax.websocket</code> API.
+ * 
+ * @author lbarnkow
+ */
 @ClientEndpoint
+@Slf4j
 public class WebsocketClient {
-  private static final Logger logger = LoggerFactory.getLogger(WebsocketClient.class);
-
+  /**
+   * A externally provided web socket container hosting all web socket
+   * connections.
+   */
   private WebSocketContainer container;
 
+  /**
+   * A listener to be informed on various events.
+   */
   private WebsocketClientListener listener;
+
+  /**
+   * The web socket session.
+   */
   private Session session;
 
+  /**
+   * A flag indicating if the session was closed by the client.
+   */
   private boolean closedByClient;
 
+  /**
+   * Counts the number of messages received.
+   */
   private long receivedMessages;
 
   @Inject
@@ -67,19 +87,30 @@ public class WebsocketClient {
     this.listener = listener;
     URI endpointUri = new URI(config.getWebsocketUrl());
 
-    logger.debug("Opening Websocket connection.");
+    log.debug("Opening Websocket connection.");
 
     session = container.connectToServer(this, endpointUri);
   }
 
+  /**
+   * Sends a plain text message to the chat server.
+   * 
+   * @param message the message
+   * @throws JsonProcessingException on serialization errors
+   */
   public void sendMessage(String message) throws JsonProcessingException {
-    logger.debug("Sending message, session id '{}', message '{}'.", session.getId(), message);
+    log.debug("Sending message, session id '{}', message '{}'.", session.getId(), message);
     session.getAsyncRemote().sendText(message);
   }
 
+  /**
+   * Called by the web socket container upon successfully opening the session.
+   * 
+   * @param session the session
+   */
   @OnOpen
   public void onOpen(Session session) {
-    logger.debug("Opened Websocket, session id '{}'.", session.getId());
+    log.debug("Opened Websocket, session id '{}'.", session.getId());
   }
 
   /**
@@ -90,8 +121,8 @@ public class WebsocketClient {
    */
   @OnClose
   public void onClose(Session userSession, CloseReason reason) {
-    logger.debug("Closed Websocket session: code '{}', message '{}'.",
-        reason.getCloseCode().getCode(), reason.getReasonPhrase());
+    log.debug("Closed Websocket session: code '{}', message '{}'.", reason.getCloseCode().getCode(),
+        reason.getReasonPhrase());
     listener.onWebsocketClose(closedByClient);
   }
 
@@ -103,18 +134,18 @@ public class WebsocketClient {
    */
   @OnMessage
   public void onMessage(String message) {
-    logger.trace("Received Websocket message: '{}'.", message);
+    log.trace("Received Websocket message: '{}'.", message);
 
     // First successful message is '{"server_id":"0"}' - just discard.
     if (receivedMessages == 0) {
       receivedMessages++;
       if (message.contains("error")) {
-        logger.error("Closing connection due to receiving an error initiating the session: {}",
+        log.error("Closing connection due to receiving an error initiating the session: {}",
             message);
         try {
           close();
         } catch (IOException e) {
-          logger.error("Failed to close session; still informing listener!", e);
+          log.error("Failed to close session; still informing listener!", e);
           listener.onWebsocketClose(true);
         }
       }
@@ -134,7 +165,7 @@ public class WebsocketClient {
       return;
     }
 
-    logger.debug("Closing Websocket, session id '{}'.", session.getId());
+    log.debug("Closing Websocket, session id '{}'.", session.getId());
 
     closedByClient = true;
     session.close();

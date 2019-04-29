@@ -22,9 +22,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
+/**
+ * See ts field in message
+ * https://rocket.chat/docs/developer-guides/realtime-api/the-message-object/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class RawDate {
+  /**
+   * The time stamp.
+   */
   @JsonProperty("$date")
   private long date;
 }

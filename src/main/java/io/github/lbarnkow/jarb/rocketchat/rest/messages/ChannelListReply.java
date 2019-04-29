@@ -26,11 +26,19 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/rest-api/channels/list/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class ChannelListReply extends BaseReply {
+  /**
+   * The channels.
+   */
   private List<RawChannel> channels;
 }

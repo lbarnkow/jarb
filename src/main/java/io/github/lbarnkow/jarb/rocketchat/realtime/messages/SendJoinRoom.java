@@ -25,12 +25,25 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See
+ * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/joining-channels/
+ * .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SendJoinRoom extends BaseMessageWithMethod {
+public class SendJoinRoom extends BaseMethod {
+  /**
+   * The method name.
+   */
   private static final String METHOD = "joinRoom";
 
+  /**
+   * The parameters.
+   */
   private final List<String> params = new ArrayList<>();
 
   /**
@@ -48,6 +61,11 @@ public class SendJoinRoom extends BaseMessageWithMethod {
     }
   }
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param room the <code>Room</code> to join
+   */
   public SendJoinRoom(Room room) {
     this(room.getId(), null);
   }

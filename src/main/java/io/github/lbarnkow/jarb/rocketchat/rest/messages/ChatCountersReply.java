@@ -22,12 +22,34 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/rest-api/channels/counters/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ChatCountersReply extends BaseReply {
+  /**
+   * boolean flag that shows that user is joined the room or not.
+   */
   private boolean joined;
+
+  /**
+   * amount of unread messages for specified user (calling user or provided
+   * userId).
+   */
   private int unreads;
+
+  /**
+   * unreadsFrom - start date-time of unread interval for specified user.
+   */
   private String unreadsFrom;
+
+  /**
+   * latest - end date-time of unread interval for specified user (or date-time of
+   * last posted message).
+   */
   private String latest;
 }

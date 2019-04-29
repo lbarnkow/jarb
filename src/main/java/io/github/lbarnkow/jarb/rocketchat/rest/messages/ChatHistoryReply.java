@@ -24,9 +24,17 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/rest-api/channels/history/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ChatHistoryReply extends BaseReply {
+  /**
+   * The messages.
+   */
   private List<RawMessage> messages;
 }

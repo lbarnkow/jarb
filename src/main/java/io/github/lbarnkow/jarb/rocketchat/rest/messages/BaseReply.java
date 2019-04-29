@@ -21,8 +21,16 @@ package io.github.lbarnkow.jarb.rocketchat.rest.messages;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
+/**
+ * Base class for all REST replies received from the chat server.
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class BaseReply {
+  /**
+   * Indicates whether the request was fulfilled successfully or not.
+   */
   private boolean success;
 }

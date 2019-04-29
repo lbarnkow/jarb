@@ -21,8 +21,16 @@ package io.github.lbarnkow.jarb.rocketchat.realtime.messages;
 import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/realtime-api/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 public class ReceiveConnected {
+  /**
+   * Unique real-time session identifier.
+   */
   private String session;
 }

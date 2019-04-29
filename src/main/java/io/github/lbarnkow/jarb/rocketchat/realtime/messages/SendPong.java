@@ -22,10 +22,18 @@ import io.github.lbarnkow.jarb.JarbJsonSettings;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/realtime-api/ .
+ * 
+ * @author lbarnkow
+ */
 @JarbJsonSettings
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class SendPong extends BaseMessage {
+  /**
+   * Constructs a new instance.
+   */
   public SendPong() {
     super("pong");
   }

@@ -23,13 +23,29 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * See https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/ .
+ * 
+ * @author lbarnkow
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class BaseSubscription extends BaseMessage {
+  /**
+   * The message name for subscriptions.
+   */
   private static final String MSG = "sub";
 
+  /**
+   * The collection to watch/stream.
+   */
   private final String name;
 
+  /**
+   * Constructs a new instance.
+   * 
+   * @param name collection to watch/stream
+   */
   BaseSubscription(String name) {
     super(MSG, UUID.randomUUID().toString());
     this.name = name;
