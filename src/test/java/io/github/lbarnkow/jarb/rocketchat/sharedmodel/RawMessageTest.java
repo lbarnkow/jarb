@@ -34,10 +34,10 @@ class RawMessageTest {
   @Test
   void testConvertWith() {
     // given
-    RawUser rawUser = RawUser.builder().id("id").username("username").build();
-    Room room = Room.builder().id("id").name("name").type(PUBLIC_CHANNEL).build();
+    final RawUser rawUser = RawUser.builder().id("id").username("username").build();
+    final Room room = Room.builder().id("id").name("name").type(PUBLIC_CHANNEL).build();
 
-    RawMessage rawMessage = RawMessage.builder() //
+    final RawMessage rawMessage = RawMessage.builder() //
         .id("id") //
         .rid(room.getId()) //
         .msg("message") //
@@ -48,11 +48,11 @@ class RawMessageTest {
         .build();
 
     // when
-    Message message = rawMessage.convertWith(room);
+    final Message message = rawMessage.convertWith(room);
 
     // then
     assertThat(message.getId()).isEqualTo(rawMessage.getId());
-    assertThat(message.getRoom()).isSameAs(room);
+    assertThat(message.getRoom()).isSameInstanceAs(room);
     assertThat(message.getRoom().getId()).isEqualTo(rawMessage.getRid());
     assertThat(message.getText()).isEqualTo(rawMessage.getMsg());
     assertThat(message.getTimestamp().toString()).isEqualTo(rawMessage.getTs());
@@ -66,10 +66,10 @@ class RawMessageTest {
   @Test
   void testOf() {
     // given
-    Room room = Room.builder().id("id").name("name").type(PUBLIC_CHANNEL).build();
-    User user = User.builder().id("id").name("name").build();
+    final Room room = Room.builder().id("id").name("name").type(PUBLIC_CHANNEL).build();
+    final User user = User.builder().id("id").name("name").build();
 
-    Message message = Message.builder() //
+    final Message message = Message.builder() //
         .id("id") //
         .room(room) //
         .text("message") //
@@ -79,11 +79,11 @@ class RawMessageTest {
         .build();
 
     // when
-    RawMessage rawMessage = RawMessage.of(message);
+    final RawMessage rawMessage = RawMessage.of(message);
 
     // then
     assertThat(message.getId()).isEqualTo(rawMessage.getId());
-    assertThat(message.getRoom()).isSameAs(room);
+    assertThat(message.getRoom()).isSameInstanceAs(room);
     assertThat(message.getRoom().getId()).isEqualTo(rawMessage.getRid());
     assertThat(message.getText()).isEqualTo(rawMessage.getMsg());
     assertThat(message.getTimestamp().toString()).isEqualTo(rawMessage.getTs());

@@ -85,8 +85,8 @@ public class ElectionCandidate extends AbstractBaseTask {
    * @param config   the parsed configuration
    * @return this instance
    */
-  public ElectionCandidate configure(ElectionCandidateListener listener,
-      ElectionConfiguration config) {
+  public ElectionCandidate configure(final ElectionCandidateListener listener,
+      final ElectionConfiguration config) {
     this.listener = listener;
     this.config = config;
     return this;
@@ -124,31 +124,31 @@ public class ElectionCandidate extends AbstractBaseTask {
           handleStolenLeaseFile(leaseFile);
           handleExpiredLeaseFile(leaseFile);
 
-          ElectionCandidateState state = this.state.get();
+          final ElectionCandidateState state = this.state.get();
           if (state == LEADER || state == RUNNING_FOR_ELECTION) {
             leaseFile = refreshLease(leaseFile);
           } else {
             challengeLease(leaseFile);
           }
-        } catch (IOException e) {
+        } catch (final IOException e) {
           log.error("IOException occurred in LeaseManager!", e);
         }
 
         sleep();
       }
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       log.info("Caught InterruptedException, withdrawing from election!");
     }
 
     try {
       releaseLease();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("Unexpected IOException in LeaseManager!", e);
     }
   }
 
   private ElectionLease readLeaseFile() throws IOException {
-    ElectionLease lease = ElectionLease.load(config.getSyncFile());
+    final ElectionLease lease = ElectionLease.load(config.getSyncFile());
 
     if (lease == null) {
       updateState(INACTIVE);
@@ -157,17 +157,17 @@ public class ElectionCandidate extends AbstractBaseTask {
     return lease;
   }
 
-  void writeLeaseFile(ElectionLease lease) throws IOException {
+  void writeLeaseFile(final ElectionLease lease) throws IOException {
     try {
       ElectionLease.save(lease, config.getSyncFile());
-    } catch (IOException e) {
+    } catch (final IOException e) {
       updateState(INACTIVE);
       throw e;
     }
   }
 
   private void releaseLease() throws IOException {
-    ElectionCandidateState state = this.state.get();
+    final ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       updateState(INACTIVE);
       Files.delete(config.getSyncFile().toPath());
@@ -175,9 +175,9 @@ public class ElectionCandidate extends AbstractBaseTask {
     }
   }
 
-  private void challengeLease(ElectionLease leaseFile) throws IOException {
+  private void challengeLease(final ElectionLease leaseFile) throws IOException {
     if (leaseFile == null || leaseFile.isExpired()) {
-      ElectionLease newLease = new ElectionLease(this, config.getLeaseTimeToLive());
+      final ElectionLease newLease = new ElectionLease(this, config.getLeaseTimeToLive());
       writeLeaseFile(newLease);
 
       log.info("Running for election w/ id '{}'", id);
@@ -186,8 +186,8 @@ public class ElectionCandidate extends AbstractBaseTask {
     }
   }
 
-  private ElectionLease refreshLease(ElectionLease oldLease) throws IOException {
-    ElectionLease newLease = new ElectionLease(oldLease, config.getLeaseTimeToLive());
+  private ElectionLease refreshLease(final ElectionLease oldLease) throws IOException {
+    final ElectionLease newLease = new ElectionLease(oldLease, config.getLeaseTimeToLive());
     writeLeaseFile(newLease);
 
     if (state.get() == RUNNING_FOR_ELECTION) {
@@ -198,8 +198,8 @@ public class ElectionCandidate extends AbstractBaseTask {
     return newLease;
   }
 
-  private void updateState(ElectionCandidateState newState) {
-    ElectionCandidateState oldState = state.getAndSet(newState);
+  private void updateState(final ElectionCandidateState newState) {
+    final ElectionCandidateState oldState = state.getAndSet(newState);
     if (oldState == newState) {
       return;
     }
@@ -212,7 +212,7 @@ public class ElectionCandidate extends AbstractBaseTask {
   private void sleep() throws InterruptedException {
     long sleepTime = sleepVarianceMsec;
 
-    ElectionCandidateState state = this.state.get();
+    final ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       sleepTime += config.getLeaseRefreshInterval();
     } else {
@@ -222,12 +222,12 @@ public class ElectionCandidate extends AbstractBaseTask {
     Thread.sleep(sleepTime);
   }
 
-  void handleMissingLeaseFile(ElectionLease leaseFile) {
+  void handleMissingLeaseFile(final ElectionLease leaseFile) {
     if (leaseFile != null) {
       return;
     }
 
-    ElectionCandidateState state = this.state.get();
+    final ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       log.error("Lease file missing even though my state was '{}'! Reverting back to '{}'.", state,
           INACTIVE);
@@ -236,12 +236,12 @@ public class ElectionCandidate extends AbstractBaseTask {
     updateState(INACTIVE);
   }
 
-  void handleStolenLeaseFile(ElectionLease leaseFile) {
+  void handleStolenLeaseFile(final ElectionLease leaseFile) {
     if (leaseFile == null) {
       return;
     }
 
-    ElectionCandidateState state = this.state.get();
+    final ElectionCandidateState state = this.state.get();
 
     if (state != LEADER && state != RUNNING_FOR_ELECTION) {
       return;
@@ -260,7 +260,7 @@ public class ElectionCandidate extends AbstractBaseTask {
     updateState(INACTIVE);
   }
 
-  void handleExpiredLeaseFile(ElectionLease leaseFile) {
+  void handleExpiredLeaseFile(final ElectionLease leaseFile) {
     if (leaseFile == null) {
       return;
     }
@@ -269,7 +269,7 @@ public class ElectionCandidate extends AbstractBaseTask {
       return;
     }
 
-    ElectionCandidateState state = this.state.get();
+    final ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
       log.error("Lease file expired during my term (state '{}')! Reverting back to '{}'.", state,
           INACTIVE);

@@ -50,22 +50,22 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
 
   private final ElectionConfiguration config = new ElectionConfiguration();
 
-  private Map<ElectionCandidate, ElectionCandidateState> states = new HashMap<>();
-  private Semaphore waitForElection = new Semaphore(0);
-  private Semaphore taskEndedSemaphore = new Semaphore(0);
+  private final Map<ElectionCandidate, ElectionCandidateState> states = new HashMap<>();
+  private final Semaphore waitForElection = new Semaphore(0);
+  private final Semaphore taskEndedSemaphore = new Semaphore(0);
 
   @Test
   void testIdUniquness() throws IOException {
     // given
-    int numCandidates = 50;
-    ElectionCandidate[] candidates = generateCandidates(numCandidates);
+    final int numCandidates = 50;
+    final ElectionCandidate[] candidates = generateCandidates(numCandidates);
 
     // when
 
     // then
-    List<String> ids =
+    final List<String> ids =
         Arrays.asList(candidates).stream().map((e) -> e.getId()).collect(Collectors.toList());
-    Set<String> uniqueIds = new HashSet<>(ids);
+    final Set<String> uniqueIds = new HashSet<>(ids);
     assertThat(ids).hasSize(numCandidates);
     assertThat(uniqueIds).hasSize(numCandidates);
   }
@@ -73,9 +73,9 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
   @Test
   void testTwoElectionTerms() throws IOException, InterruptedException {
     // given
-    int numCandidates = 25;
-    TaskManager tasks = new TaskManager();
-    ElectionCandidate[] candidates = generateCandidates(numCandidates);
+    final int numCandidates = 25;
+    final TaskManager tasks = new TaskManager();
+    final ElectionCandidate[] candidates = generateCandidates(numCandidates);
     tasks.start(Optional.of(this), true, candidates);
     waitForNewLeader();
 
@@ -93,7 +93,8 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
 
     shutdownAllWithLeaderStoppingLast(tasks, candidates, secondLeader);
     Thread.sleep(100L);
-    Map<ElectionCandidate, ElectionCandidateState> statesAfterShutdown = new HashMap<>(states);
+    final Map<ElectionCandidate, ElectionCandidateState> statesAfterShutdown =
+        new HashMap<>(states);
 
     // then
     assertThat(statesAfterFirstElection).hasSize(numCandidates);
@@ -102,7 +103,7 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
 
     assertThat(firstLeader).isNotNull();
     assertThat(secondLeader).isNotNull();
-    assertThat(firstLeader).isNotSameAs(secondLeader);
+    assertThat(firstLeader).isNotSameInstanceAs(secondLeader);
 
     assertThat(statesAfterFirstElection.get(firstLeader)).isEqualTo(LEADER);
     statesAfterFirstElection.remove(firstLeader);
@@ -110,13 +111,13 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
     assertThat(statesAfterSecondElection.get(secondLeader)).isEqualTo(LEADER);
     statesAfterSecondElection.remove(secondLeader);
 
-    for (ElectionCandidateState state : statesAfterFirstElection.values()) {
+    for (final ElectionCandidateState state : statesAfterFirstElection.values()) {
       assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
     }
-    for (ElectionCandidateState state : statesAfterSecondElection.values()) {
+    for (final ElectionCandidateState state : statesAfterSecondElection.values()) {
       assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
     }
-    for (ElectionCandidateState state : statesAfterShutdown.values()) {
+    for (final ElectionCandidateState state : statesAfterShutdown.values()) {
       assertThat(state).isAnyOf(INACTIVE, RUNNING_FOR_ELECTION);
     }
   }
@@ -126,8 +127,8 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
   void testFailedLeaseFileWrite() {
     // given
     config.setSyncFileName("/dev/rtc0");
-    ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
-    ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
+    final ElectionCandidate candidate = new ElectionCandidate().configure(this, config);
+    final ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
 
     candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
@@ -143,7 +144,7 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
   @Test
   void testMissingLease() {
     // given
-    ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
+    final ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
     candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
 
@@ -160,8 +161,8 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
     // given
     final ElectionCandidate thief = new ElectionCandidate();
     final ElectionLease lease = new ElectionLease(thief, DEFAULT_LEASE_TTL);
-    ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
-    ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
+    final ElectionCandidate candidate1 = new ElectionCandidate().configure(this, null);
+    final ElectionCandidate candidate2 = new ElectionCandidate().configure(this, null);
     candidate1.state.set(LEADER);
     candidate2.state.set(RUNNING_FOR_ELECTION);
     assertThat(candidate1.isLeader()).isTrue();
@@ -181,10 +182,10 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
   @Test
   void testExpiredLease() {
     // given
-    ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
+    final ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
     candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
-    ElectionLease lease = new ElectionLease(candidate.getId(), 50L, 100L);
+    final ElectionLease lease = new ElectionLease(candidate.getId(), 50L, 100L);
 
     // when
     candidate.handleExpiredLeaseFile(lease);
@@ -194,12 +195,12 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
     assertThat(states.get(candidate)).isEqualTo(INACTIVE);
   }
 
-  ElectionCandidate[] generateCandidates(int n) throws IOException {
-    File tmpFile = Files.createTempFile(getClass().getSimpleName(), null).toFile();
+  ElectionCandidate[] generateCandidates(final int n) throws IOException {
+    final File tmpFile = Files.createTempFile(getClass().getSimpleName(), null).toFile();
     tmpFile.deleteOnExit();
     config.setSyncFileName(tmpFile.getAbsolutePath());
 
-    ElectionCandidate[] result = new ElectionCandidate[n];
+    final ElectionCandidate[] result = new ElectionCandidate[n];
 
     for (int i = 0; i < n; i++) {
       result[i] = new ElectionCandidate().configure(this, config);
@@ -209,8 +210,8 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
     return result;
   }
 
-  ElectionCandidate findLeader(ElectionCandidate[] candidates) {
-    for (ElectionCandidate candidate : candidates) {
+  ElectionCandidate findLeader(final ElectionCandidate[] candidates) {
+    for (final ElectionCandidate candidate : candidates) {
       if (candidate.isLeader()) {
         return candidate;
       }
@@ -225,14 +226,16 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
     }
   }
 
-  private void shutdownAllWithLeaderStoppingLast(TaskManager tasks, ElectionCandidate[] candidates,
-      ElectionCandidate leader) throws InterruptedException {
-    for (ElectionCandidate c : candidates) {
+  private void shutdownAllWithLeaderStoppingLast(final TaskManager tasks,
+      final ElectionCandidate[] candidates, final ElectionCandidate leader)
+      throws InterruptedException {
+    for (final ElectionCandidate c : candidates) {
       if (c != leader) {
         tasks.stop(c);
       }
     }
-    boolean success = taskEndedSemaphore.tryAcquire(candidates.length - 1, 5, TimeUnit.SECONDS);
+    final boolean success =
+        taskEndedSemaphore.tryAcquire(candidates.length - 1, 5, TimeUnit.SECONDS);
     if (!success) {
       throw new RuntimeException(
           "Non-leader candidate tasks took more than 5 seconds to go into state DEAD!");
@@ -242,8 +245,8 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
   }
 
   @Override
-  public synchronized void onStateChanged(ElectionCandidate candidate,
-      ElectionCandidateState oldState, ElectionCandidateState newState) {
+  public synchronized void onStateChanged(final ElectionCandidate candidate,
+      final ElectionCandidateState oldState, final ElectionCandidateState newState) {
     states.put(candidate, newState);
     if (newState == LEADER) {
       waitForElection.release();
@@ -251,7 +254,7 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
   }
 
   @Override
-  public void onTaskEnded(TaskEndedEvent event) {
+  public void onTaskEnded(final TaskEndedEvent event) {
     taskEndedSemaphore.release();
   }
 

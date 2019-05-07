@@ -35,7 +35,7 @@ public enum RoomType {
    */
   private final String rawType;
 
-  private RoomType(String rawType) {
+  private RoomType(final String rawType) {
     this.rawType = rawType;
   }
 
@@ -50,8 +50,8 @@ public enum RoomType {
    * @param rawType the raw room type
    * @return a enum value
    */
-  public static RoomType parse(String rawType) {
-    for (RoomType type : RoomType.values()) {
+  public static RoomType parse(final String rawType) {
+    for (final RoomType type : RoomType.values()) {
       if (type.rawType.equals(rawType)) {
         return type;
       }

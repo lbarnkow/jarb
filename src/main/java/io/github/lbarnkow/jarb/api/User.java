@@ -32,10 +32,10 @@ public class User {
   /**
    * The user id.
    */
-  String id;
+  private final String id;
 
   /**
    * The user name.
    */
-  String name;
+  private final String name;
 }

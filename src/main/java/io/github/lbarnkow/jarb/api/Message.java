@@ -36,36 +36,36 @@ public class Message {
   /**
    * The message id.
    */
-  String id;
+  private final String id;
 
   /**
    * The <code>Room</code> - Identify the room the message belongs.
    */
-  Room room;
+  private final Room room;
 
   /**
    * The textual message.
    */
-  String text;
+  private final String text;
 
   /**
    * The message time stamp (date of creation on client).
    */
-  Instant timestamp;
+  private final Instant timestamp;
 
   /**
    * The <code>User</code> that sent the message.
    */
-  User user;
+  private final User user;
 
   /**
    * The <code>Attachment</code>s.
    */
   @Builder.Default
-  List<Attachment> attachments = Collections.emptyList();
+  private List<Attachment> attachments = Collections.emptyList();
 
   /**
    * The <code>MessageType</code>.
    */
-  MessageType type;
+  private final MessageType type;
 }

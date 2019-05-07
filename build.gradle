@@ -26,7 +26,7 @@ apply from: 'config/gradle/pmd.gradle'
 apply from: 'config/gradle/jacoco.gradle'
 apply from: 'config/gradle/license.gradle'
 
-mainClassName = 'io.github.lbarnkow.jarb.Main'
+mainClassName = 'io.github.lbarnkow.jarb.JarbMain'
 
 dependencies {
     // SHA-256 digest to hash passwords

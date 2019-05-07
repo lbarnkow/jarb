@@ -54,23 +54,23 @@ class LoginTaskTest implements LoginTaskListener {
   private static final String TEST_AUTH_ID = "auth_id";
   private static final String TEST_AUTH_TOKEN = "auth_token";
 
-  private List<ListenerData> events = new ArrayList<>();
+  private final List<ListenerData> events = new ArrayList<>();
 
   @Test
   void testTask() throws InterruptedException, ReplyErrorException, IOException, TimeoutException {
     // given
-    RealtimeClient rtClient = mock(RealtimeClient.class);
-    ReceiveLoginReply invalidReply = createLoginReplyData(false);
-    ReceiveLoginReply validReply = createLoginReplyData(true);
+    final RealtimeClient rtClient = mock(RealtimeClient.class);
+    final ReceiveLoginReply invalidReply = createLoginReplyData(false);
+    final ReceiveLoginReply validReply = createLoginReplyData(true);
     when(rtClient.sendMessageAndWait(any(SendLogin.class), eq(ReceiveLoginReply.class)))
         .thenReturn(invalidReply, validReply);
 
-    Bot bot = mock(Bot.class);
-    Credentials credentials = new Credentials(TEST_USERNAME, TEST_PASSWORD);
+    final Bot bot = mock(Bot.class);
+    final Credentials credentials = new Credentials(TEST_USERNAME, TEST_PASSWORD);
     when(bot.getName()).thenReturn(TEST_BOTNAME);
 
-    LoginTask task = new LoginTask(bot, credentials, rtClient, this);
-    TaskWrapper wrapper = new TaskWrapper(task);
+    final LoginTask task = new LoginTask(bot, credentials, rtClient, this);
+    final TaskWrapper wrapper = new TaskWrapper(task);
 
     // when
     wrapper.startTask(Optional.empty());
@@ -82,14 +82,14 @@ class LoginTaskTest implements LoginTaskListener {
         eq(ReceiveLoginReply.class));
     assertThat(events).isNotEmpty();
     events.forEach(event -> {
-      assertThat(event.source).isSameAs(task);
+      assertThat(event.source).isSameInstanceAs(task);
       assertThat(event.bot.getName()).isEqualTo(TEST_BOTNAME);
       assertThat(event.authInfo.getUserId()).isEqualTo(TEST_AUTH_ID);
       assertThat(event.authInfo.getAuthToken()).isEqualTo(TEST_AUTH_TOKEN);
     });
   }
 
-  private ReceiveLoginReply createLoginReplyData(boolean valid) {
+  private ReceiveLoginReply createLoginReplyData(final boolean valid) {
     final ReceiveLoginReply reply = new ReceiveLoginReply();
     final LoginResult result = new ReceiveLoginReply.LoginResult();
     final RawDate expires = new RawDate();
@@ -110,7 +110,8 @@ class LoginTaskTest implements LoginTaskListener {
   }
 
   @Override
-  public void onLoginAuthTokenRefreshed(LoginTask source, Bot bot, AuthInfo authInfo) {
+  public void onLoginAuthTokenRefreshed(final LoginTask source, final Bot bot,
+      final AuthInfo authInfo) {
     events.add(new ListenerData(source, bot, authInfo));
   }
 
@@ -119,7 +120,7 @@ class LoginTaskTest implements LoginTaskListener {
     Bot bot;
     AuthInfo authInfo;
 
-    ListenerData(LoginTask source, Bot bot, AuthInfo authInfo) {
+    ListenerData(final LoginTask source, final Bot bot, final AuthInfo authInfo) {
       this.source = source;
       this.bot = bot;
       this.authInfo = authInfo;

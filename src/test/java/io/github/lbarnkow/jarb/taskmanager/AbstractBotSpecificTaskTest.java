@@ -30,19 +30,19 @@ class AbstractBotSpecificTaskTest {
   @Test
   void test() {
     // given
-    Bot bot = Mockito.mock(Bot.class);
+    final Bot bot = Mockito.mock(Bot.class);
     when(bot.getName()).thenReturn("TestBot");
 
     // when
-    AbstractBotSpecificTaskTestImpl task = new AbstractBotSpecificTaskTestImpl(bot);
+    final AbstractBotSpecificTaskTestImpl task = new AbstractBotSpecificTaskTestImpl(bot);
 
     // then
-    assertThat(task.getBot()).isSameAs(bot);
+    assertThat(task.getBot()).isSameInstanceAs(bot);
     assertThat(task.getName()).contains(bot.getName());
   }
 
   private static class AbstractBotSpecificTaskTestImpl extends AbstractBotSpecificTask {
-    public AbstractBotSpecificTaskTestImpl(Bot bot) {
+    public AbstractBotSpecificTaskTestImpl(final Bot bot) {
       super(bot);
     }
 

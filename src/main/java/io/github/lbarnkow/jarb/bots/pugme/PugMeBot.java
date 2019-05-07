@@ -96,7 +96,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
    * @param jerseyClient a jerseyClient instance to do the REST calls
    */
   @Inject
-  public PugMeBot(Random random, Client jerseyClient) {
+  public PugMeBot(final Random random, final Client jerseyClient) {
     super();
 
     this.random = random;
@@ -104,20 +104,20 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
   }
 
   @Override
-  public Bot initialize(String name, String username) {
+  public Bot initialize(final String name, final String username) {
     val expression = REGEX_BASE.replace("%BOTNAME%", username);
     regex = Pattern.compile(expression, DOTALL);
     return super.initialize(name, username);
   }
 
   @Override
-  public boolean offerRoom(Room room) {
+  public boolean offerRoom(final Room room) {
     // Don't auto-join anywhere, let others invite me
     return false;
   }
 
   @Override
-  public Optional<Message> offerMessage(Message message) {
+  public Optional<Message> offerMessage(final Message message) {
     Message reply = null;
 
     if (message.getType() != REGULAR_CHAT_MESSAGE) {
@@ -128,7 +128,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
     }
 
     try {
-      Room room = message.getRoom();
+      final Room room = message.getRoom();
       val matcher = regex.matcher(message.getText());
       if (matcher.matches()) {
         val action = parseAction(matcher.group(1));
@@ -142,7 +142,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
           reply = Message.builder().room(room).attachments(getHelpText()).build();
         }
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Failed to handle message '{}'!", message, e);
       reply = Message.builder().room(message.getRoom())
           .text("*PugMeBot made a doody!* :poop: _(i.e. an internal error occured.)_").build();
@@ -151,8 +151,8 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
     return Optional.ofNullable(reply);
   }
 
-  private Message createPugReply(Room room, int number) {
-    List<Attachment> attachments = new ArrayList<>();
+  private Message createPugReply(final Room room, final int number) {
+    final List<Attachment> attachments = new ArrayList<>();
 
     int num = number;
     if (num == 0) {
@@ -204,18 +204,18 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
         .forEach(child -> pugsCache.add(child.getData().getUrl()));
   }
 
-  private String parseAction(String s) {
+  private String parseAction(final String s) {
     if (s != null) {
       return s.trim();
     }
     return "";
   }
 
-  private int parseInt(String s, int or) {
-    String data = (s != null) ? s.trim() : null;
+  private int parseInt(final String s, final int or) {
+    final String data = (s != null) ? s.trim() : null;
     try {
       return Integer.parseInt(data);
-    } catch (NumberFormatException e) {
+    } catch (final NumberFormatException e) {
       return or;
     }
   }

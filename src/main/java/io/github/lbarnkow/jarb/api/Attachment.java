@@ -35,80 +35,80 @@ public class Attachment {
    * The color you want the order on the left side to be, any value background-css
    * supports.
    */
-  String color;
+  private final String color;
 
   /**
    * The text to display for this attachment, it is different than the message's
    * text.
    */
-  String text;
+  private final String text;
 
   /**
    * Displays the time next to the text portion.
    */
-  Instant timestamp;
+  private final Instant timestamp;
 
   /**
    * An image that displays to the left of the text, looks better when this is
    * relatively small.
    */
-  String thumbUrl;
+  private final String thumbUrl;
 
   /**
    * Only applicable if the ts is provided, as it makes the time clickable to this
    * link.
    */
-  String messageLink;
+  private final String messageLink;
 
   /**
    * Causes the image, audio, and video sections to be hiding when collapsed is
    * true.
    */
-  boolean collapsed;
+  private final boolean collapsed;
 
   /**
    * Name of the author.
    */
-  String authorName;
+  private final String authorName;
 
   /**
    * Providing this makes the author name clickable and points to this link.
    */
-  String authorLink;
+  private final String authorLink;
 
   /**
    * Displays a tiny icon to the left of the Author’s name.
    */
-  String authorIcon;
+  private final String authorIcon;
 
   /**
    * Title to display for this attachment, displays under the author.
    */
-  String title;
+  private final String title;
 
   /**
    * Providing this makes the title clickable, pointing to this link.
    */
-  String titleLink;
+  private final String titleLink;
 
   /**
    * When this is true, a download icon appears and clicking this saves the link
    * to file.
    */
-  boolean titleLinkDownload;
+  private final boolean titleLinkDownload;
 
   /**
    * The image to display, will be “big” and easy to see.
    */
-  String imageUrl;
+  private final String imageUrl;
 
   /**
    * Audio file to play, only supports what html audio does.
    */
-  String audioUrl;
+  private final String audioUrl;
 
   /**
    * Video file to play, only supports what html video does.
    */
-  String videoUrl;
+  private final String videoUrl;
 }

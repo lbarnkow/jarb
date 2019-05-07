@@ -35,12 +35,12 @@ import lombok.extern.slf4j.Slf4j;
 public class DummyBot extends AbstractBaseBot implements Bot {
 
   @Override
-  public boolean offerRoom(Room room) {
+  public boolean offerRoom(final Room room) {
     return true;
   }
 
   @Override
-  public Optional<Message> offerMessage(Message message) {
+  public Optional<Message> offerMessage(final Message message) {
     log.error(message.toString());
     return Optional.empty();
   }

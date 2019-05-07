@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
@@ -38,8 +39,8 @@ import lombok.val;
  * @author lbarnkow
  */
 @Slf4j
-public final class Main {
-  private Main() {
+public final class JarbMain {
+  private JarbMain() {
   }
 
   /**
@@ -47,16 +48,16 @@ public final class Main {
    *
    * @param args CLI args (currently not used)
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     log.info("# # # W E L C O M E # # #");
 
-    BotManagerConfiguration config = loadConfig("jarb-config.yaml");
+    final BotManagerConfiguration config = loadConfig("jarb-config.yaml");
 
-    Injector guice = Guice.createInjector(new GuiceModule());
+    final Injector guice = Guice.createInjector(new GuiceModule());
 
-    Bot[] bots = Main.createBots(config, guice);
-    val runtime = guice.getInstance(Runtime.class);
-    val botManager = guice.getInstance(BotManager.class);
+    final Bot[] bots = JarbMain.createBots(config, guice);
+    final val runtime = guice.getInstance(Runtime.class);
+    final val botManager = guice.getInstance(BotManager.class);
 
     runtime.addShutdownHook(new Thread("ShutdownHook") {
       @Override
@@ -70,15 +71,15 @@ public final class Main {
     botManager.start(config, bots);
   }
 
-  private static BotManagerConfiguration loadConfig(String path) {
+  private static BotManagerConfiguration loadConfig(final String path) {
     BotManagerConfiguration result = null;
-    val file = new File(path);
+    final val file = new File(path);
 
     if (file.exists()) {
-      val mapper = new ObjectMapper(new YAMLFactory());
+      final val mapper = new ObjectMapper(new YAMLFactory());
       try {
         result = mapper.readValue(file, BotManagerConfiguration.class);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         log.error("Failed to read configuration from file '{}'!", path, e);
         System.exit(1);
       }
@@ -90,9 +91,10 @@ public final class Main {
     return validateConfiguration(result);
   }
 
-  private static BotManagerConfiguration validateConfiguration(BotManagerConfiguration config) {
+  private static BotManagerConfiguration
+      validateConfiguration(final BotManagerConfiguration config) {
     // Bot names must be unique!
-    HashSet<String> names = new HashSet<>();
+    final HashSet<String> names = new HashSet<>();
     config.getBots().forEach(botConfig -> names.add(botConfig.getName()));
     if (names.size() != config.getBots().size()) {
       throw new IllegalArgumentException(
@@ -102,16 +104,16 @@ public final class Main {
     return config;
   }
 
-  private static Bot[] createBots(BotManagerConfiguration config, Injector guice) {
-    val bots = new ArrayList<Bot>();
+  private static Bot[] createBots(final BotManagerConfiguration config, final Injector guice) {
+    final List<Bot> bots = new ArrayList<>();
 
     config.getBots().forEach(botConfig -> {
       try {
-        val clazz = loadClass(botConfig);
-        val bot = guice.getInstance(clazz);
+        final val clazz = loadClass(botConfig);
+        final val bot = guice.getInstance(clazz);
         bot.initialize(botConfig.getName(), botConfig.getCredentials().getUsername());
         bots.add(bot);
-      } catch (Exception e) {
+      } catch (final Exception e) {
         log.error("Failed to load, instantiate and initialize the bot '{}'!", botConfig.getName(),
             e);
         System.exit(1);
@@ -121,17 +123,17 @@ public final class Main {
     return bots.toArray(new Bot[0]);
   }
 
-  @SuppressWarnings("unchecked")
-  private static Class<Bot> loadClass(BotConfiguration botConfig) {
+  @SuppressWarnings({ "unchecked", "PMD.OnlyOneReturn" })
+  private static Class<Bot> loadClass(final BotConfiguration botConfig) {
     try {
-      val clazz = Bot.class.getClassLoader().loadClass(botConfig.getQualifiedClassName());
+      final val clazz = Bot.class.getClassLoader().loadClass(botConfig.getQualifiedClassName());
       if (Bot.class.isAssignableFrom(clazz)) {
         return (Class<Bot>) clazz;
       }
 
       log.error("Selected bot class '{}' is not a in the type hierachy of '{}'!",
           botConfig.getQualifiedClassName(), Bot.class.getName());
-    } catch (ClassNotFoundException e) {
+    } catch (final ClassNotFoundException e) {
       log.error("Failed to load bot class '{}'!", botConfig.getQualifiedClassName(), e);
     }
     System.exit(1);

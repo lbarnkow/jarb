@@ -17,7 +17,7 @@ pmd {
         "config/pmd/jarb-documentation.xml",
         "config/pmd/jarb-errorprone.xml",
         "config/pmd/jarb-design.xml",
-        // "category/java/codestyle.xml", (627)
+        "config/pmd/jarb-codestyle.xml",
     ]
 }
 

@@ -102,7 +102,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
    * Externally supplied factory for <code>RealtimeClient</code> instances. Each
    * managed bot will get its own real-time client.
    */
-  private final transient Provider<RealtimeClient> realtimeClientProvider;
+  private final transient Provider<RealtimeClient> rtClientProvider;
 
   /**
    * Map associating each managed bot with additional data and object references.
@@ -139,12 +139,13 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
   private final transient RoomProcessor roomProcessor;
 
   @Inject
-  BotManager(TaskManager taskManager, ElectionCandidate election,
-      Provider<RealtimeClient> realtimeClientProvider, RestClient restClient,
-      RoomProcessor roomProcessor) {
+  /* package */ BotManager(final TaskManager taskManager, final ElectionCandidate election,
+      final Provider<RealtimeClient> rtClientProvider, final RestClient restClient,
+      final RoomProcessor roomProcessor) {
+    super();
     this.tasks = taskManager;
     this.election = election;
-    this.realtimeClientProvider = realtimeClientProvider;
+    this.rtClientProvider = rtClientProvider;
     this.restClient = restClient;
     this.roomProcessor = roomProcessor;
   }
@@ -158,13 +159,13 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
    * @param config the parsed configuration
    * @param bots   the bots being managed by this instance
    */
-  public void start(BotManagerConfiguration config, Bot... bots) {
+  public void start(final BotManagerConfiguration config, final Bot... bots) {
     this.config = config;
 
-    for (Bot bot : bots) {
+    for (final Bot bot : bots) {
       @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // unique objects needed
-      BotDataStruct dataStruct = new BotDataStruct();
-      dataStruct.realtimeClient = realtimeClientProvider.get();
+      final BotDataStruct dataStruct = new BotDataStruct();
+      dataStruct.realtimeClient = rtClientProvider.get();
       this.bots.put(bot, dataStruct);
     }
     restClient.initialize(config.getConnection());
@@ -187,13 +188,13 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 
       log.info("Closing websocket session...");
 
-      for (Map.Entry<Bot, BotDataStruct> entry : bots.entrySet()) {
-        Bot bot = entry.getKey();
-        BotDataStruct data = entry.getValue();
+      for (final Map.Entry<Bot, BotDataStruct> entry : bots.entrySet()) {
+        final Bot bot = entry.getKey();
+        final BotDataStruct data = entry.getValue();
 
         try {
           data.realtimeClient.disconnect();
-        } catch (IOException e) {
+        } catch (final IOException e) {
           log.error("Caught {} while disconnecting realtimeClient for bot '{}'!",
               e.getClass().getSimpleName(), bot.getName(), e);
         }
@@ -208,24 +209,25 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     try {
       while (keepGoing) {
         eventPool.acquire();
-        QueuedEvent event = eventQueue.pollFirst();
+        final QueuedEvent event = eventQueue.pollFirst();
 
         keepGoing = handleEvent(event);
       }
 
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       if (!shuttingDown.get()) {
         log.info("Caught InterruptedException shutting down...");
       }
-    } catch (Exception e) {
+    } catch (final Exception e) {
       log.error("Unexpected Exception; shutting down!", e);
     }
 
     stop();
   }
 
-  private boolean handleEvent(QueuedEvent event) throws URISyntaxException, DeploymentException,
-      IOException, RestClientException, InterruptedException, ReplyErrorException {
+  private boolean handleEvent(final QueuedEvent event)
+      throws URISyntaxException, DeploymentException, IOException, RestClientException,
+      InterruptedException, ReplyErrorException {
     boolean keepGoing = true;
 
     if (event.type == EventTypes.TASK_ENDED) {
@@ -257,18 +259,18 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     return keepGoing;
   }
 
-  private boolean handleTaskEnded(QueuedEvent event) {
-    val taskEndedEvent = (TaskEndedEvent) event.data;
-    val task = taskEndedEvent.getTask();
-    val state = taskEndedEvent.getState();
-    val throwable = taskEndedEvent.getLastError().orElse(null);
+  private boolean handleTaskEnded(final QueuedEvent event) {
+    final val taskEndedEvent = (TaskEndedEvent) event.data;
+    final val task = taskEndedEvent.getTask();
+    final val state = taskEndedEvent.getState();
+    final val throwable = taskEndedEvent.getLastError().orElse(null);
 
-    if (throwable != null) {
-      log.error("A background task '{}' stopped with an error while in state '{}'; shutting down!",
-          task.getName(), state, throwable);
-    } else {
+    if (throwable == null) {
       log.info("A background task '{}' stopped w/o an error in state '{}'; shutting down!",
           task.getName(), state);
+    } else {
+      log.error("A background task '{}' stopped with an error while in state '{}'; shutting down!",
+          task.getName(), state, throwable);
     }
 
     return false;
@@ -276,7 +278,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
 
   private boolean handleAcquiredLeadershipEvent()
       throws URISyntaxException, DeploymentException, IOException {
-    for (BotDataStruct data : bots.values()) {
+    for (final BotDataStruct data : bots.values()) {
       data.realtimeClient.connect(this, config.getConnection());
     }
     return true;
@@ -287,15 +289,15 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     return false;
   }
 
-  private boolean handleRealtimeSessionEstablishedEvent(QueuedEvent event) {
-    Bot bot = (Bot) event.data;
-    BotDataStruct dataStruct = bots.get(bot);
-    RealtimeClient realtimeClient = dataStruct.realtimeClient;
+  private boolean handleRealtimeSessionEstablishedEvent(final QueuedEvent event) {
+    final Bot bot = (Bot) event.data;
+    final BotDataStruct dataStruct = bots.get(bot);
+    final RealtimeClient realtimeClient = dataStruct.realtimeClient;
 
     log.info("Real-time session established for bot '{}'; logging in bot...", bot.getName());
 
-    Credentials credentials = findCredentials(bot);
-    LoginTask loginTask = new LoginTask(bot, credentials, realtimeClient, this);
+    final Credentials credentials = findCredentials(bot);
+    final LoginTask loginTask = new LoginTask(bot, credentials, realtimeClient, this);
     dataStruct.loginTask = loginTask;
 
     tasks.start(Optional.of(this), loginTask);
@@ -303,8 +305,8 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     return true;
   }
 
-  private Credentials findCredentials(Bot bot) {
-    for (BotConfiguration configBot : config.getBots()) {
+  private Credentials findCredentials(final Bot bot) {
+    for (final BotConfiguration configBot : config.getBots()) {
       if (bot.getName().equals(configBot.getName())) {
         return configBot.getCredentials();
       }
@@ -312,11 +314,11 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     throw new IllegalStateException("Can't find BotConfiguration for Bot '" + bot.getName() + "'!");
   }
 
-  private boolean handleRealtimeSessionClosed(QueuedEvent event) {
+  private boolean handleRealtimeSessionClosed(final QueuedEvent event) {
     @SuppressWarnings("unchecked")
-    Tuple<Bot, Boolean> tuple = (Tuple<Bot, Boolean>) event.data;
-    Bot bot = tuple.getFirst();
-    boolean initiatedByClient = tuple.getSecond();
+    final Tuple<Bot, Boolean> tuple = (Tuple<Bot, Boolean>) event.data;
+    final Bot bot = tuple.getFirst();
+    final boolean initiatedByClient = tuple.getSecond();
     if (!initiatedByClient) {
       log.info("Realtime connection for bot '{}' was closed by other side; shutting down!",
           bot.getName());
@@ -324,64 +326,64 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     return false;
   }
 
-  private boolean handleAuthTokenRefreshed(QueuedEvent event) throws JsonProcessingException {
+  private boolean handleAuthTokenRefreshed(final QueuedEvent event) throws JsonProcessingException {
     @SuppressWarnings("unchecked")
-    Tuple<Bot, AuthInfo> tuple = (Tuple<Bot, AuthInfo>) event.data;
+    final Tuple<Bot, AuthInfo> tuple = (Tuple<Bot, AuthInfo>) event.data;
 
-    Bot bot = tuple.getFirst();
-    AuthInfo newAuthInfo = tuple.getSecond();
+    final Bot bot = tuple.getFirst();
+    final AuthInfo newAuthInfo = tuple.getSecond();
 
-    BotDataStruct dataStruct = bots.get(bot);
-    AuthInfo previousAuthInfo = dataStruct.authInfo.getValue();
+    final BotDataStruct dataStruct = bots.get(bot);
+    final AuthInfo previousAuthInfo = dataStruct.authInfo.getValue();
 
     if (newAuthInfo.isValid() && !previousAuthInfo.isValid()) {
       dataStruct.authInfo.setValue(newAuthInfo);
 
-      SubscriptionsTrackerTask subscriptionsTrackerTask =
+      final SubscriptionsTrackerTask subsTrackerTask =
           new SubscriptionsTrackerTask(bot, dataStruct.realtimeClient, this);
-      PublicChannelAutoJoinerTask autoJoinerTask = new PublicChannelAutoJoinerTask(restClient,
+      final PublicChannelAutoJoinerTask autoJoinerTask = new PublicChannelAutoJoinerTask(restClient,
           dataStruct.realtimeClient, bot, dataStruct.authInfo);
 
-      dataStruct.subscriptionsTrackerTask = subscriptionsTrackerTask;
+      dataStruct.subsTrackerTask = subsTrackerTask;
       dataStruct.autoJoinerTask = autoJoinerTask;
 
-      tasks.start(Optional.of(this), subscriptionsTrackerTask);
+      tasks.start(Optional.of(this), subsTrackerTask);
       tasks.start(Optional.of(this), autoJoinerTask);
     }
 
     return true;
   }
 
-  private boolean handleNewSubscription(QueuedEvent event) throws JsonProcessingException {
+  private boolean handleNewSubscription(final QueuedEvent event) throws JsonProcessingException {
     @SuppressWarnings("unchecked")
-    Tuple<Bot, Room> tuple = (Tuple<Bot, Room>) event.data;
-    Bot bot = tuple.getFirst();
-    Room room = tuple.getSecond();
-    BotDataStruct dataStruct = bots.get(bot);
+    final Tuple<Bot, Room> tuple = (Tuple<Bot, Room>) event.data;
+    final Bot bot = tuple.getFirst();
+    final Room room = tuple.getSecond();
+    final BotDataStruct dataStruct = bots.get(bot);
 
     // Add realtime subscription
-    SendStreamRoomMessages message = new SendStreamRoomMessages(room);
-    RealtimeClient realtimeClient = dataStruct.realtimeClient;
+    final SendStreamRoomMessages message = new SendStreamRoomMessages(room);
+    final RealtimeClient realtimeClient = dataStruct.realtimeClient;
     realtimeClient.sendMessage(message);
 
     log.info("Added real-time subscription for bot '{}' to room '{}'.", bot.getName(),
         room.getName());
 
     // catch-up on unread messages
-    Tuple<Bot, String> newTuple = new Tuple<>(bot, room.getId());
-    QueuedEvent newEvent = new QueuedEvent(EventTypes.PROCESS_ROOM, newTuple);
+    final Tuple<Bot, String> newTuple = new Tuple<>(bot, room.getId());
+    final QueuedEvent newEvent = new QueuedEvent(EventTypes.PROCESS_ROOM, newTuple);
     enqueueEvent(newEvent);
 
     return true;
   }
 
-  private boolean handleProcessRoom(QueuedEvent event)
+  private boolean handleProcessRoom(final QueuedEvent event)
       throws RestClientException, InterruptedException, ReplyErrorException, IOException {
     @SuppressWarnings("unchecked")
-    Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
-    Bot bot = tuple.getFirst();
-    String roomId = tuple.getSecond();
-    BotDataStruct dataStruct = bots.get(bot);
+    final Tuple<Bot, String> tuple = (Tuple<Bot, String>) event.data;
+    final Bot bot = tuple.getFirst();
+    final String roomId = tuple.getSecond();
+    final BotDataStruct dataStruct = bots.get(bot);
 
     roomProcessor.processRoom(dataStruct.realtimeClient, restClient, dataStruct.authInfo.getValue(),
         bot, roomId);
@@ -390,64 +392,68 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
   }
 
   @Override
-  public void onTaskEnded(TaskEndedEvent taskEndedEvent) {
-    val event = new QueuedEvent(EventTypes.TASK_ENDED, taskEndedEvent);
+  public void onTaskEnded(final TaskEndedEvent taskEndedEvent) {
+    final val event = new QueuedEvent(EventTypes.TASK_ENDED, taskEndedEvent);
     enqueueEvent(event);
   }
 
   @Override
-  public void onStateChanged(ElectionCandidate candidate, ElectionCandidateState oldState,
-      ElectionCandidateState newState) {
+  public void onStateChanged(final ElectionCandidate candidate,
+      final ElectionCandidateState oldState, final ElectionCandidateState newState) {
     if (newState == LEADER) {
-      QueuedEvent event = new QueuedEvent(EventTypes.ACQUIRED_LEADERSHIP, null);
+      final QueuedEvent event = new QueuedEvent(EventTypes.ACQUIRED_LEADERSHIP, null);
       enqueueEvent(event);
     } else if (newState == INACTIVE && oldState != null) {
-      QueuedEvent event = new QueuedEvent(EventTypes.LOST_LEADERSHIP, null);
+      final QueuedEvent event = new QueuedEvent(EventTypes.LOST_LEADERSHIP, null);
       enqueueEvent(event);
     }
   }
 
   @Override
-  public void onRealtimeClientSessionEstablished(RealtimeClient source) {
-    Bot bot = lookupBotFor(source);
-    QueuedEvent event = new QueuedEvent(EventTypes.REALTIME_SESSION_ESTABLISHED, bot);
+  public void onRealtimeClientSessionEstablished(final RealtimeClient source) {
+    final Bot bot = lookupBotFor(source);
+    final QueuedEvent event = new QueuedEvent(EventTypes.REALTIME_SESSION_ESTABLISHED, bot);
     enqueueEvent(event);
   }
 
   @Override
-  public void onRealtimeClientSessionClose(RealtimeClient source, boolean initiatedByClient) {
-    Tuple<Bot, Boolean> tuple = new Tuple<>(lookupBotFor(source), initiatedByClient);
-    QueuedEvent event = new QueuedEvent(EventTypes.REALTIME_SESSION_CLOSED, tuple);
+  public void onRealtimeClientSessionClose(final RealtimeClient source,
+      final boolean initiatedByClient) {
+    final Tuple<Bot, Boolean> tuple = new Tuple<>(lookupBotFor(source), initiatedByClient);
+    final QueuedEvent event = new QueuedEvent(EventTypes.REALTIME_SESSION_CLOSED, tuple);
     enqueueEvent(event);
   }
 
   @Override
-  public void onRealtimeClientStreamRoomMessagesUpdate(RealtimeClient source, String roomId) {
-    Bot bot = lookupBotFor(source);
-    Tuple<Bot, String> tuple = new Tuple<>(bot, roomId);
-    QueuedEvent event = new QueuedEvent(EventTypes.PROCESS_ROOM, tuple);
+  public void onRealtimeClientStreamRoomMessagesUpdate(final RealtimeClient source,
+      final String roomId) {
+    final Bot bot = lookupBotFor(source);
+    final Tuple<Bot, String> tuple = new Tuple<>(bot, roomId);
+    final QueuedEvent event = new QueuedEvent(EventTypes.PROCESS_ROOM, tuple);
     enqueueEvent(event);
   }
 
   @Override
-  public void onLoginAuthTokenRefreshed(LoginTask source, Bot bot, AuthInfo authInfo) {
-    Tuple<Bot, AuthInfo> tuple = new Tuple<>(bot, authInfo);
-    QueuedEvent event = new QueuedEvent(EventTypes.AUTH_TOKEN_REFRESHED, tuple);
+  public void onLoginAuthTokenRefreshed(final LoginTask source, final Bot bot,
+      final AuthInfo authInfo) {
+    final Tuple<Bot, AuthInfo> tuple = new Tuple<>(bot, authInfo);
+    final QueuedEvent event = new QueuedEvent(EventTypes.AUTH_TOKEN_REFRESHED, tuple);
     enqueueEvent(event);
   }
 
   @Override
-  public void onNewSubscription(SubscriptionsTrackerTask source, Bot bot, Room room) {
+  public void onNewSubscription(final SubscriptionsTrackerTask source, final Bot bot,
+      final Room room) {
     roomProcessor.cacheRoom(room);
-    Tuple<Bot, Room> tuple = new Tuple<>(bot, room);
-    QueuedEvent event = new QueuedEvent(EventTypes.NEW_SUBSCRIPTION, tuple);
+    final Tuple<Bot, Room> tuple = new Tuple<>(bot, room);
+    final QueuedEvent event = new QueuedEvent(EventTypes.NEW_SUBSCRIPTION, tuple);
     enqueueEvent(event);
   }
 
-  private Bot lookupBotFor(RealtimeClient realtimeClient) {
-    for (Map.Entry<Bot, BotDataStruct> entry : bots.entrySet()) {
-      Bot bot = entry.getKey();
-      BotDataStruct dataStruct = entry.getValue();
+  private Bot lookupBotFor(final RealtimeClient realtimeClient) {
+    for (final Map.Entry<Bot, BotDataStruct> entry : bots.entrySet()) {
+      final Bot bot = entry.getKey();
+      final BotDataStruct dataStruct = entry.getValue();
 
       if (dataStruct.realtimeClient == realtimeClient) {
         return bot;
@@ -457,7 +463,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     throw new IllegalStateException("No bot associated with RealtimeClient!");
   }
 
-  private void enqueueEvent(QueuedEvent event) {
+  private void enqueueEvent(final QueuedEvent event) {
     eventQueue.add(event);
     eventPool.release();
   }
@@ -478,7 +484,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
      */
     private final transient Object data;
 
-    QueuedEvent(EventTypes type, Object data) {
+    /* package */ QueuedEvent(final EventTypes type, final Object data) {
       this.type = type;
       this.data = data;
     }
@@ -489,7 +495,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
    *
    * @author lbarnkow
    */
-  private static enum EventTypes {
+  private enum EventTypes {
     TASK_ENDED, //
     REALTIME_SESSION_CLOSED, //
     ACQUIRED_LEADERSHIP, //
@@ -526,7 +532,7 @@ public class BotManager extends AbstractBaseTask implements ElectionCandidateLis
     /**
      * The <code>SubscriptionsTrackerTask</code> for this <code>Bot</code>.
      */
-    private transient SubscriptionsTrackerTask subscriptionsTrackerTask;
+    private transient SubscriptionsTrackerTask subsTrackerTask;
 
     /**
      * The <code>PublicChannelAutoJoinerTask</code> for this <code>Bot</code>.

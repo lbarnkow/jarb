@@ -33,14 +33,14 @@ class ElectionLeaseTest {
 
   private static final long DEFAULT_LEASE_TTL = 1000L;
 
-  private String id = UUID.randomUUID().toString();
+  private final String id = UUID.randomUUID().toString();
 
   @Test
   void testState() {
     // given
 
     // when
-    ElectionLease lease = new ElectionLease(id, 5000L, 6000L);
+    final ElectionLease lease = new ElectionLease(id, 5000L, 6000L);
 
     // then
     assertThat(lease.getLeaderId()).isEqualTo(id);
@@ -51,16 +51,16 @@ class ElectionLeaseTest {
   @Test
   void testIsOwnedBy() {
     // given
-    ElectionCandidate candidate1 = new ElectionCandidate();
-    ElectionCandidate candidate2 = new ElectionCandidate();
-    ElectionLease lease1 = new ElectionLease(candidate1, 0L);
-    ElectionLease lease2 = new ElectionLease(candidate2, 0L);
+    final ElectionCandidate candidate1 = new ElectionCandidate();
+    final ElectionCandidate candidate2 = new ElectionCandidate();
+    final ElectionLease lease1 = new ElectionLease(candidate1, 0L);
+    final ElectionLease lease2 = new ElectionLease(candidate2, 0L);
 
     // when
-    boolean idOwnsLease1 = lease1.isOwnedBy(candidate1);
-    boolean id2OwnsLease1 = lease1.isOwnedBy(candidate2);
-    boolean idOwnsLease2 = lease2.isOwnedBy(candidate1);
-    boolean id2OwnsLease2 = lease2.isOwnedBy(candidate2);
+    final boolean idOwnsLease1 = lease1.isOwnedBy(candidate1);
+    final boolean id2OwnsLease1 = lease1.isOwnedBy(candidate2);
+    final boolean idOwnsLease2 = lease2.isOwnedBy(candidate1);
+    final boolean id2OwnsLease2 = lease2.isOwnedBy(candidate2);
 
     // then
     assertThat(idOwnsLease1).isTrue();
@@ -72,13 +72,13 @@ class ElectionLeaseTest {
   @Test
   void testLeaseExpiration() throws InterruptedException {
     // given
-    long now = System.currentTimeMillis();
-    ElectionLease leaseA = new ElectionLease(id, now, now + 10L);
+    final long now = System.currentTimeMillis();
+    final ElectionLease leaseA = new ElectionLease(id, now, now + 10L);
 
     // when
-    boolean isExpiredBeforeSleep = leaseA.isExpired();
+    final boolean isExpiredBeforeSleep = leaseA.isExpired();
     Thread.sleep(15L);
-    boolean isExpiredAfterSleep = leaseA.isExpired();
+    final boolean isExpiredAfterSleep = leaseA.isExpired();
 
     // then
     assertThat(isExpiredBeforeSleep).isFalse();
@@ -88,13 +88,13 @@ class ElectionLeaseTest {
   @Test
   void testLeaseRenewal() {
     // given
-    ElectionLease lease1 = new ElectionLease(id, 1000L, 2000L);
+    final ElectionLease lease1 = new ElectionLease(id, 1000L, 2000L);
 
     // when
-    ElectionLease lease2 = new ElectionLease(lease1, DEFAULT_LEASE_TTL);
+    final ElectionLease lease2 = new ElectionLease(lease1, DEFAULT_LEASE_TTL);
 
     // then
-    assertThat(lease1).isNotSameAs(lease2);
+    assertThat(lease1).isNotSameInstanceAs(lease2);
     assertThat(lease1.getLeaderId()).isEqualTo(lease2.getLeaderId());
     assertThat(lease1.isExpired()).isTrue();
     assertThat(lease2.isExpired()).isFalse();
@@ -103,16 +103,16 @@ class ElectionLeaseTest {
   @Test
   void testLoadAndSave() throws IOException {
     // given
-    File tmpFile = Files.createTempFile("test", null).toFile();
-    ElectionCandidate candidate = new ElectionCandidate();
-    ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
+    final File tmpFile = Files.createTempFile("test", null).toFile();
+    final ElectionCandidate candidate = new ElectionCandidate();
+    final ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
 
     // when
     ElectionLease.save(lease, tmpFile);
-    ElectionLease lease2 = ElectionLease.load(tmpFile);
+    final ElectionLease lease2 = ElectionLease.load(tmpFile);
 
     // then
-    assertThat(lease).isNotSameAs(lease2);
+    assertThat(lease).isNotSameInstanceAs(lease2);
     assertThat(lease.getLeaderId()).isEqualTo(lease2.getLeaderId());
     assertThat(lease.getLeaseAcquired()).isEqualTo(lease2.getLeaseAcquired());
     assertThat(lease.getLeaseExpiration()).isEqualTo(lease2.getLeaseExpiration());
@@ -123,7 +123,8 @@ class ElectionLeaseTest {
     // given
 
     // when
-    ElectionLease lease = ElectionLease.load(new File("/tmp/" + UUID.randomUUID().toString()));
+    final ElectionLease lease =
+        ElectionLease.load(new File("/tmp/" + UUID.randomUUID().toString()));
 
     // then
     assertThat(lease).isNull();
@@ -143,8 +144,8 @@ class ElectionLeaseTest {
   @Test
   void testSaveWithBadTargetPath() {
     // given
-    ElectionCandidate candidate = new ElectionCandidate();
-    ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
+    final ElectionCandidate candidate = new ElectionCandidate();
+    final ElectionLease lease = new ElectionLease(candidate, DEFAULT_LEASE_TTL);
 
     // when
     assertThrows(IOException.class, () -> {
@@ -157,8 +158,8 @@ class ElectionLeaseTest {
   @Test
   void testSaveWithExpiredLease() throws IOException {
     // given
-    File tmpFile = Files.createTempFile("test", null).toFile();
-    ElectionLease lease = new ElectionLease(id, 0L, 10L);
+    final File tmpFile = Files.createTempFile("test", null).toFile();
+    final ElectionLease lease = new ElectionLease(id, 0L, 10L);
 
     // when
     assertThrows(ElectionLeaseExpiredException.class, () -> {

@@ -32,15 +32,15 @@ public class Room {
   /**
    * The room id.
    */
-  final String id;
+  private final String id;
 
   /**
    * The human-readable name.
    */
-  final String name;
+  private final String name;
 
   /**
    * The room type.
    */
-  final RoomType type;
+  private final RoomType type;
 }

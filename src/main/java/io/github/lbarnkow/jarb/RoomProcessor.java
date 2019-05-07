@@ -71,7 +71,7 @@ public class RoomProcessor {
    *
    * @param room the <code>Room</code>
    */
-  public void cacheRoom(Room room) {
+  public void cacheRoom(final Room room) {
     log.debug("Cached room object: {}", room);
     roomCache.put(room.getId(), room);
   }
@@ -92,36 +92,37 @@ public class RoomProcessor {
    * @throws ReplyErrorException  on bad real-time replies
    * @throws IOException          on io errors
    */
-  public void processRoom(RealtimeClient realtimeClient, RestClient restClient, AuthInfo authInfo,
-      Bot bot, String roomId)
+  public void processRoom(final RealtimeClient realtimeClient, final RestClient restClient,
+      final AuthInfo authInfo, final Bot bot, final String roomId)
       throws RestClientException, InterruptedException, ReplyErrorException, IOException {
-    Room room = resolveRoomType(restClient, authInfo, roomId);
+    final Room room = resolveRoomType(restClient, authInfo, roomId);
 
-    ChatCountersReply countersBefore =
+    final ChatCountersReply countersBefore =
         restClient.getChatCounters(authInfo, room.getType(), room.getId());
     if (countersBefore.isJoined() || room.getType() == RoomType.INSTANT_MESSAGE) {
       log.debug("Bot '{}' needs to process (at least) '{}' unread messages in room '{}'.",
           bot.getName(), countersBefore.getUnreads(), room.getName());
 
       restClient.markSubscriptionRead(authInfo, roomId);
-      ChatCountersReply countersAfter =
+      final ChatCountersReply countersAfter =
           restClient.getChatCounters(authInfo, room.getType(), room.getId());
 
-      List<Message> history = getHistory(restClient, authInfo, room, countersBefore, countersAfter);
-      for (Message message : history) {
+      final List<Message> history =
+          getHistory(restClient, authInfo, room, countersBefore, countersAfter);
+      for (final Message message : history) {
         Optional<Message> reply = Optional.empty();
         try {
           reply = bot.offerMessage(message);
-        } catch (Exception e) {
+        } catch (final Exception e) {
           log.error("Bot '{}' failed to process message '{}'!", bot.getName(), message, e);
         }
         try {
           if (reply.isPresent()) {
             @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // don't reuse msg objects
-            SendSendMessage outgoing = new SendSendMessage(reply.get());
+            final SendSendMessage outgoing = new SendSendMessage(reply.get());
             realtimeClient.sendMessage(outgoing);
           }
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
           log.error("Failed to send Bot '{}'s reply '{}'!", bot.getName(), reply.get(), e);
         }
       }
@@ -131,14 +132,14 @@ public class RoomProcessor {
     }
   }
 
-  private Room resolveRoomType(RestClient restClient, AuthInfo authInfo, String roomId)
-      throws RestClientException {
+  private Room resolveRoomType(final RestClient restClient, final AuthInfo authInfo,
+      final String roomId) throws RestClientException {
     if (!roomCache.containsKey(roomId)) {
-      SubscriptionsGetOneReply subscription = restClient.getOneSubscription(authInfo, roomId);
+      final SubscriptionsGetOneReply subscription = restClient.getOneSubscription(authInfo, roomId);
 
-      String roomName = subscription.getName();
-      RoomType roomType = RoomType.parse(subscription.getType());
-      Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
+      final String roomName = subscription.getName();
+      final RoomType roomType = RoomType.parse(subscription.getType());
+      final Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
 
       roomCache.put(roomId, room);
     }
@@ -146,24 +147,26 @@ public class RoomProcessor {
     return roomCache.get(roomId);
   }
 
-  private List<Message> getHistory(RestClient restClient, AuthInfo authInfo, Room room,
-      ChatCountersReply before, ChatCountersReply after) throws RestClientException {
-    List<Message> result = new ArrayList<>();
+  private List<Message> getHistory(final RestClient restClient, final AuthInfo authInfo,
+      final Room room, final ChatCountersReply before, final ChatCountersReply after)
+      throws RestClientException {
+    final List<Message> result = new ArrayList<>();
 
-    Instant oldest = Instant.parse(before.getUnreadsFrom());
-    Instant latest = Instant.parse(after.getUnreadsFrom());
-    ChatHistoryReply history = restClient.getChatHistory(authInfo, room, latest, oldest, true);
+    final Instant oldest = Instant.parse(before.getUnreadsFrom());
+    final Instant latest = Instant.parse(after.getUnreadsFrom());
+    final ChatHistoryReply history =
+        restClient.getChatHistory(authInfo, room, latest, oldest, true);
 
-    for (RawMessage rawMsg : history.getMessages()) {
-      String userId = rawMsg.getUser().getId();
-      String userName = rawMsg.getUser().getUsername();
-      User user = User.builder().id(userId).name(userName).build();
+    for (final RawMessage rawMsg : history.getMessages()) {
+      final String userId = rawMsg.getUser().getId();
+      final String userName = rawMsg.getUser().getUsername();
+      final User user = User.builder().id(userId).name(userName).build();
 
-      String rmId = rawMsg.getId();
-      String rmMsg = rawMsg.getMsg();
-      Instant rmTs = Instant.parse(rawMsg.getTs());
-      MessageType rmType = MessageType.parse(rawMsg.getType());
-      Message message = Message.builder().id(rmId).text(rmMsg).room(room).timestamp(rmTs)
+      final String rmId = rawMsg.getId();
+      final String rmMsg = rawMsg.getMsg();
+      final Instant rmTs = Instant.parse(rawMsg.getTs());
+      final MessageType rmType = MessageType.parse(rawMsg.getType());
+      final Message message = Message.builder().id(rmId).text(rmMsg).room(room).timestamp(rmTs)
           .type(rmType).user(user).build();
       result.add(message);
     }

@@ -61,10 +61,10 @@ public abstract class AbstractBaseBot implements Bot {
   private List<Attachment> helpText;
 
   @Override
-  public Bot initialize(String name, String username) {
+  public Bot initialize(final String name, final String username) {
     try {
       loadHelpText();
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("Failed to read 'HELP.md' for bot '{}'!", name, e);
     }
 

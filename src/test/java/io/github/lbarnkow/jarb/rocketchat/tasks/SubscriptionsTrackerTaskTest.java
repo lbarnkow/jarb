@@ -52,21 +52,21 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
 
   private static final String TEST_BOTNAME = "TestBot";
 
-  private List<ListenerData> events = new ArrayList<>();
+  private final List<ListenerData> events = new ArrayList<>();
 
   @Test
   void testTask() throws InterruptedException, ReplyErrorException, IOException, TimeoutException {
     // given
-    ReceiveGetSubscriptionsReply reply = createTestData(5);
+    final ReceiveGetSubscriptionsReply reply = createTestData(5);
 
-    RealtimeClient rtClient = mock(RealtimeClient.class);
+    final RealtimeClient rtClient = mock(RealtimeClient.class);
     when(rtClient.sendMessageAndWait(any(), any())).thenReturn(reply);
 
-    Bot bot = mock(Bot.class);
+    final Bot bot = mock(Bot.class);
     when(bot.getName()).thenReturn(TEST_BOTNAME);
 
-    SubscriptionsTrackerTask task = new SubscriptionsTrackerTask(bot, rtClient, 10L, this);
-    TaskWrapper wrapper = new TaskWrapper(task);
+    final SubscriptionsTrackerTask task = new SubscriptionsTrackerTask(bot, rtClient, 10L, this);
+    final TaskWrapper wrapper = new TaskWrapper(task);
 
     // when
     wrapper.startTask(Optional.empty());
@@ -78,7 +78,7 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
         eq(ReceiveGetSubscriptionsReply.class));
     assertThat(events.size()).isEqualTo(5);
     events.forEach(event -> {
-      assertThat(event.source).isSameAs(task);
+      assertThat(event.source).isSameInstanceAs(task);
       assertThat(event.bot.getName()).isEqualTo(TEST_BOTNAME);
       assertThat(event.room.getId()).startsWith(TEST_ROOM_ID_PREFIX);
       assertThat(event.room.getName()).startsWith(TEST_ROOM_NAME_PREFIX);
@@ -88,21 +88,21 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
   @Test
   void testDefaultSleepTime() {
     // given
-    Bot bot = mock(Bot.class);
+    final Bot bot = mock(Bot.class);
     when(bot.getName()).thenReturn(TEST_BOTNAME);
 
     // when
-    SubscriptionsTrackerTask task = new SubscriptionsTrackerTask(bot, null, null);
+    final SubscriptionsTrackerTask task = new SubscriptionsTrackerTask(bot, null, null);
 
     // then
     assertThat(task.getSleepTime()).isEqualTo(DEFAULT_SLEEP_TIME);
 
   }
 
-  private ReceiveGetSubscriptionsReply createTestData(int num) {
-    List<RawSubscription> subs = new ArrayList<>();
+  private ReceiveGetSubscriptionsReply createTestData(final int num) {
+    final List<RawSubscription> subs = new ArrayList<>();
     for (int i = 0; i < num; i++) {
-      RawSubscription sub = new RawSubscription();
+      final RawSubscription sub = new RawSubscription();
       sub.setId("TEST_SUB_ID_" + randomUUID().toString());
       sub.setRid(TEST_ROOM_ID_PREFIX + randomUUID().toString());
       sub.setName(TEST_ROOM_NAME_PREFIX + randomUUID().toString());
@@ -110,13 +110,14 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
       subs.add(sub);
     }
 
-    ReceiveGetSubscriptionsReply reply = new ReceiveGetSubscriptionsReply();
+    final ReceiveGetSubscriptionsReply reply = new ReceiveGetSubscriptionsReply();
     reply.setResult(subs);
     return reply;
   }
 
   @Override
-  public void onNewSubscription(SubscriptionsTrackerTask source, Bot bot, Room room) {
+  public void onNewSubscription(final SubscriptionsTrackerTask source, final Bot bot,
+      final Room room) {
     events.add(new ListenerData(source, bot, room));
   }
 
@@ -125,7 +126,7 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
     Bot bot;
     Room room;
 
-    ListenerData(SubscriptionsTrackerTask source, Bot bot, Room room) {
+    ListenerData(final SubscriptionsTrackerTask source, final Bot bot, final Room room) {
       this.source = source;
       this.bot = bot;
       this.room = room;

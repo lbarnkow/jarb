@@ -29,10 +29,10 @@ import org.junit.jupiter.api.Test;
 
 class TaskManagerTest {
 
-  private TaskManager manager = new TaskManager();
-  private DummyTaskForUnitTesting task1 = new DummyTaskForUnitTesting(50L);
-  private DummyTaskForUnitTesting task2 = new DummyTaskForUnitTesting(50L);
-  private DummyTaskForUnitTesting task3 = new DummyTaskForUnitTesting(50L);
+  private final TaskManager manager = new TaskManager();
+  private final DummyTaskForUnitTesting task1 = new DummyTaskForUnitTesting(50L);
+  private final DummyTaskForUnitTesting task2 = new DummyTaskForUnitTesting(50L);
+  private final DummyTaskForUnitTesting task3 = new DummyTaskForUnitTesting(50L);
 
   @Test
   void testStart() throws InterruptedException {
@@ -48,7 +48,7 @@ class TaskManagerTest {
 
     // then
     assertThat(manager.getTaskCount()).isEqualTo(3);
-    assertThat(manager.getTasks()).containsAllOf(task3, task2, task1);
+    assertThat(manager.getTasks()).containsAtLeast(task3, task2, task1);
 
     assertThat(task1.succeeded).isTrue();
     assertThat(task2.succeeded).isTrue();
@@ -107,7 +107,7 @@ class TaskManagerTest {
     // given
     manager.start(Optional.empty(), true, task1);
     assertThat(manager.getTasks()).hasSize(1);
-    Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
+    final Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
 
     // when
     manager.stopAll();
@@ -122,7 +122,7 @@ class TaskManagerTest {
   void testPruneLiveTask() {
     // given
     manager.start(Optional.empty(), true, task1);
-    Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
+    final Task[] tasksArray = manager.getTasks().toArray(new Task[] {});
 
     // when
     assertThrows(IllegalStateException.class, () -> manager.prune(tasksArray));

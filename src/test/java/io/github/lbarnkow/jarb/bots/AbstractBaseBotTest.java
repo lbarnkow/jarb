@@ -35,28 +35,28 @@ class AbstractBaseBotTest {
   @Test
   void testHelpTextNonExistant() {
     // given
-    NoHelpBot bot = new NoHelpBot();
+    final NoHelpBot bot = new NoHelpBot();
 
     // when
     bot.initialize(TEST_BOTNAME, TEST_USERNAME);
 
     // then
     assertThat(bot.getName()).isEqualTo(TEST_BOTNAME);
-    assertThat(bot.getUsername()).isSameAs(TEST_USERNAME);
+    assertThat(bot.getUsername()).isSameInstanceAs(TEST_USERNAME);
     assertThat(bot.getHelpText()).isNull();
   }
 
   @Test
   void testHelpText() {
     // given
-    HelpBot bot = new HelpBot();
+    final HelpBot bot = new HelpBot();
 
     // when
     bot.initialize(TEST_BOTNAME, TEST_USERNAME);
 
     // then
     assertThat(bot.getName()).isEqualTo(TEST_BOTNAME);
-    assertThat(bot.getUsername()).isSameAs(TEST_USERNAME);
+    assertThat(bot.getUsername()).isSameInstanceAs(TEST_USERNAME);
     assertThat(bot.getHelpText()).hasSize(1);
     assertThat(bot.getHelpText().get(0).getText()).isEqualTo(TEST_HELP_TEXT);
   }
@@ -64,14 +64,14 @@ class AbstractBaseBotTest {
   @Test
   void testHelpTextIoException() {
     // given
-    TestBot bot = new TestBot();
+    final TestBot bot = new TestBot();
 
     // when
     bot.initialize(TEST_BOTNAME, TEST_USERNAME);
 
     // then
     assertThat(bot.getName()).isEqualTo(TEST_BOTNAME);
-    assertThat(bot.getUsername()).isSameAs(TEST_USERNAME);
+    assertThat(bot.getUsername()).isSameInstanceAs(TEST_USERNAME);
     assertThat(bot.getHelpText()).isNull();
   }
 
