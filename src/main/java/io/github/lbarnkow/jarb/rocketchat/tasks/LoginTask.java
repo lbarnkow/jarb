@@ -33,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * A background task periodically trying to acquire new authorization tokens by
  * logging in to the chat server for a given bot.
- * 
+ *
  * @author lbarnkow
  */
 @Slf4j
@@ -71,8 +71,8 @@ public class LoginTask extends AbstractBotSpecificTask {
    * @param listener       a listener to inform about successful logins and
    *                       updated tokens
    */
-  public LoginTask(Bot bot, Credentials credentials, RealtimeClient realtimeClient,
-      LoginTaskListener listener) {
+  public LoginTask(final Bot bot, final Credentials credentials,
+      final RealtimeClient realtimeClient, final LoginTaskListener listener) {
     super(bot);
 
     this.realtimeClient = realtimeClient;
@@ -85,12 +85,12 @@ public class LoginTask extends AbstractBotSpecificTask {
     final Bot bot = getBot();
 
     try {
-      SendLogin message = new SendLogin(credentials);
+      final SendLogin message = new SendLogin(credentials);
 
       while (true) {
-        ReceiveLoginReply reply =
+        final ReceiveLoginReply reply =
             realtimeClient.sendMessageAndWait(message, ReceiveLoginReply.class);
-        AuthInfo authInfo = convertReply(reply);
+        final AuthInfo authInfo = convertReply(reply);
 
         long sleepTime = 100L;
 
@@ -106,27 +106,27 @@ public class LoginTask extends AbstractBotSpecificTask {
         Thread.sleep(sleepTime);
       }
 
-    } catch (ReplyErrorException e) {
+    } catch (final ReplyErrorException e) {
       log.error("Login failed, stopping logins! Message: '{}'.", e.getError().getMessage());
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       log.trace("{} was interrupted.", getClass().getSimpleName());
     }
 
     log.info("Stopped login task.");
   }
 
-  private AuthInfo convertReply(ReceiveLoginReply reply) {
-    String userId = reply.getResult().getId();
-    String token = reply.getResult().getToken();
-    long epochExpires = reply.getResult().getTokenExpires().getDate();
-    Instant expires = Instant.ofEpochMilli(epochExpires);
+  private AuthInfo convertReply(final ReceiveLoginReply reply) {
+    final String userId = reply.getResult().getId();
+    final String token = reply.getResult().getToken();
+    final long epochExpires = reply.getResult().getTokenExpires().getDate();
+    final Instant expires = Instant.ofEpochMilli(epochExpires);
 
     return AuthInfo.builder().userId(userId).authToken(token).expires(expires).build();
   }
 
-  private long calculateSleepTime(AuthInfo authInfo) {
-    Duration diff = Duration.between(Instant.now(), authInfo.getExpires());
-    long sleepTime = Math.min((diff.toMillis() / 2L), MAX_TOKEN_REFRESH_INTERVAL);
+  private long calculateSleepTime(final AuthInfo authInfo) {
+    final Duration diff = Duration.between(Instant.now(), authInfo.getExpires());
+    final long sleepTime = Math.min((diff.toMillis() / 2L), MAX_TOKEN_REFRESH_INTERVAL);
 
     return sleepTime;
   }

@@ -25,7 +25,7 @@ import lombok.ToString;
 /**
  * Exception wrapping any error received from the chat server on the web socket
  * connection.
- * 
+ *
  * @author lbarnkow
  */
 @ToString
@@ -40,10 +40,10 @@ public class ReplyErrorException extends Exception {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param error the error
    */
-  public ReplyErrorException(BaseMessage.BaseError error) {
+  public ReplyErrorException(final BaseMessage.BaseError error) {
     this.error = error;
   }
 }

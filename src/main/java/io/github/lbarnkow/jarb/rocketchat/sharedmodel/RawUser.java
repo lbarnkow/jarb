@@ -30,7 +30,7 @@ import lombok.NoArgsConstructor;
  * See
  * https://rocket.chat/docs/developer-guides/rest-api/authentication/login/#payload
  * .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -68,7 +68,7 @@ public class RawUser {
    * @param u the <code>User</code> instance to convert
    * @return the resulting <code>RawUser</code>
    */
-  public static RawUser of(User u) {
+  public static RawUser of(final User u) {
     return RawUser.builder() //
         .id(u.getId()) //
         .username(u.getName()) //

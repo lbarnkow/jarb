@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -41,6 +42,7 @@ import lombok.val;
  */
 @Slf4j
 @ToString
+@NoArgsConstructor
 public abstract class AbstractBaseBot implements Bot {
   /**
    * Stores the logical jarb run-time name.
@@ -74,19 +76,25 @@ public abstract class AbstractBaseBot implements Bot {
     return this;
   }
 
-  void loadHelpText() throws IOException {
-    val stream = getClass().getResourceAsStream("HELP.md");
+  /**
+   * Tries to load 'HELP.md' from the same package as the current bots class.
+   *
+   * @throws IOException on IO errors
+   */
+  protected void loadHelpText() throws IOException {
+    final val stream = getClass().getResourceAsStream("HELP.md");
 
     if (stream != null) {
-      val reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
-      val sb = new StringBuilder();
+      final val reader = new BufferedReader(new InputStreamReader(stream, Charsets.UTF_8));
+      final val builder = new StringBuilder();
       String line = reader.readLine();
       while (line != null) {
-        sb.append(line).append("\n");
+        builder.append(line).append("\n");
         line = reader.readLine();
       }
 
-      helpText = Lists.asList(Attachment.builder().text(sb.toString()).build(), new Attachment[0]);
+      helpText =
+          Lists.asList(Attachment.builder().text(builder.toString()).build(), new Attachment[0]);
     }
   }
 }

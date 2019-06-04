@@ -23,6 +23,7 @@ import io.github.lbarnkow.jarb.api.Message;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.bots.AbstractBaseBot;
 import java.util.Optional;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -32,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author lbarnkow
  */
 @Slf4j
+@NoArgsConstructor
 public class DummyBot extends AbstractBaseBot implements Bot {
 
   @Override

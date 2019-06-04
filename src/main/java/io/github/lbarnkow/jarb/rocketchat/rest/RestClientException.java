@@ -24,7 +24,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Exception wrapping any error occuring during a REST call to the chat server.
- * 
+ *
  * @author lbarnkow
  */
 public class RestClientException extends Exception {
@@ -32,10 +32,10 @@ public class RestClientException extends Exception {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param object The response from the REST endpoint
    */
-  public RestClientException(Object object) {
+  public RestClientException(final Object object) {
     super("Bad response from REST endpoint: "
         + ToStringBuilder.reflectionToString(object, SHORT_PREFIX_STYLE));
   }

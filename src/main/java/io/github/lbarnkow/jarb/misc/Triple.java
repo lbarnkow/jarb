@@ -45,7 +45,7 @@ public class Triple<A, B, C> extends Tuple<A, B> {
    * @param second the second element
    * @param third  the third element
    */
-  public Triple(A first, B second, C third) {
+  public Triple(final A first, final B second, final C third) {
     super(first, second);
     this.third = third;
   }

@@ -71,7 +71,7 @@ public class ElectionLease {
    */
   private long leaseExpiration;
 
-  private ElectionLease(String leaderId, long ttl) {
+  private ElectionLease(final String leaderId, final long ttl) {
     this(leaderId, System.currentTimeMillis(), System.currentTimeMillis() + ttl);
   }
 
@@ -82,7 +82,7 @@ public class ElectionLease {
    * @param leader the candidate
    * @param ttl    the time-to-live for this lease
    */
-  public ElectionLease(ElectionCandidate leader, long ttl) {
+  public ElectionLease(final ElectionCandidate leader, final long ttl) {
     this(leader.getId(), ttl);
   }
 
@@ -92,7 +92,7 @@ public class ElectionLease {
    * @param oldLease the previous lease
    * @param ttl      the time-to-live for this lease
    */
-  public ElectionLease(ElectionLease oldLease, long ttl) {
+  public ElectionLease(final ElectionLease oldLease, final long ttl) {
     this(oldLease.leaderId, ttl);
   }
 
@@ -103,7 +103,7 @@ public class ElectionLease {
    *         otherwise
    */
   public boolean isExpired() {
-    long now = System.currentTimeMillis();
+    final long now = System.currentTimeMillis();
     return leaseExpiration < now;
   }
 
@@ -115,7 +115,7 @@ public class ElectionLease {
    * @return <code>true</code> if the id of the given candidate matches the leader
    *         id in this lease; <code>false</code> otherwise
    */
-  public boolean isOwnedBy(ElectionCandidate candidate) {
+  public boolean isOwnedBy(final ElectionCandidate candidate) {
     return Objects.equals(leaderId, candidate.getId());
   }
 
@@ -126,7 +126,7 @@ public class ElectionLease {
    * @return the deserialized <code>ElectionLease</code> instance
    * @throws IOException on io errors
    */
-  public static ElectionLease load(File file) throws IOException {
+  public static ElectionLease load(final File file) throws IOException {
     if (!file.exists()) {
       return null;
     }
@@ -139,7 +139,7 @@ public class ElectionLease {
       tries++;
       try {
         lease = MAPPER.readValue(file, ElectionLease.class);
-      } catch (IOException e) {
+      } catch (final IOException e) {
         lastException = e;
       }
     }
@@ -163,19 +163,19 @@ public class ElectionLease {
    * @throws IOException on io errors
    */
   @SuppressWarnings("PMD.CyclomaticComplexity")
-  public static void save(ElectionLease lease, File file) throws IOException {
+  public static void save(final ElectionLease lease, final File file) throws IOException {
     boolean success = false;
     IOException lastException = null;
-    int tries = 0;
+    final int tries = 0;
 
-    Path tmp = Files.createTempFile(UUID.randomUUID().toString(), null);
+    final Path tmp = Files.createTempFile(UUID.randomUUID().toString(), null);
     MAPPER.writeValue(tmp.toFile(), lease);
 
     while (!lease.isExpired() && !success && tries < MAX_FILE_IO_RETRIES) {
       try {
         Files.move(tmp, file.toPath(), REPLACE_EXISTING);
         success = true;
-      } catch (IOException e) {
+      } catch (final IOException e) {
         lastException = e;
       }
     }

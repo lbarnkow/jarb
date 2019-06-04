@@ -90,8 +90,8 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
    * @param authInfo       authorization token for the <code>RestClient</code>
    * @param sleepTime      the interval between each query
    */
-  PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
-      Holder<AuthInfo> authInfo, long sleepTime) {
+  PublicChannelAutoJoinerTask(final RestClient restClient, final RealtimeClient realtimeClient,
+      final Bot bot, final Holder<AuthInfo> authInfo, final long sleepTime) {
     super(bot);
 
     this.restClient = restClient;
@@ -109,33 +109,33 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
    * @param bot            the <code>Bot</code>
    * @param authInfo       authorization token for the <code>RestClient</code>
    */
-  public PublicChannelAutoJoinerTask(RestClient restClient, RealtimeClient realtimeClient, Bot bot,
-      Holder<AuthInfo> authInfo) {
+  public PublicChannelAutoJoinerTask(final RestClient restClient,
+      final RealtimeClient realtimeClient, final Bot bot, final Holder<AuthInfo> authInfo) {
     this(restClient, realtimeClient, bot, authInfo, DEFAULT_SLEEP_TIME);
   }
 
   @Override
   public void runTask() throws Exception {
-    Bot bot = getBot();
+    final Bot bot = getBot();
 
     try {
       while (true) {
-        ChannelListReply channels = restClient.getChannelList(authInfo.getValue());
-        ChannelListJoinedReply joinedChannels =
+        final ChannelListReply channels = restClient.getChannelList(authInfo.getValue());
+        final ChannelListJoinedReply joinedChannels =
             restClient.getChannelListJoined(authInfo.getValue());
 
-        Map<String, RawChannel> roomIdsNotJoined =
+        final Map<String, RawChannel> roomIdsNotJoined =
             findChannelsNotJoined(channels.getChannels(), joinedChannels.getChannels());
 
-        for (RawChannel channel : roomIdsNotJoined.values()) {
-          Room room = channel.convert();
+        for (final RawChannel channel : roomIdsNotJoined.values()) {
+          final Room room = channel.convert();
 
-          boolean shouldJoin = bot.offerRoom(room);
+          final boolean shouldJoin = bot.offerRoom(room);
           // What about join code?! Currently API doesn't enforce the passwords (0.73)
           if (shouldJoin) {
             @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // don't reuse msg objects
-            SendJoinRoom message = new SendJoinRoom(room);
-            ReceiveJoinRoomReply reply =
+            final SendJoinRoom message = new SendJoinRoom(room);
+            final ReceiveJoinRoomReply reply =
                 realtimeClient.sendMessageAndWait(message, ReceiveJoinRoomReply.class);
 
             if (reply.isSuccess()) {
@@ -148,20 +148,20 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
 
         Thread.sleep(sleepTime);
       }
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       log.trace("{} was interrupted.", getClass().getSimpleName());
     }
   }
 
-  private Map<String, RawChannel> findChannelsNotJoined(List<RawChannel> channels,
-      List<RawChannel> joinedChannels) {
+  private Map<String, RawChannel> findChannelsNotJoined(final List<RawChannel> channels,
+      final List<RawChannel> joinedChannels) {
     @SuppressWarnings("PMD.UseConcurrentHashMap") // no thrad-safety required
-    Map<String, RawChannel> channelsNotJoined = new HashMap<>();
+    final Map<String, RawChannel> channelsNotJoined = new HashMap<>();
 
-    for (RawChannel channel : channels) {
+    for (final RawChannel channel : channels) {
       channelsNotJoined.put(channel.getId(), channel);
     }
-    for (RawChannel channel : joinedChannels) {
+    for (final RawChannel channel : joinedChannels) {
       channelsNotJoined.remove(channel.getId());
     }
 

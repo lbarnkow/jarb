@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
 /**
  * See
  * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/login/ .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -45,17 +45,17 @@ public class SendLogin extends BaseMethod {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param credentials the <code>Credentials</code> to use for log ins
    */
-  public SendLogin(Credentials credentials) {
+  public SendLogin(final Credentials credentials) {
     super(METHOD);
     this.params = new Params[] { new Params(credentials) };
   }
 
   /**
    * Login method parameters.
-   * 
+   *
    * @author lbarnkow
    */
   @JarbJsonSettings
@@ -73,10 +73,10 @@ public class SendLogin extends BaseMethod {
 
     /**
      * Constructs a new instance.
-     * 
+     *
      * @param credentials the <code>Credentials</code> to use for log ins
      */
-    public Params(Credentials credentials) {
+    public Params(final Credentials credentials) {
       this.user = new User(credentials.getUsername());
       this.password = new Password(credentials.getPassword(), "sha-256");
     }
@@ -84,7 +84,7 @@ public class SendLogin extends BaseMethod {
 
   /**
    * Login method User.
-   * 
+   *
    * @author lbarnkow
    */
   @JarbJsonSettings
@@ -98,7 +98,7 @@ public class SendLogin extends BaseMethod {
 
   /**
    * Login method Password.
-   * 
+   *
    * @author lbarnkow
    */
   @JarbJsonSettings

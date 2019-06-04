@@ -30,7 +30,7 @@ import lombok.EqualsAndHashCode;
  * See
  * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/send-message/
  * .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -49,10 +49,10 @@ public class SendSendMessage extends BaseMethod {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param message the message to send
    */
-  public SendSendMessage(Message message) {
+  public SendSendMessage(final Message message) {
     super(METHOD);
     params = Arrays.asList(RawMessage.of(message));
   }

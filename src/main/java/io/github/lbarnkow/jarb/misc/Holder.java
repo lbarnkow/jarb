@@ -54,7 +54,7 @@ public class Holder<T> {
    *
    * @param value the inital value.
    */
-  public Holder(T value) {
+  public Holder(final T value) {
     this.initialValue = value;
     this.value = value;
   }

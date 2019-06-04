@@ -20,7 +20,7 @@ package io.github.lbarnkow.jarb.api;
 
 /**
  * Custom run-time exception to be used by bots.
- * 
+ *
  * @author lbarnkow
  */
 public class BotException extends RuntimeException {
@@ -28,20 +28,20 @@ public class BotException extends RuntimeException {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param message the error message
    */
-  public BotException(String message) {
+  public BotException(final String message) {
     super(message);
   }
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param message the error message
    * @param cause   the root cause
    */
-  public BotException(String message, Throwable cause) {
+  public BotException(final String message, final Throwable cause) {
     super(message, cause);
   }
 }

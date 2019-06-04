@@ -25,7 +25,7 @@ import lombok.EqualsAndHashCode;
 
 /**
  * See https://rocket.chat/docs/developer-guides/realtime-api/ .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -44,21 +44,21 @@ public class BaseMethod extends BaseMessage {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param id     The unique id matching up a request/response pair
    * @param method The method
    */
-  BaseMethod(String id, String method) {
+  BaseMethod(final String id, final String method) {
     super(MSG, id);
     this.method = method;
   }
 
   /**
    * Constructs a new instance (with a random id).
-   * 
+   *
    * @param method The method
    */
-  public BaseMethod(String method) {
+  public BaseMethod(final String method) {
     this(UUID.randomUUID().toString(), method);
   }
 }

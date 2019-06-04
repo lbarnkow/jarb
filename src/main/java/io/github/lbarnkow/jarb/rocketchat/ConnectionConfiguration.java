@@ -65,7 +65,7 @@ public class ConnectionConfiguration {
    * @return the websocket URL
    */
   public String getWebsocketUrl() {
-    String scheme = encrypted ? "wss" : "ws";
+    final String scheme = encrypted ? "wss" : "ws";
     return scheme + "://" + host + ":" + port + "/websocket/";
   }
 
@@ -75,7 +75,7 @@ public class ConnectionConfiguration {
    * @return the REST URL
    */
   public String getRestUrl() {
-    String scheme = encrypted ? "https" : "http";
+    final String scheme = encrypted ? "https" : "http";
     return scheme + "://" + host + ":" + port + "/api/v1";
   }
 }

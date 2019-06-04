@@ -10,6 +10,14 @@
     </description>
 
     <rule ref="category/java/codestyle.xml">
-        <!-- <exclude name="RuleClassNameToExclude"/> -->
+        <!-- ExcessiveImports - Rule is included and configured below. -->
+        <exclude name="TooManyStaticImports"/>
+    </rule>
+
+    <!-- ExcessiveImports - Allow a higher number of static imports. -->
+    <rule ref="category/java/codestyle.xml/TooManyStaticImports">
+        <properties>
+            <property name="maximumStaticImports" value="10"/>
+        </properties>
     </rule>
 </ruleset>

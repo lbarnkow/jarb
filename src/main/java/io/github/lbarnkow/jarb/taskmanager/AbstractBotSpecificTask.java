@@ -45,7 +45,7 @@ public abstract class AbstractBotSpecificTask extends AbstractBaseTask {
    *
    * @param bot the <code>Bot</code>
    */
-  public AbstractBotSpecificTask(Bot bot) {
+  public AbstractBotSpecificTask(final Bot bot) {
     this.bot = bot;
     this.setName(getClass().getSimpleName() + "-" + bot.getName() + "-thread");
   }

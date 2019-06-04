@@ -77,7 +77,7 @@ class AbstractBaseBotTest {
 
   public static class TestBot extends NoHelpBot {
     @Override
-    void loadHelpText() throws IOException {
+    protected void loadHelpText() throws IOException {
       throw new IOException();
     }
   }

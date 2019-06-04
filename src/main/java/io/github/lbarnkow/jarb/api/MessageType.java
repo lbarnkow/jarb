@@ -70,7 +70,7 @@ public enum MessageType {
   @Getter
   private final String rawType;
 
-  private MessageType(final String rawType) {
+  MessageType(final String rawType) {
     this.rawType = rawType;
   }
 
@@ -82,8 +82,10 @@ public enum MessageType {
    * @return a enum value
    */
   public static MessageType parse(final String rawType) {
+    MessageType result = UNKNOWN;
+
     if (rawType == null) {
-      return REGULAR_CHAT_MESSAGE;
+      result = REGULAR_CHAT_MESSAGE;
     }
 
     for (final MessageType type : MessageType.values()) {
@@ -91,10 +93,11 @@ public enum MessageType {
         continue;
       }
       if (type.rawType.equals(rawType)) {
-        return type;
+        result = type;
+        break;
       }
     }
 
-    return UNKNOWN;
+    return result;
   }
 }

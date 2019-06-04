@@ -59,7 +59,7 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
    *
    * @param manager the <code>TaskManager</code>
    */
-  public DeadTaskPrunerTask(TaskManager manager) {
+  public DeadTaskPrunerTask(final TaskManager manager) {
     this(manager, TASK_INTERVAL_MSEC);
   }
 
@@ -70,7 +70,7 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
 
       try {
         Thread.sleep(taskInterval);
-      } catch (InterruptedException e) {
+      } catch (final InterruptedException e) {
         break;
       }
     }
@@ -79,7 +79,7 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
   int pruneTasks() {
     int pruned = 0;
 
-    for (Task task : manager.getTasks()) {
+    for (final Task task : manager.getTasks()) {
       if (manager.getTaskState(task) == DEAD) {
         log.debug("Pruning task '{}' in state '{}'.", task.getName(), DEAD);
         pruned++;

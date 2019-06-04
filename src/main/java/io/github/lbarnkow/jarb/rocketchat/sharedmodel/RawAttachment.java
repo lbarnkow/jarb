@@ -35,7 +35,7 @@ import lombok.val;
  * See
  * https://rocket.chat/docs/developer-guides/rest-api/chat/postmessage/#attachments-detail
  * .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -175,12 +175,12 @@ public class RawAttachment {
    *                to convert
    * @return the resulting <code>Attachment</code> instances
    */
-  public static List<Attachment> convertList(List<RawAttachment> rawList) {
+  public static List<Attachment> convertList(final List<RawAttachment> rawList) {
     if (rawList == null || rawList.isEmpty()) {
       return Collections.emptyList();
     }
 
-    val result = new ArrayList<Attachment>();
+    final List<Attachment> result = new ArrayList<>();
     rawList.stream().forEach(ra -> result.add(ra.convert()));
     return result;
   }
@@ -192,7 +192,7 @@ public class RawAttachment {
    * @param a the <code>Attachment</code> instance to convert
    * @return the resulting <code>RawAttachment</code>
    */
-  public static RawAttachment of(Attachment a) {
+  public static RawAttachment of(final Attachment a) {
     return RawAttachment.builder() //
         .color(a.getColor()) //
         .text(a.getText()) //
@@ -220,12 +220,12 @@ public class RawAttachment {
    *             convert
    * @return the resulting <code>RawAttachment</code> instances
    */
-  public static List<RawAttachment> of(List<Attachment> list) {
+  public static List<RawAttachment> of(final List<Attachment> list) {
     if (list == null || list.isEmpty()) {
       return Collections.emptyList();
     }
 
-    val result = new ArrayList<RawAttachment>();
+    final List<RawAttachment> result = new ArrayList<>();
     list.stream().forEach(a -> result.add(RawAttachment.of(a)));
     return result;
   }

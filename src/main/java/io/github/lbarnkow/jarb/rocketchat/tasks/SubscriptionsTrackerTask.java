@@ -83,8 +83,8 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
    * @param sleepTime      the interval between each query
    * @param listener       the listener to inform about new subscriptions
    */
-  SubscriptionsTrackerTask(Bot bot, RealtimeClient realtimeClient, long sleepTime,
-      SubscriptionsTrackerTaskListener listener) {
+  SubscriptionsTrackerTask(final Bot bot, final RealtimeClient realtimeClient, final long sleepTime,
+      final SubscriptionsTrackerTaskListener listener) {
     super(bot);
 
     this.bot = bot;
@@ -101,8 +101,8 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
    * @param realtimeClient the <code>RealtimeClient</code>
    * @param listener       the listener to inform about new subscriptions
    */
-  public SubscriptionsTrackerTask(Bot bot, RealtimeClient realtimeClient,
-      SubscriptionsTrackerTaskListener listener) {
+  public SubscriptionsTrackerTask(final Bot bot, final RealtimeClient realtimeClient,
+      final SubscriptionsTrackerTaskListener listener) {
     this(bot, realtimeClient, DEFAULT_SLEEP_TIME, listener);
   }
 
@@ -110,21 +110,21 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
   public void runTask() throws Exception {
     Set<String> knownIds = new HashSet<>();
     try {
-      SendGetSubscriptions message = new SendGetSubscriptions();
-      Set<String> newIds = new HashSet<>();
+      final SendGetSubscriptions message = new SendGetSubscriptions();
+      final Set<String> newIds = new HashSet<>();
 
       while (true) {
-        ReceiveGetSubscriptionsReply reply =
+        final ReceiveGetSubscriptionsReply reply =
             realtimeClient.sendMessageAndWait(message, ReceiveGetSubscriptionsReply.class);
 
-        for (RawSubscription sub : reply.getResult()) {
+        for (final RawSubscription sub : reply.getResult()) {
           newIds.add(sub.getId());
 
           if (!knownIds.contains(sub.getId())) {
-            String roomId = sub.getRid();
-            String roomName = sub.getName();
-            RoomType roomType = RoomType.parse(sub.getType());
-            Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
+            final String roomId = sub.getRid();
+            final String roomName = sub.getName();
+            final RoomType roomType = RoomType.parse(sub.getType());
+            final Room room = Room.builder().id(roomId).name(roomName).type(roomType).build();
             log.debug("Bot '{}' has a subscription to room '{}'.", bot.getName(), room.getName());
             listener.onNewSubscription(this, bot, room);
           }
@@ -134,7 +134,7 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
         newIds.clear();
         Thread.sleep(sleepTime);
       }
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       log.trace("{} was interrupted.", getClass().getSimpleName());
     }
   }

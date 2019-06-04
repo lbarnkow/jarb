@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * A simplified abstraction from the <code>javax.websocket</code> API.
- * 
+ *
  * @author lbarnkow
  */
 @ClientEndpoint
@@ -69,7 +69,7 @@ public class WebsocketClient {
   private transient long receivedMessages;
 
   @Inject
-  WebsocketClient(WebSocketContainer container) {
+  WebsocketClient(final WebSocketContainer container) {
     this.container = container;
   }
 
@@ -82,10 +82,11 @@ public class WebsocketClient {
    * @throws DeploymentException on connections issues
    * @throws IOException         on io errors
    */
-  public void initialize(ConnectionConfiguration config, WebsocketClientListener listener)
+  public void initialize(final ConnectionConfiguration config,
+      final WebsocketClientListener listener)
       throws URISyntaxException, DeploymentException, IOException {
     this.listener = listener;
-    URI endpointUri = new URI(config.getWebsocketUrl());
+    final URI endpointUri = new URI(config.getWebsocketUrl());
 
     log.debug("Opening Websocket connection.");
 
@@ -94,22 +95,22 @@ public class WebsocketClient {
 
   /**
    * Sends a plain text message to the chat server.
-   * 
+   *
    * @param message the message
    * @throws JsonProcessingException on serialization errors
    */
-  public void sendMessage(String message) throws JsonProcessingException {
+  public void sendMessage(final String message) throws JsonProcessingException {
     log.debug("Sending message, session id '{}', message '{}'.", session.getId(), message);
     session.getAsyncRemote().sendText(message);
   }
 
   /**
    * Called by the web socket container upon successfully opening the session.
-   * 
+   *
    * @param session the session
    */
   @OnOpen
-  public void onOpen(Session session) {
+  public void onOpen(final Session session) {
     log.debug("Opened Websocket, session id '{}'.", session.getId());
   }
 
@@ -120,7 +121,7 @@ public class WebsocketClient {
    * @param reason      the reason
    */
   @OnClose
-  public void onClose(Session userSession, CloseReason reason) {
+  public void onClose(final Session userSession, final CloseReason reason) {
     log.debug("Closed Websocket session: code '{}', message '{}'.", reason.getCloseCode().getCode(),
         reason.getReasonPhrase());
     listener.onWebsocketClose(closedByClient);
@@ -133,7 +134,7 @@ public class WebsocketClient {
    * @param message the received message
    */
   @OnMessage
-  public void onMessage(String message) {
+  public void onMessage(final String message) {
     log.trace("Received Websocket message: '{}'.", message);
 
     // First successful message is '{"server_id":"0"}' - just discard.
@@ -144,7 +145,7 @@ public class WebsocketClient {
             message);
         try {
           close();
-        } catch (IOException e) {
+        } catch (final IOException e) {
           log.error("Failed to close session; still informing listener!", e);
           listener.onWebsocketClose(true);
         }

@@ -29,7 +29,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * See https://rocket.chat/docs/developer-guides/rest-api/channels/list/ .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -61,7 +61,7 @@ public class RawChannel {
    * @return the resulting <code>Room</code>
    */
   public Room convert() {
-    RoomType type = RoomType.parse(this.type);
+    final RoomType type = RoomType.parse(this.type);
     return Room.builder().id(id).name(name).type(type).build();
   }
 
@@ -71,8 +71,8 @@ public class RawChannel {
    * @param room the <code>Room</code> instance to convert
    * @return the resulting <code>RawChannel</code>
    */
-  public static RawChannel of(Room room) {
-    RawChannel channel = new RawChannel();
+  public static RawChannel of(final Room room) {
+    final RawChannel channel = new RawChannel();
     channel.id = room.getId();
     channel.name = room.getName();
     channel.type = room.getType().getRawType();

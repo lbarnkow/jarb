@@ -29,7 +29,7 @@ import lombok.EqualsAndHashCode;
  * See
  * https://rocket.chat/docs/developer-guides/realtime-api/method-calls/joining-channels/
  * .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -52,7 +52,7 @@ public class SendJoinRoom extends BaseMethod {
    * @param roomId   id of the room to join
    * @param joinCode an optional join code for protected rooms
    */
-  public SendJoinRoom(String roomId, String joinCode) {
+  public SendJoinRoom(final String roomId, final String joinCode) {
     super(METHOD);
 
     this.params.add(roomId);
@@ -63,10 +63,10 @@ public class SendJoinRoom extends BaseMethod {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param room the <code>Room</code> to join
    */
-  public SendJoinRoom(Room room) {
+  public SendJoinRoom(final Room room) {
     this(room.getId(), null);
   }
 }

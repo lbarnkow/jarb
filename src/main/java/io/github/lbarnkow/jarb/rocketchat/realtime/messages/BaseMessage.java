@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * See https://rocket.chat/docs/developer-guides/realtime-api/ .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -53,27 +53,27 @@ public class BaseMessage {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param msg The type of communication ('method' or 'sub')
    * @param id  The unique id matching up a request/response pair
    */
-  BaseMessage(String msg, String id) {
+  BaseMessage(final String msg, final String id) {
     this.msg = msg;
     this.id = id;
   }
 
   /**
    * Constructs a new instance (with a random id).
-   * 
+   *
    * @param msg The type of communication ('method' or 'sub')
    */
-  BaseMessage(String msg) {
+  BaseMessage(final String msg) {
     this(msg, null);
   }
 
   /**
    * Error structure, used in responses.
-   * 
+   *
    * @author lbarnkow
    */
   @JarbJsonSettings

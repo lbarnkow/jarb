@@ -35,7 +35,7 @@ public enum RoomType {
    */
   private final String rawType;
 
-  private RoomType(final String rawType) {
+  RoomType(final String rawType) {
     this.rawType = rawType;
   }
 

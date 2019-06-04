@@ -35,13 +35,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
 import lombok.Synchronized;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 /**
  * <code>PugMeBot</code> replies with images of pugs fetched from reddit. It's a
@@ -105,7 +106,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
 
   @Override
   public Bot initialize(final String name, final String username) {
-    val expression = REGEX_BASE.replace("%BOTNAME%", username);
+    final String expression = REGEX_BASE.replace("%BOTNAME%", username);
     regex = Pattern.compile(expression, DOTALL);
     return super.initialize(name, username);
   }
@@ -120,32 +121,29 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
   public Optional<Message> offerMessage(final Message message) {
     Message reply = null;
 
-    if (message.getType() != REGULAR_CHAT_MESSAGE) {
-      return Optional.empty(); // Only care about regular chat posts
-    }
-    if (message.getUser().getName().equals(getUsername())) {
-      return Optional.empty(); // Don't process our own posts
-    }
+    // Only care about regular chat posts not originating from ourselves.
+    if (message.getType() == REGULAR_CHAT_MESSAGE
+        && !message.getUser().getName().equals(getUsername())) {
+      try {
+        final Room room = message.getRoom();
+        final Matcher matcher = regex.matcher(message.getText());
+        if (matcher.matches()) {
+          final String action = trimAction(matcher.group(1));
 
-    try {
-      final Room room = message.getRoom();
-      val matcher = regex.matcher(message.getText());
-      if (matcher.matches()) {
-        val action = parseAction(matcher.group(1));
-
-        if (action.isEmpty()) {
-          reply = createPugReply(room, 1);
-        } else if ("bomb".equals(action)) {
-          val count = parseInt(matcher.group(2), 5);
-          reply = createPugReply(room, count);
-        } else {
-          reply = Message.builder().room(room).attachments(getHelpText()).build();
+          if (action.isEmpty()) {
+            reply = createPugReply(room, 1);
+          } else if ("bomb".equals(action)) {
+            final int count = parseInt(matcher.group(2), 5);
+            reply = createPugReply(room, count);
+          } else {
+            reply = Message.builder().room(room).attachments(getHelpText()).build();
+          }
         }
+      } catch (final Exception e) {
+        log.error("Failed to handle message '{}'!", message, e);
+        reply = Message.builder().room(message.getRoom())
+            .text("*PugMeBot made a doody!* :poop: _(i.e. an internal error occured.)_").build();
       }
-    } catch (final Exception e) {
-      log.error("Failed to handle message '{}'!", message, e);
-      reply = Message.builder().room(message.getRoom())
-          .text("*PugMeBot made a doody!* :poop: _(i.e. an internal error occured.)_").build();
     }
 
     return Optional.ofNullable(reply);
@@ -170,21 +168,21 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
 
   @Synchronized
   private String selectImageUrl() {
-    val twentyFourHoursAgo = Instant.now().minus(24, HOURS);
+    final Instant oneDayAgo = Instant.now().minus(24, HOURS);
 
-    if (lastUpdate == null || lastUpdate.isBefore(twentyFourHoursAgo)) {
+    if (lastUpdate == null || lastUpdate.isBefore(oneDayAgo)) {
       pugsCache.clear();
       loadPugs();
       lastUpdate = Instant.now();
     }
 
-    val index = random.nextInt(pugsCache.size());
+    final int index = random.nextInt(pugsCache.size());
     return pugsCache.get(index);
   }
 
   private void loadPugs() {
     // https://www.reddit.com/r/pugs.json?sort=top&t=week&limit=100
-    val response = jersey.target("https://www.reddit.com/r") //
+    final Response response = jersey.target("https://www.reddit.com/r") //
         .queryParam("sort", "top") //
         .queryParam("t", "week") //
         .queryParam("limit", "100") //
@@ -196,7 +194,7 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
       throw new BotException(response.readEntity(String.class));
     }
 
-    val posts = response.readEntity(RedditResponse.class);
+    final RedditResponse posts = response.readEntity(RedditResponse.class);
 
     posts.getData().getChildren().stream() //
         .filter(child -> !child.getData().isVideo()) //
@@ -204,19 +202,26 @@ public class PugMeBot extends AbstractBaseBot implements Bot {
         .forEach(child -> pugsCache.add(child.getData().getUrl()));
   }
 
-  private String parseAction(final String s) {
-    if (s != null) {
-      return s.trim();
+  private String trimAction(final String string) {
+    String result = "";
+
+    if (string != null) {
+      result = string.trim();
     }
-    return "";
+
+    return result;
   }
 
-  private int parseInt(final String s, final int or) {
-    final String data = (s != null) ? s.trim() : null;
+  private int parseInt(final String string, final int defaultValue) {
+    final String data = string == null ? null : string.trim();
+    int result;
+
     try {
-      return Integer.parseInt(data);
+      result = Integer.parseInt(data);
     } catch (final NumberFormatException e) {
-      return or;
+      result = defaultValue;
     }
+
+    return result;
   }
 }

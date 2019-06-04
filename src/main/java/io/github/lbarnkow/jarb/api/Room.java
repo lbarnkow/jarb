@@ -28,10 +28,12 @@ import lombok.Value;
  */
 @Value
 @Builder
+@SuppressWarnings("PMD.ShortClassName")
 public class Room {
   /**
    * The room id.
    */
+  @SuppressWarnings("PMD.ShortVariable")
   private final String id;
 
   /**

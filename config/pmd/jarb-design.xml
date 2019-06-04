@@ -18,5 +18,16 @@
 
         <!-- LoosePackageCoupling - Rule needs to be configured to be useful. -->
         <exclude name="LoosePackageCoupling"/>
+
+        <!-- ExcessiveImports - Rule is included and configured below. -->
+        <exclude name="ExcessiveImports"/>
     </rule>
+
+    <!-- ExcessiveImports - Allow a higher number of unique imports. -->
+    <rule ref="category/java/design.xml/ExcessiveImports">
+        <properties>
+            <property name="minimum" value="50"/>
+        </properties>
+    </rule>
+
 </ruleset>

@@ -71,7 +71,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
    *
    * @param manager the <code>TaskManager</code>
    */
-  public TaskTableLoggerTask(TaskManager manager) {
+  public TaskTableLoggerTask(final TaskManager manager) {
     this(manager, TASK_INTERVAL_MSEC);
   }
 
@@ -80,7 +80,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
     while (true) {
       log.info("Logging running background tasks");
 
-      TaskStates tasks = countTasks();
+      final TaskStates tasks = countTasks();
 
       log.info("UNUSED......: {}", tasks.unused);
       log.info("ACTIVATING..: {}", tasks.activating);
@@ -91,17 +91,17 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
 
       try {
         Thread.sleep(taskInterval);
-      } catch (InterruptedException e) {
+      } catch (final InterruptedException e) {
         break;
       }
     }
   }
 
   TaskStates countTasks() {
-    TaskStates result = new TaskStates();
+    final TaskStates result = new TaskStates();
 
-    for (Task task : manager.getTasks()) {
-      TaskState state = manager.getTaskState(task);
+    for (final Task task : manager.getTasks()) {
+      final TaskState state = manager.getTaskState(task);
       log.debug("{} : {}", task.getName(), state);
 
       if (state == UNUSED) {

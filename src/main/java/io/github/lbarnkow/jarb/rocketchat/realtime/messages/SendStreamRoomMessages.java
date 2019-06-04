@@ -27,7 +27,7 @@ import lombok.EqualsAndHashCode;
  * See
  * https://rocket.chat/docs/developer-guides/realtime-api/subscriptions/stream-room-messages/
  * .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -46,10 +46,10 @@ public class SendStreamRoomMessages extends BaseSubscription {
 
   /**
    * Constructs a new instance.
-   * 
+   *
    * @param room the <code>Room</code> to subscribe to
    */
-  public SendStreamRoomMessages(Room room) {
+  public SendStreamRoomMessages(final Room room) {
     super(COLLECTION);
     params = new Object[] { room.getId(), false };
   }

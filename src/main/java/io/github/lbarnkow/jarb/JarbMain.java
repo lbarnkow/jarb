@@ -126,15 +126,15 @@ public final class JarbMain {
   @SuppressWarnings({ "unchecked", "PMD.OnlyOneReturn" })
   private static Class<Bot> loadClass(final BotConfiguration botConfig) {
     try {
-      final val clazz = Bot.class.getClassLoader().loadClass(botConfig.getQualifiedClassName());
+      final val clazz = Bot.class.getClassLoader().loadClass(botConfig.getClassName());
       if (Bot.class.isAssignableFrom(clazz)) {
         return (Class<Bot>) clazz;
       }
 
       log.error("Selected bot class '{}' is not a in the type hierachy of '{}'!",
-          botConfig.getQualifiedClassName(), Bot.class.getName());
+          botConfig.getClassName(), Bot.class.getName());
     } catch (final ClassNotFoundException e) {
-      log.error("Failed to load bot class '{}'!", botConfig.getQualifiedClassName(), e);
+      log.error("Failed to load bot class '{}'!", botConfig.getClassName(), e);
     }
     System.exit(1);
 

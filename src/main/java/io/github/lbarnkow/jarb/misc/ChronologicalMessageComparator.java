@@ -34,7 +34,7 @@ public class ChronologicalMessageComparator implements Comparator<Message> {
       new ChronologicalMessageComparator();
 
   @Override
-  public int compare(Message o1, Message o2) {
+  public int compare(final Message o1, final Message o2) {
     return o1.getTimestamp().compareTo(o2.getTimestamp());
   }
 }

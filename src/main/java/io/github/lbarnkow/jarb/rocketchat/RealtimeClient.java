@@ -62,7 +62,7 @@ public class RealtimeClient implements WebsocketClientListener {
   private final transient Map<String, Object> unansweredRequests = new ConcurrentHashMap<>();
 
   @Inject
-  RealtimeClient(WebsocketClient client) {
+  RealtimeClient(final WebsocketClient client) {
     this.client = client;
   }
 
@@ -77,7 +77,7 @@ public class RealtimeClient implements WebsocketClientListener {
    * @throws DeploymentException caused by connection issues
    * @throws IOException         on io errors
    */
-  public void connect(RealtimeClientListener listener, ConnectionConfiguration config)
+  public void connect(final RealtimeClientListener listener, final ConnectionConfiguration config)
       throws URISyntaxException, DeploymentException, IOException {
     this.listener = listener;
     client.initialize(config, this);
@@ -89,8 +89,8 @@ public class RealtimeClient implements WebsocketClientListener {
     client.close();
   }
 
-  public void sendMessage(Object message) throws JsonProcessingException {
-    String json = MAPPER.writeValueAsString(message);
+  public void sendMessage(final Object message) throws JsonProcessingException {
+    final String json = MAPPER.writeValueAsString(message);
     client.sendMessage(json);
   }
 
@@ -109,26 +109,27 @@ public class RealtimeClient implements WebsocketClientListener {
    * @throws IOException          on io errors
    * @throws TimeoutException     on exceeding the wait timeout
    */
-  public <X> X sendMessageAndWait(BaseMessage message, long timeout, Class<X> replyType)
+  public <X> X sendMessageAndWait(final BaseMessage message, final long timeout,
+      final Class<X> replyType)
       throws InterruptedException, ReplyErrorException, IOException, TimeoutException {
     if (message.getId() == null) {
       throw new IllegalArgumentException(
           "Messages must have a unique id to be used with 'sendMessageAndWait()'!");
     }
 
-    Semaphore sem = new Semaphore(0);
+    final Semaphore sem = new Semaphore(0);
     unansweredRequests.put(message.getId(), sem);
 
     sendMessage(message);
-    boolean wasAnswered = sem.tryAcquire(timeout, MILLISECONDS);
-    Object value = unansweredRequests.remove(message.getId());
+    final boolean wasAnswered = sem.tryAcquire(timeout, MILLISECONDS);
+    final Object value = unansweredRequests.remove(message.getId());
 
     if (!wasAnswered || value == null || sem.equals(value)) {
       throw new TimeoutException(message.toString());
     }
 
     @SuppressWarnings("unchecked")
-    Tuple<BaseMessage, String> reply = (Tuple<BaseMessage, String>) value;
+    final Tuple<BaseMessage, String> reply = (Tuple<BaseMessage, String>) value;
     if (reply.getFirst().getError() != null) {
       throw new ReplyErrorException(reply.getFirst().getError());
     }
@@ -136,20 +137,20 @@ public class RealtimeClient implements WebsocketClientListener {
     return MAPPER.readValue(reply.getSecond(), replyType);
   }
 
-  public <X> X sendMessageAndWait(BaseMessage message, Class<X> replyType)
+  public <X> X sendMessageAndWait(final BaseMessage message, final Class<X> replyType)
       throws InterruptedException, ReplyErrorException, IOException, TimeoutException {
     return sendMessageAndWait(message, 1000L * 60L, replyType);
   }
 
   @Override
-  public void onWebsocketClose(boolean initiatedByClient) {
+  public void onWebsocketClose(final boolean initiatedByClient) {
     listener.onRealtimeClientSessionClose(this, initiatedByClient);
   }
 
   @Override
-  public void onWebsocketMessage(String message) {
+  public void onWebsocketMessage(final String message) {
     try {
-      BaseMessage baseMessage = MAPPER.readValue(message, BaseMessage.class);
+      final BaseMessage baseMessage = MAPPER.readValue(message, BaseMessage.class);
 
       if (REC_MSG_CONNECTED.equals(baseMessage.getMsg())) {
         handleConnected();
@@ -166,11 +167,11 @@ public class RealtimeClient implements WebsocketClientListener {
 
       }
 
-    } catch (IOException e) {
+    } catch (final IOException e) {
       log.error("Unexpected error deserializing server message '{}'; closing session!", message, e);
       try {
         client.close();
-      } catch (IOException e1) {
+      } catch (final IOException e1) {
         log.error("Unexpected error disconnecting!", e1);
       }
     }
@@ -184,9 +185,9 @@ public class RealtimeClient implements WebsocketClientListener {
     sendMessage(new SendPong());
   }
 
-  private void handleMessageWithId(BaseMessage message, String rawJson) {
+  private void handleMessageWithId(final BaseMessage message, final String rawJson) {
     if (unansweredRequests.containsKey(message.getId())) {
-      Semaphore semaphore = (Semaphore) unansweredRequests.remove(message.getId());
+      final Semaphore semaphore = (Semaphore) unansweredRequests.remove(message.getId());
       unansweredRequests.put(message.getId(), new Tuple<>(message, rawJson));
       semaphore.release();
     } else {
@@ -194,13 +195,13 @@ public class RealtimeClient implements WebsocketClientListener {
     }
   }
 
-  private void handleSubscriptionUpdate(BaseMessage message, String rawJson)
+  private void handleSubscriptionUpdate(final BaseMessage message, final String rawJson)
       throws JsonParseException, JsonMappingException, IOException {
     if (SendStreamRoomMessages.COLLECTION.equals(message.getCollection())) {
-      ReceiveStreamRoomMessagesSubscriptionUpdate subscriptionUpdate =
+      final ReceiveStreamRoomMessagesSubscriptionUpdate subscriptionUpdate =
           MAPPER.readValue(rawJson, ReceiveStreamRoomMessagesSubscriptionUpdate.class);
-      List<Arg> args = subscriptionUpdate.getFields().getArgs();
-      for (Arg arg : args) {
+      final List<Arg> args = subscriptionUpdate.getFields().getArgs();
+      for (final Arg arg : args) {
         listener.onRealtimeClientStreamRoomMessagesUpdate(this, arg.getRid());
       }
 

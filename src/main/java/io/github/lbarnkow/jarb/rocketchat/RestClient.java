@@ -52,12 +52,12 @@ public class RestClient {
   private transient WebTarget baseTarget;
 
   @Inject
-  RestClient(Client client) {
+  RestClient(final Client client) {
     this.client = client;
   }
 
   @Synchronized
-  public void initialize(ConnectionConfiguration config) {
+  public void initialize(final ConnectionConfiguration config) {
     baseTarget = client.target(config.getRestUrl());
   }
 
@@ -72,10 +72,10 @@ public class RestClient {
    * @return public channels on the server
    * @throws RestClientException on bad HTTP status codes
    */
-  public ChannelListReply getChannelList(AuthInfo authInfo) throws RestClientException {
-    List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
+  public ChannelListReply getChannelList(final AuthInfo authInfo) throws RestClientException {
+    final List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
 
-    Response response = buildRequest(authInfo, "channels.list", params).get();
+    final Response response = buildRequest(authInfo, "channels.list", params).get();
     handleBadHttpResponseCodes(response);
 
     return response.readEntity(ChannelListReply.class);
@@ -93,10 +93,11 @@ public class RestClient {
    * @return public channels the user has joined on the server
    * @throws RestClientException on bad HTTP status codes
    */
-  public ChannelListJoinedReply getChannelListJoined(AuthInfo authInfo) throws RestClientException {
-    List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
+  public ChannelListJoinedReply getChannelListJoined(final AuthInfo authInfo)
+      throws RestClientException {
+    final List<QueryParam> params = Arrays.asList(new QueryParam("count", 0));
 
-    Response response = buildRequest(authInfo, "channels.list.joined", params).get();
+    final Response response = buildRequest(authInfo, "channels.list.joined", params).get();
     handleBadHttpResponseCodes(response);
 
     return response.readEntity(ChannelListJoinedReply.class);
@@ -114,11 +115,11 @@ public class RestClient {
    * @return the subscription
    * @throws RestClientException on bad HTTP status codes
    */
-  public SubscriptionsGetOneReply getOneSubscription(AuthInfo authInfo, String roomId)
+  public SubscriptionsGetOneReply getOneSubscription(final AuthInfo authInfo, final String roomId)
       throws RestClientException {
-    List<QueryParam> params = Arrays.asList(new QueryParam("roomId", roomId));
+    final List<QueryParam> params = Arrays.asList(new QueryParam("roomId", roomId));
 
-    Response response = buildRequest(authInfo, "subscriptions.getOne", params).get();
+    final Response response = buildRequest(authInfo, "subscriptions.getOne", params).get();
     handleBadHttpResponseCodes(response);
 
     return response.readEntity(SubscriptionsGetOneReply.class);
@@ -145,12 +146,12 @@ public class RestClient {
    * @return the counters
    * @throws RestClientException on bad HTTP status codes
    */
-  public ChatCountersReply getChatCounters(AuthInfo authInfo, RoomType roomType, String roomId)
-      throws RestClientException {
-    List<QueryParam> params = Arrays.asList(new QueryParam("roomId", roomId));
+  public ChatCountersReply getChatCounters(final AuthInfo authInfo, final RoomType roomType,
+      final String roomId) throws RestClientException {
+    final List<QueryParam> params = Arrays.asList(new QueryParam("roomId", roomId));
 
-    String endpointBase = selectRestEndpointBase(roomType);
-    Response response = buildRequest(authInfo, endpointBase + ".counters", params).get();
+    final String endpointBase = selectRestEndpointBase(roomType);
+    final Response response = buildRequest(authInfo, endpointBase + ".counters", params).get();
 
     handleBadHttpResponseCodes(response);
 
@@ -180,17 +181,18 @@ public class RestClient {
    * @return the messages with the given time frame
    * @throws RestClientException on bad HTTP status codes
    */
-  public ChatHistoryReply getChatHistory(AuthInfo authInfo, Room room, Instant latest,
-      Instant oldest, boolean inclusive) throws RestClientException {
-    List<QueryParam> params = Arrays.asList(//
+  public ChatHistoryReply getChatHistory(final AuthInfo authInfo, final Room room,
+      final Instant latest, final Instant oldest, final boolean inclusive)
+      throws RestClientException {
+    final List<QueryParam> params = Arrays.asList(//
         new QueryParam("roomId", room.getId()), //
         new QueryParam("latest", latest.toString()), //
         new QueryParam("oldest", oldest.toString()), //
         new QueryParam("inclusive", Boolean.toString(inclusive)), //
         new QueryParam("count", 0));
 
-    String endpointBase = selectRestEndpointBase(room.getType());
-    Response response = buildRequest(authInfo, endpointBase + ".history", params).get();
+    final String endpointBase = selectRestEndpointBase(room.getType());
+    final Response response = buildRequest(authInfo, endpointBase + ".history", params).get();
 
     handleBadHttpResponseCodes(response);
 
@@ -210,19 +212,19 @@ public class RestClient {
    * @return the server's reply
    * @throws RestClientException on bad HTTP status codes
    */
-  public SubscriptionsReadReply markSubscriptionRead(AuthInfo authInfo, String roomId)
+  public SubscriptionsReadReply markSubscriptionRead(final AuthInfo authInfo, final String roomId)
       throws RestClientException {
-    Map<String, String> payload = Collections.singletonMap("rid", roomId);
+    final Map<String, String> payload = Collections.singletonMap("rid", roomId);
 
-    Entity<Map<String, String>> body = Entity.entity(payload, APPLICATION_JSON);
-    Response response = buildRequest(authInfo, "subscriptions.read", emptyList()).post(body);
+    final Entity<Map<String, String>> body = Entity.entity(payload, APPLICATION_JSON);
+    final Response response = buildRequest(authInfo, "subscriptions.read", emptyList()).post(body);
 
     handleBadHttpResponseCodes(response);
 
     return response.readEntity(SubscriptionsReadReply.class);
   }
 
-  private String selectRestEndpointBase(RoomType roomType) {
+  private String selectRestEndpointBase(final RoomType roomType) {
     switch (roomType) {
       case PUBLIC_CHANNEL:
         return "channels";
@@ -235,24 +237,25 @@ public class RestClient {
     }
   }
 
-  private void handleBadHttpResponseCodes(Response response) throws RestClientException {
+  private void handleBadHttpResponseCodes(final Response response) throws RestClientException {
     if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
       throw new RestClientException(response.readEntity(String.class));
     }
   }
 
-  private Builder buildRequest(AuthInfo authInfo, String path, List<QueryParam> params) {
+  private Builder buildRequest(final AuthInfo authInfo, final String path,
+      final List<QueryParam> params) {
     WebTarget target = baseTarget;
 
-    for (QueryParam param : params) {
+    for (final QueryParam param : params) {
       target = target.queryParam(param.getKey(), param.getValues());
     }
 
     return target.path(path).request(MediaType.APPLICATION_JSON).headers(authHeaders(authInfo));
   }
 
-  private MultivaluedHashMap<String, Object> authHeaders(AuthInfo authInfo) {
-    MultivaluedHashMap<String, Object> headers = new MultivaluedHashMap<>();
+  private MultivaluedHashMap<String, Object> authHeaders(final AuthInfo authInfo) {
+    final MultivaluedHashMap<String, Object> headers = new MultivaluedHashMap<>();
     headers.putSingle("X-User-Id", authInfo.getUserId());
     headers.putSingle("X-Auth-Token", authInfo.getAuthToken());
 
@@ -263,7 +266,7 @@ public class RestClient {
     private final String key;
     private final Object[] values;
 
-    public QueryParam(String key, Object... values) {
+    public QueryParam(final String key, final Object... values) {
       this.key = key;
       this.values = Arrays.copyOf(values, values.length);
     }

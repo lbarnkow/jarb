@@ -70,7 +70,7 @@ public class TaskManager {
    * @param tasks    the tasks to run and track
    */
   @Synchronized
-  public void start(Optional<TaskEndedCallback> callback, Task... tasks) {
+  public void start(final Optional<TaskEndedCallback> callback, final Task... tasks) {
     start(callback, false, tasks);
   }
 
@@ -84,8 +84,8 @@ public class TaskManager {
    * @param tasks                  the tasks to run and track
    */
   @Synchronized
-  public void start(Optional<TaskEndedCallback> callback, boolean disableManagementTasks,
-      Task... tasks) {
+  public void start(final Optional<TaskEndedCallback> callback,
+      final boolean disableManagementTasks, final Task... tasks) {
     if (!started) {
       if (!disableManagementTasks) {
         startTasks(callback, managementTasks);
@@ -96,10 +96,10 @@ public class TaskManager {
     startTasks(callback, tasks);
   }
 
-  private void startTasks(Optional<TaskEndedCallback> callback, Task... tasks) {
-    for (Task task : tasks) {
+  private void startTasks(final Optional<TaskEndedCallback> callback, final Task... tasks) {
+    for (final Task task : tasks) {
       @SuppressWarnings("PMD.AvoidInstantiatingObjectsInLoops") // unique objects needed
-      TaskWrapper wrapper = new TaskWrapper(task);
+      final TaskWrapper wrapper = new TaskWrapper(task);
       wrapper.startTask(callback);
       this.tasks.put(task, wrapper);
     }
@@ -122,8 +122,8 @@ public class TaskManager {
    *
    * @param tasks the tasks to stop
    */
-  public void stop(Task... tasks) {
-    for (Task task : tasks) {
+  public void stop(final Task... tasks) {
+    for (final Task task : tasks) {
       this.tasks.get(task).stopTask();
     }
   }
@@ -135,9 +135,9 @@ public class TaskManager {
    *
    * @param tasks the terminated tasks to prune
    */
-  public void prune(Task... tasks) {
-    for (Task task : tasks) {
-      TaskWrapper wrapper = this.tasks.get(task);
+  public void prune(final Task... tasks) {
+    for (final Task task : tasks) {
+      final TaskWrapper wrapper = this.tasks.get(task);
       if (wrapper.getState() != DEAD) {
         throw new IllegalStateException("Only tasks in state " + DEAD + " can be pruned!");
       }
@@ -178,7 +178,7 @@ public class TaskManager {
    * @param task the <code>Task</code>
    * @return the <code>TaskState</code>
    */
-  public TaskState getTaskState(Task task) {
+  public TaskState getTaskState(final Task task) {
     return tasks.get(task).getState();
   }
 
@@ -187,7 +187,7 @@ public class TaskManager {
       boolean done = false;
       while (!done) {
         done = true;
-        for (TaskWrapper wrapper : tasks.values()) {
+        for (final TaskWrapper wrapper : tasks.values()) {
           if (wrapper.getState() != DEAD) {
             done = false;
           }
@@ -195,7 +195,7 @@ public class TaskManager {
         Thread.sleep(50L);
       }
 
-    } catch (InterruptedException e) {
+    } catch (final InterruptedException e) {
       log.error("Caught InterruptedException while waiting for all tasks to stop!");
     }
   }

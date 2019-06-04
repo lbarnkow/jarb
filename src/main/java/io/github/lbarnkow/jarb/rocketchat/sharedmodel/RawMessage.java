@@ -35,7 +35,7 @@ import lombok.NoArgsConstructor;
 /**
  * See
  * https://rocket.chat/docs/developer-guides/realtime-api/the-message-object/ .
- * 
+ *
  * @author lbarnkow
  */
 @JarbJsonSettings
@@ -131,7 +131,7 @@ public class RawMessage {
    *             Room-ID
    * @return the resulting <code>Message</code>
    */
-  public Message convertWith(Room room) {
+  public Message convertWith(final Room room) {
     return Message.builder() //
         .id(id) //
         .room(room) //
@@ -150,7 +150,7 @@ public class RawMessage {
    * @param m the <code>Message</code> instance to convert
    * @return the resulting <code>RawMessage</code>
    */
-  public static RawMessage of(Message m) {
+  public static RawMessage of(final Message m) {
     return RawMessage.builder() //
         .id(m.getId()) //
         .rid(m.getRoom().getId()) //

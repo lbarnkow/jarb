@@ -36,6 +36,7 @@ public class Message {
   /**
    * The message id.
    */
+  @SuppressWarnings("PMD.ShortVariable")
   private final String id;
 
   /**

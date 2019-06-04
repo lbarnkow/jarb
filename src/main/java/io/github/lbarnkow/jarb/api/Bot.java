@@ -25,6 +25,7 @@ import java.util.Optional;
  *
  * @author lbarnkow
  */
+@SuppressWarnings("PMD.ShortClassName")
 public interface Bot {
   /**
    * Called by jarb to initialize the <code>Bot</code> instance with its logical
