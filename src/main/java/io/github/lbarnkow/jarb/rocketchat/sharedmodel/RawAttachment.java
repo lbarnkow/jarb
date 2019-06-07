@@ -29,7 +29,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.val;
 
 /**
  * See
@@ -60,6 +59,7 @@ public class RawAttachment {
   /**
    * Displays the time next to the text portion.
    */
+  @SuppressWarnings("PMD.ShortVariable")
   private String ts;
 
   /**
@@ -151,7 +151,7 @@ public class RawAttachment {
     return Attachment.builder() //
         .color(color) //
         .text(text) //
-        .timestamp(ts != null ? Instant.parse(ts) : null) //
+        .timestamp(ts == null ? null : Instant.parse(ts)) //
         .thumbUrl(thumbUrl) //
         .messageLink(messageLink) //
         .collapsed(collapsed) //
@@ -189,26 +189,27 @@ public class RawAttachment {
    * Converts an <code>Attachment</code> instance to a <code>RawAttachment</code>
    * instance.
    *
-   * @param a the <code>Attachment</code> instance to convert
+   * @param attachment the <code>Attachment</code> instance to convert
    * @return the resulting <code>RawAttachment</code>
    */
-  public static RawAttachment of(final Attachment a) {
+  @SuppressWarnings("PMD.ShortMethodName")
+  public static RawAttachment of(final Attachment attachment) {
     return RawAttachment.builder() //
-        .color(a.getColor()) //
-        .text(a.getText()) //
-        .ts(a.getTimestamp() != null ? a.getTimestamp().toString() : null) //
-        .thumbUrl(a.getThumbUrl()) //
-        .messageLink(a.getMessageLink()) //
-        .collapsed(a.isCollapsed()) //
-        .authorName(a.getAuthorName()) //
-        .authorLink(a.getAuthorLink()) //
-        .authorIcon(a.getAuthorIcon()) //
-        .title(a.getTitle()) //
-        .titleLink(a.getTitleLink()) //
-        .titleLinkDownload(a.isTitleLinkDownload()) //
-        .imageUrl(a.getImageUrl()) //
-        .audioUrl(a.getAudioUrl()) //
-        .videoUrl(a.getVideoUrl()) //
+        .color(attachment.getColor()) //
+        .text(attachment.getText()) //
+        .ts(attachment.getTimestamp() == null ? null : attachment.getTimestamp().toString()) //
+        .thumbUrl(attachment.getThumbUrl()) //
+        .messageLink(attachment.getMessageLink()) //
+        .collapsed(attachment.isCollapsed()) //
+        .authorName(attachment.getAuthorName()) //
+        .authorLink(attachment.getAuthorLink()) //
+        .authorIcon(attachment.getAuthorIcon()) //
+        .title(attachment.getTitle()) //
+        .titleLink(attachment.getTitleLink()) //
+        .titleLinkDownload(attachment.isTitleLinkDownload()) //
+        .imageUrl(attachment.getImageUrl()) //
+        .audioUrl(attachment.getAudioUrl()) //
+        .videoUrl(attachment.getVideoUrl()) //
         .build();
   }
 
@@ -220,6 +221,7 @@ public class RawAttachment {
    *             convert
    * @return the resulting <code>RawAttachment</code> instances
    */
+  @SuppressWarnings("PMD.ShortMethodName")
   public static List<RawAttachment> of(final List<Attachment> list) {
     if (list == null || list.isEmpty()) {
       return Collections.emptyList();

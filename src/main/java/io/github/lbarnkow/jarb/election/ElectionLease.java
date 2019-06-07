@@ -49,7 +49,7 @@ public class ElectionLease {
   /**
    * Maximum number of retries upon IOExceptions.
    */
-  private static final int MAX_FILE_IO_RETRIES = 5;
+  private static final int MAX_FILE_RETRIES = 5;
 
   /**
    * The <code>ObjectMapper</code> to de-/serialize the election lease file.
@@ -83,7 +83,7 @@ public class ElectionLease {
    * @param ttl    the time-to-live for this lease
    */
   public ElectionLease(final ElectionCandidate leader, final long ttl) {
-    this(leader.getId(), ttl);
+    this(leader.getUuid(), ttl);
   }
 
   /**
@@ -116,7 +116,7 @@ public class ElectionLease {
    *         id in this lease; <code>false</code> otherwise
    */
   public boolean isOwnedBy(final ElectionCandidate candidate) {
-    return Objects.equals(leaderId, candidate.getId());
+    return Objects.equals(leaderId, candidate.getUuid());
   }
 
   /**
@@ -135,7 +135,7 @@ public class ElectionLease {
     IOException lastException = null;
     int tries = 0;
 
-    while (lease == null && tries < MAX_FILE_IO_RETRIES) {
+    while (lease == null && tries < MAX_FILE_RETRIES) {
       tries++;
       try {
         lease = MAPPER.readValue(file, ElectionLease.class);
@@ -171,7 +171,7 @@ public class ElectionLease {
     final Path tmp = Files.createTempFile(UUID.randomUUID().toString(), null);
     MAPPER.writeValue(tmp.toFile(), lease);
 
-    while (!lease.isExpired() && !success && tries < MAX_FILE_IO_RETRIES) {
+    while (!lease.isExpired() && !success && tries < MAX_FILE_RETRIES) {
       try {
         Files.move(tmp, file.toPath(), REPLACE_EXISTING);
         success = true;

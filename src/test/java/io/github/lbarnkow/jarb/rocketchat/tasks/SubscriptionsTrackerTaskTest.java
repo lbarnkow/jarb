@@ -19,7 +19,7 @@
 package io.github.lbarnkow.jarb.rocketchat.tasks;
 
 import static com.google.common.truth.Truth.assertThat;
-import static io.github.lbarnkow.jarb.rocketchat.tasks.SubscriptionsTrackerTask.DEFAULT_SLEEP_TIME;
+import static io.github.lbarnkow.jarb.rocketchat.tasks.SubscriptionsTrackerTask.SLEEP_TIME;
 import static java.util.UUID.randomUUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -95,7 +95,7 @@ class SubscriptionsTrackerTaskTest implements SubscriptionsTrackerTaskListener {
     final SubscriptionsTrackerTask task = new SubscriptionsTrackerTask(bot, null, null);
 
     // then
-    assertThat(task.getSleepTime()).isEqualTo(DEFAULT_SLEEP_TIME);
+    assertThat(task.getSleepTime()).isEqualTo(SLEEP_TIME);
 
   }
 

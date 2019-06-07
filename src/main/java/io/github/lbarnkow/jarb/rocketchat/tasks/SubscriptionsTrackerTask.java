@@ -49,7 +49,7 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
    * The default interval in which a the chat server should be queried for new
    * subscriptions.
    */
-  public static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
+  public static final long SLEEP_TIME = 1000L * 15L; // 15 seconds
 
   /**
    * The <code>Bot</code> for which sever-side subscriptions should be tracked.
@@ -83,8 +83,8 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
    * @param sleepTime      the interval between each query
    * @param listener       the listener to inform about new subscriptions
    */
-  SubscriptionsTrackerTask(final Bot bot, final RealtimeClient realtimeClient, final long sleepTime,
-      final SubscriptionsTrackerTaskListener listener) {
+  /* default */ SubscriptionsTrackerTask(final Bot bot, final RealtimeClient realtimeClient,
+      final long sleepTime, final SubscriptionsTrackerTaskListener listener) {
     super(bot);
 
     this.bot = bot;
@@ -103,7 +103,7 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
    */
   public SubscriptionsTrackerTask(final Bot bot, final RealtimeClient realtimeClient,
       final SubscriptionsTrackerTaskListener listener) {
-    this(bot, realtimeClient, DEFAULT_SLEEP_TIME, listener);
+    this(bot, realtimeClient, SLEEP_TIME, listener);
   }
 
   @Override
@@ -145,7 +145,7 @@ public class SubscriptionsTrackerTask extends AbstractBotSpecificTask {
    *
    * @author lbarnkow
    */
-  public static interface SubscriptionsTrackerTaskListener {
+  public interface SubscriptionsTrackerTaskListener {
     /**
      * Called on every new server-side subscription.
      *

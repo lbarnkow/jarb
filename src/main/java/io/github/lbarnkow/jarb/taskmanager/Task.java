@@ -23,6 +23,7 @@ package io.github.lbarnkow.jarb.taskmanager;
  *
  * @author lbarnkow
  */
+@SuppressWarnings("PMD.ShortClassName")
 public interface Task {
   /**
    * Gets the logical name of this <code>Task</code>.

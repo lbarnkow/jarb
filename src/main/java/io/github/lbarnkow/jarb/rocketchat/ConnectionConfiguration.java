@@ -42,7 +42,7 @@ public class ConnectionConfiguration {
   /**
    * The default value to indicate use of encrypted connections.
    */
-  private static final boolean DEFAULT_IS_ENCRYPTED = false;
+  private static final boolean DEFAULT_USE_TLS = false;
 
   /**
    * The host name to use as chat server.
@@ -57,7 +57,7 @@ public class ConnectionConfiguration {
   /**
    * A falg indicating whether encrypted connections should be used or not.
    */
-  private boolean encrypted = DEFAULT_IS_ENCRYPTED;
+  private boolean encrypted = DEFAULT_USE_TLS;
 
   /**
    * Returns the URL for websocket connections to the chat server.

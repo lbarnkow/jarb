@@ -10,6 +10,9 @@
     </description>
 
     <rule ref="category/java/design.xml">
+        <!-- exclude controversial rules -->
+        <exclude name="UseObjectForClearerAPI"/>
+
         <!-- LawOfDemeter - Amongst other "problems" it makes lombok-builders unusable. -->
         <exclude name="LawOfDemeter"/>
 

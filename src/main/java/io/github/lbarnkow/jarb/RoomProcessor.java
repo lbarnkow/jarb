@@ -18,8 +18,6 @@
 
 package io.github.lbarnkow.jarb;
 
-import static io.github.lbarnkow.jarb.misc.ChronologicalMessageComparator.CHRONOLOGICAL_MESSAGE_COMPARATOR;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.lbarnkow.jarb.api.AuthInfo;
 import io.github.lbarnkow.jarb.api.Bot;
@@ -28,6 +26,7 @@ import io.github.lbarnkow.jarb.api.MessageType;
 import io.github.lbarnkow.jarb.api.Room;
 import io.github.lbarnkow.jarb.api.RoomType;
 import io.github.lbarnkow.jarb.api.User;
+import io.github.lbarnkow.jarb.misc.ChronologicalMessageComparator;
 import io.github.lbarnkow.jarb.rocketchat.RealtimeClient;
 import io.github.lbarnkow.jarb.rocketchat.RestClient;
 import io.github.lbarnkow.jarb.rocketchat.realtime.ReplyErrorException;
@@ -173,7 +172,7 @@ public class RoomProcessor {
       result.add(message);
     }
 
-    Collections.sort(result, CHRONOLOGICAL_MESSAGE_COMPARATOR);
+    Collections.sort(result, ChronologicalMessageComparator.INSTANCE);
     return result;
   }
 }

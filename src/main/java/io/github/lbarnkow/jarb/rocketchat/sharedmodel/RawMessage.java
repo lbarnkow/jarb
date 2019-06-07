@@ -48,6 +48,7 @@ public class RawMessage {
    * The message id.
    */
   @JsonProperty("_id")
+  @SuppressWarnings("PMD.ShortVariable")
   private String id;
 
   /**
@@ -63,6 +64,7 @@ public class RawMessage {
   /**
    * The message time stamp (date of creation on client).
    */
+  @SuppressWarnings("PMD.ShortVariable")
   private String ts;
 
   /**
@@ -136,7 +138,7 @@ public class RawMessage {
         .id(id) //
         .room(room) //
         .text(msg) //
-        .timestamp(ts != null ? Instant.parse(ts) : null) //
+        .timestamp(ts == null ? null : Instant.parse(ts)) //
         .user(user.convert()) //
         .attachments(RawAttachment.convertList(attachments)) //
         .type(MessageType.parse(type)) //
@@ -147,17 +149,18 @@ public class RawMessage {
    * Converts a <code>Message</code> instance to a <code>RawMessage</code>
    * instance.
    *
-   * @param m the <code>Message</code> instance to convert
+   * @param message the <code>Message</code> instance to convert
    * @return the resulting <code>RawMessage</code>
    */
-  public static RawMessage of(final Message m) {
+  @SuppressWarnings("PMD.ShortMethodName")
+  public static RawMessage of(final Message message) {
     return RawMessage.builder() //
-        .id(m.getId()) //
-        .rid(m.getRoom().getId()) //
-        .msg(m.getText()) //
-        .ts(m.getTimestamp() != null ? m.getTimestamp().toString() : null) //
-        .user(m.getUser() != null ? RawUser.of(m.getUser()) : null) //
-        .attachments(RawAttachment.of(m.getAttachments())) //
+        .id(message.getId()) //
+        .rid(message.getRoom().getId()) //
+        .msg(message.getText()) //
+        .ts(message.getTimestamp() == null ? null : message.getTimestamp().toString()) //
+        .user(message.getUser() == null ? null : RawUser.of(message.getUser())) //
+        .attachments(RawAttachment.of(message.getAttachments())) //
         .build();
   }
 }

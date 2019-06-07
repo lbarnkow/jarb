@@ -43,6 +43,7 @@ public class RawUser {
    * Your username or email.
    */
   @JsonProperty("_id")
+  @SuppressWarnings("PMD.ShortVariable")
   private String id;
 
   /**
@@ -65,13 +66,14 @@ public class RawUser {
   /**
    * Converts an <code>User</code> instance to a <code>RawUser</code> instance.
    *
-   * @param u the <code>User</code> instance to convert
+   * @param user the <code>User</code> instance to convert
    * @return the resulting <code>RawUser</code>
    */
-  public static RawUser of(final User u) {
+  @SuppressWarnings("PMD.ShortMethodName")
+  public static RawUser of(final User user) {
     return RawUser.builder() //
-        .id(u.getId()) //
-        .username(u.getName()) //
+        .id(user.getId()) //
+        .username(user.getName()) //
         .build();
   }
 }

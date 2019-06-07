@@ -30,11 +30,11 @@ public class ChronologicalMessageComparator implements Comparator<Message> {
   /**
    * Static thread-safe instance of this comparator.
    */
-  public static final ChronologicalMessageComparator CHRONOLOGICAL_MESSAGE_COMPARATOR =
+  public static final ChronologicalMessageComparator INSTANCE =
       new ChronologicalMessageComparator();
 
   @Override
-  public int compare(final Message o1, final Message o2) {
-    return o1.getTimestamp().compareTo(o2.getTimestamp());
+  public int compare(final Message message1, final Message message2) {
+    return message1.getTimestamp().compareTo(message2.getTimestamp());
   }
 }

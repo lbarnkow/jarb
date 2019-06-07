@@ -79,15 +79,15 @@ public class TaskManager {
    * task lifecycle.
    *
    * @param callback               a function to call upon each tasks termination
-   * @param disableManagementTasks allows to disable managements tasks, for
+   * @param disableMgmtTasks allows to disable managements tasks, for
    *                               example automatically pruning DEAD tasks
    * @param tasks                  the tasks to run and track
    */
   @Synchronized
   public void start(final Optional<TaskEndedCallback> callback,
-      final boolean disableManagementTasks, final Task... tasks) {
+      final boolean disableMgmtTasks, final Task... tasks) {
     if (!started) {
-      if (!disableManagementTasks) {
+      if (!disableMgmtTasks) {
         startTasks(callback, managementTasks);
       }
       started = true;

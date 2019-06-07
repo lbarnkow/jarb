@@ -29,8 +29,7 @@ class ChronologicalMessageComparatorTest {
 
   private Message past = Message.builder().timestamp(Instant.now().minus(1, DAYS)).build();
   private Message future = Message.builder().timestamp(Instant.now().plus(1, DAYS)).build();
-  private ChronologicalMessageComparator comparator =
-      ChronologicalMessageComparator.CHRONOLOGICAL_MESSAGE_COMPARATOR;
+  private ChronologicalMessageComparator comparator = ChronologicalMessageComparator.INSTANCE;
 
   @Test
   void testComparePastAndFuture() {

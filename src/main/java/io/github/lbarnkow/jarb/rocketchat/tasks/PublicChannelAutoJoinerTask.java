@@ -55,7 +55,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
    * The default interval in which a the chat server should be queried for new
    * rooms.
    */
-  public static final long DEFAULT_SLEEP_TIME = 1000L * 15L; // 15 seconds
+  public static final long SLEEP_TIME = 1000L * 15L; // 15 seconds
 
   /**
    * Externally supplied <code>RestClient</code> to use to query the chat server.
@@ -90,8 +90,9 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
    * @param authInfo       authorization token for the <code>RestClient</code>
    * @param sleepTime      the interval between each query
    */
-  PublicChannelAutoJoinerTask(final RestClient restClient, final RealtimeClient realtimeClient,
-      final Bot bot, final Holder<AuthInfo> authInfo, final long sleepTime) {
+  /* default */ PublicChannelAutoJoinerTask(final RestClient restClient,
+      final RealtimeClient realtimeClient, final Bot bot, final Holder<AuthInfo> authInfo,
+      final long sleepTime) {
     super(bot);
 
     this.restClient = restClient;
@@ -111,7 +112,7 @@ public class PublicChannelAutoJoinerTask extends AbstractBotSpecificTask {
    */
   public PublicChannelAutoJoinerTask(final RestClient restClient,
       final RealtimeClient realtimeClient, final Bot bot, final Holder<AuthInfo> authInfo) {
-    this(restClient, realtimeClient, bot, authInfo, DEFAULT_SLEEP_TIME);
+    this(restClient, realtimeClient, bot, authInfo, SLEEP_TIME);
   }
 
   @Override

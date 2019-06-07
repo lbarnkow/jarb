@@ -43,7 +43,7 @@ public class LoginTask extends AbstractBotSpecificTask {
    * The default interval in which a new authorization token should be acquired by
    * logging in to the chat server.
    */
-  private static final long MAX_TOKEN_REFRESH_INTERVAL = Duration.ofMinutes(60L).toMillis();
+  private static final long TOKEN_REFRESH_MS = Duration.ofMinutes(60L).toMillis();
 
   /**
    * Externally supplied and pre-configured <code>RealtimeClient</code> to use to
@@ -126,9 +126,7 @@ public class LoginTask extends AbstractBotSpecificTask {
 
   private long calculateSleepTime(final AuthInfo authInfo) {
     final Duration diff = Duration.between(Instant.now(), authInfo.getExpires());
-    final long sleepTime = Math.min((diff.toMillis() / 2L), MAX_TOKEN_REFRESH_INTERVAL);
-
-    return sleepTime;
+    return Math.min(diff.toMillis() / 2L, TOKEN_REFRESH_MS);
   }
 
   /**
@@ -137,7 +135,7 @@ public class LoginTask extends AbstractBotSpecificTask {
    *
    * @author lbarnkow
    */
-  public static interface LoginTaskListener {
+  public interface LoginTaskListener {
     /**
      * Called on every successful login to pass along the new authorization token.
      *

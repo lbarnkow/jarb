@@ -64,7 +64,7 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
 
     // then
     final List<String> ids =
-        Arrays.asList(candidates).stream().map((e) -> e.getId()).collect(Collectors.toList());
+        Arrays.asList(candidates).stream().map((e) -> e.getUuid()).collect(Collectors.toList());
     final Set<String> uniqueIds = new HashSet<>(ids);
     assertThat(ids).hasSize(numCandidates);
     assertThat(uniqueIds).hasSize(numCandidates);
@@ -185,7 +185,7 @@ class ElectionCandidateTest implements ElectionCandidateListener, TaskEndedCallb
     final ElectionCandidate candidate = new ElectionCandidate().configure(this, null);
     candidate.state.set(LEADER);
     assertThat(candidate.isLeader()).isTrue();
-    final ElectionLease lease = new ElectionLease(candidate.getId(), 50L, 100L);
+    final ElectionLease lease = new ElectionLease(candidate.getUuid(), 50L, 100L);
 
     // when
     candidate.handleExpiredLeaseFile(lease);

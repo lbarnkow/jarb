@@ -24,6 +24,7 @@ import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEACTIVATING;
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.UNUSED;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 import io.github.lbarnkow.jarb.taskmanager.Task;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
@@ -51,7 +52,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
    * The default interval in which a table of the running tasks should be written
    * to the log.
    */
-  private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
+  private static final long TASK_INTERVAL_MS = 1000L * 60L * 5L; // repeat TASK every 5 minutes
 
   /**
    * Externally supplied <code>TaskManager</code> to query about the running
@@ -72,7 +73,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
    * @param manager the <code>TaskManager</code>
    */
   public TaskTableLoggerTask(final TaskManager manager) {
-    this(manager, TASK_INTERVAL_MSEC);
+    this(manager, TASK_INTERVAL_MS);
   }
 
   @Override
@@ -97,6 +98,7 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
     }
   }
 
+  @VisibleForTesting
   TaskStates countTasks() {
     final TaskStates result = new TaskStates();
 
@@ -125,29 +127,34 @@ public class TaskTableLoggerTask extends AbstractBaseTask {
    *
    * @author lbarnkow
    */
-  static class TaskStates {
+  public static class TaskStates {
     /**
      * The amount of tasks in state 'UNUSED'.
      */
-    transient int unused;
+    public transient int unused;
     /**
      * The amount of tasks in state 'ACTIVATING'.
      */
-    transient int activating;
+    public transient int activating;
     /**
      * The amount of tasks in state 'ACTIVE'.
      */
-    transient int active;
+    public transient int active;
     /**
      * The amount of tasks in state 'DEACTIVATING'.
      */
-    transient int deactivating;
+    public transient int deactivating;
     /**
      * The amount of tasks in state 'DEAD'.
      */
-    transient int dead;
+    public transient int dead;
 
-    int getTotal() {
+    /**
+     * Returns the number of tasks across all task states.
+     * 
+     * @return the number of tasks across all task states.
+     */
+    public int getTotal() {
       return unused + activating + active + deactivating + dead;
     }
   }

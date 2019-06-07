@@ -20,6 +20,7 @@ package io.github.lbarnkow.jarb.taskmanager.managementtasks;
 
 import static io.github.lbarnkow.jarb.taskmanager.TaskState.DEAD;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 import io.github.lbarnkow.jarb.taskmanager.Task;
 import io.github.lbarnkow.jarb.taskmanager.TaskManager;
@@ -40,7 +41,7 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
   /**
    * The default interval in which dead tasks should be pruned.
    */
-  private static final long TASK_INTERVAL_MSEC = 1000L * 60L * 5L; // repeat TASK every 5 minutes
+  private static final long TASK_INTERVAL_MS = 1000L * 60L * 5L; // repeat TASK every 5 minutes
 
   /**
    * Externally supplied <code>TaskManager</code> to find and prune dead tasks
@@ -60,7 +61,7 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
    * @param manager the <code>TaskManager</code>
    */
   public DeadTaskPrunerTask(final TaskManager manager) {
-    this(manager, TASK_INTERVAL_MSEC);
+    this(manager, TASK_INTERVAL_MS);
   }
 
   @Override
@@ -76,6 +77,7 @@ public class DeadTaskPrunerTask extends AbstractBaseTask {
     }
   }
 
+  @VisibleForTesting
   int pruneTasks() {
     int pruned = 0;
 

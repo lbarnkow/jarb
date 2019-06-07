@@ -22,11 +22,13 @@ import static io.github.lbarnkow.jarb.election.ElectionCandidateState.INACTIVE;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.LEADER;
 import static io.github.lbarnkow.jarb.election.ElectionCandidateState.RUNNING_FOR_ELECTION;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.github.lbarnkow.jarb.taskmanager.AbstractBaseTask;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -45,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @SuppressWarnings("PMD.TooManyMethods")
+@NoArgsConstructor
 public class ElectionCandidate extends AbstractBaseTask {
 
   /**
@@ -58,13 +61,13 @@ public class ElectionCandidate extends AbstractBaseTask {
   /**
    * Random unique id of this <code>ElectionCandidate</code>.
    */
-  private final transient String id = UUID.randomUUID().toString();
+  private final transient String uuid = UUID.randomUUID().toString();
 
   /**
    * The current <code>ElectionCandidateState</code> of this candidate.
    */
-  transient AtomicReference<ElectionCandidateState> state =
-      new AtomicReference<ElectionCandidateState>(null);
+  @VisibleForTesting
+  transient AtomicReference<ElectionCandidateState> state = new AtomicReference<>(null);
 
   /**
    * A listener to inform on changes of state changes for this candidate.
@@ -107,8 +110,8 @@ public class ElectionCandidate extends AbstractBaseTask {
    *
    * @return the unique id
    */
-  public String getId() {
-    return id;
+  public String getUuid() {
+    return uuid;
   }
 
   @Override
@@ -157,6 +160,7 @@ public class ElectionCandidate extends AbstractBaseTask {
     return lease;
   }
 
+  @VisibleForTesting
   void writeLeaseFile(final ElectionLease lease) throws IOException {
     try {
       ElectionLease.save(lease, config.getSyncFile());
@@ -177,21 +181,21 @@ public class ElectionCandidate extends AbstractBaseTask {
 
   private void challengeLease(final ElectionLease leaseFile) throws IOException {
     if (leaseFile == null || leaseFile.isExpired()) {
-      final ElectionLease newLease = new ElectionLease(this, config.getLeaseTimeToLive());
+      final ElectionLease newLease = new ElectionLease(this, config.getLeaseTtl());
       writeLeaseFile(newLease);
 
-      log.info("Running for election w/ id '{}'", id);
+      log.info("Running for election w/ id '{}'", uuid);
 
       updateState(RUNNING_FOR_ELECTION);
     }
   }
 
   private ElectionLease refreshLease(final ElectionLease oldLease) throws IOException {
-    final ElectionLease newLease = new ElectionLease(oldLease, config.getLeaseTimeToLive());
+    final ElectionLease newLease = new ElectionLease(oldLease, config.getLeaseTtl());
     writeLeaseFile(newLease);
 
     if (state.get() == RUNNING_FOR_ELECTION) {
-      log.info("Won election w/ id '{}'! Promoted to state '{}'!", id, LEADER);
+      log.info("Won election w/ id '{}'! Promoted to state '{}'!", uuid, LEADER);
     }
     updateState(LEADER);
 
@@ -214,14 +218,15 @@ public class ElectionCandidate extends AbstractBaseTask {
 
     final ElectionCandidateState state = this.state.get();
     if (state == LEADER || state == RUNNING_FOR_ELECTION) {
-      sleepTime += config.getLeaseRefreshInterval();
+      sleepTime += config.getLeaseRefreshMs();
     } else {
-      sleepTime += config.getLeaseChallengeInterval();
+      sleepTime += config.getLeaseRetryMs();
     }
 
     Thread.sleep(sleepTime);
   }
 
+  @VisibleForTesting
   void handleMissingLeaseFile(final ElectionLease leaseFile) {
     if (leaseFile != null) {
       return;
@@ -236,6 +241,7 @@ public class ElectionCandidate extends AbstractBaseTask {
     updateState(INACTIVE);
   }
 
+  @VisibleForTesting
   void handleStolenLeaseFile(final ElectionLease leaseFile) {
     if (leaseFile == null) {
       return;
@@ -260,6 +266,7 @@ public class ElectionCandidate extends AbstractBaseTask {
     updateState(INACTIVE);
   }
 
+  @VisibleForTesting
   void handleExpiredLeaseFile(final ElectionLease leaseFile) {
     if (leaseFile == null) {
       return;

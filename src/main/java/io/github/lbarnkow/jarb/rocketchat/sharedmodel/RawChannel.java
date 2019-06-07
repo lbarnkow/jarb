@@ -42,6 +42,7 @@ public class RawChannel {
    * The channel id.
    */
   @JsonProperty("_id")
+  @SuppressWarnings("PMD.ShortVariable")
   private String id;
 
   /**
@@ -71,6 +72,7 @@ public class RawChannel {
    * @param room the <code>Room</code> instance to convert
    * @return the resulting <code>RawChannel</code>
    */
+  @SuppressWarnings("PMD.ShortMethodName")
   public static RawChannel of(final Room room) {
     final RawChannel channel = new RawChannel();
     channel.id = room.getId();

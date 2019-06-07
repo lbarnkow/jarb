@@ -20,7 +20,7 @@ package io.github.lbarnkow.jarb.rocketchat.tasks;
 
 import static com.google.common.truth.Truth.assertThat;
 import static io.github.lbarnkow.jarb.api.RoomType.PUBLIC_CHANNEL;
-import static io.github.lbarnkow.jarb.rocketchat.tasks.PublicChannelAutoJoinerTask.DEFAULT_SLEEP_TIME;
+import static io.github.lbarnkow.jarb.rocketchat.tasks.PublicChannelAutoJoinerTask.SLEEP_TIME;
 import static java.util.UUID.randomUUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -111,7 +111,7 @@ class PublicChannelAutoJoinerTaskTest {
     PublicChannelAutoJoinerTask task = new PublicChannelAutoJoinerTask(null, null, bot, null);
 
     // then
-    assertThat(task.getSleepTime()).isEqualTo(DEFAULT_SLEEP_TIME);
+    assertThat(task.getSleepTime()).isEqualTo(SLEEP_TIME);
   }
 
   private List<RawChannel> createChannelData(int numChannels) {

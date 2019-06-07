@@ -10,6 +10,16 @@
     </description>
 
     <rule ref="category/java/errorprone.xml">
+        <!-- exclude controversial rules -->
+        <exclude name="AssignmentInOperand"/>
+        <exclude name="AvoidAccessibilityAlteration"/>
+        <exclude name="AvoidLiteralsInIfCondition"/>
+        <exclude name="DataflowAnomalyAnalysis"/>
+        <exclude name="DoNotCallGarbageCollectionExplicitly"/>
+        <exclude name="DontImportSun"/>
+        <exclude name="NullAssignment"/>
+        <exclude name="SuspiciousOctalEscape"/>
+
         <!-- DataflowAnomalyAnalysis - (Currently) outdated rule that produces lots of false-positives. -->
         <!-- see https://github.com/pmd/pmd/issues/1304#issuecomment-412925368 -->
         <exclude name="DataflowAnomalyAnalysis"/>

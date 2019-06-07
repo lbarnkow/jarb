@@ -41,11 +41,13 @@ public class RawSubscription {
   /**
    * Timestamp the room was created at, so this should equal the room’s ts field.
    */
+  @SuppressWarnings("PMD.ShortVariable")
   private RawDate ts;
 
   /**
    * Last seen timestamp (The last time the user has seen a message in the room).
    */
+  @SuppressWarnings("PMD.ShortVariable")
   private RawDate ls;
 
   /**
@@ -94,5 +96,6 @@ public class RawSubscription {
    * The subscription id.
    */
   @JsonProperty("_id")
+  @SuppressWarnings("PMD.ShortVariable")
   private String id;
 }

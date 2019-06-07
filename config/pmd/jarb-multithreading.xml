@@ -10,6 +10,10 @@
     </description>
 
     <rule ref="category/java/multithreading.xml">
+        <!-- exclude controversial rules -->
+        <exclude name="AvoidUsingVolatile"/>
+        <exclude name="UseConcurrentHashMap"/>
+
         <!-- DoNotUseThreads - jarb isn't a J2EE application! -->
         <exclude name="DoNotUseThreads"/>
     </rule>

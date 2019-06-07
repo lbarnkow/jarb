@@ -10,6 +10,7 @@
     </description>
 
     <rule ref="category/java/bestpractices.xml">
-        <!-- <exclude name="RuleClassNameToExclude"/> -->
+        <!-- exclude controversial rules -->
+        <exclude name="OneDeclarationPerLine"/>
     </rule>
 </ruleset>

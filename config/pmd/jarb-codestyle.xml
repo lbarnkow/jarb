@@ -10,6 +10,16 @@
     </description>
 
     <rule ref="category/java/codestyle.xml">
+        <!-- exclude controversial rules -->
+        <exclude name="AtLeastOneConstructor"/>
+        <exclude name="AvoidFinalLocalVariable"/>
+        <exclude name="AvoidPrefixingMethodParameters"/>
+        <exclude name="AvoidUsingNativeCode"/>
+        <exclude name="CallSuperInConstructor"/>
+        <exclude name="DefaultPackage"/>
+        <exclude name="OnlyOneReturn"/>
+        <exclude name="UnnecessaryConstructor"/>
+
         <!-- ExcessiveImports - Rule is included and configured below. -->
         <exclude name="TooManyStaticImports"/>
     </rule>
